@@ -136,6 +136,11 @@ a.kg{text-decoration:underline 1px dotted;text-underline-offset:3px}
 .ctrl select,.ctrl input{min-height:40px;border:1px solid var(--line);border-radius:8px;padding:0 10px;background:var(--panel)}
 .chart{width:100%;overflow-x:auto}
 .chart svg{display:block;max-width:100%;height:auto}
+.ctrl select,.ctrl input{max-width:100%}
+@media (max-width:640px){.chart>svg[viewBox^="0 0 880"]{min-width:640px;max-width:none}.chart>svg[viewBox^="-4"],.chart>div>svg[viewBox^="-4"]{min-width:600px;max-width:none}
+.chart:has(>svg[viewBox^="0 0 880"])::after,.chart:has(>svg[viewBox^="-4"])::after,.chart:has(>div>svg[viewBox^="-4"])::after{content:"← 左右滑動看完整圖表 →";display:block;position:sticky;left:0;width:calc(100vw - 64px);text-align:center;font-size:12px;color:var(--muted);padding:4px 0}}
+table.dt th .thb{all:unset;cursor:pointer;display:inline}
+table.dt th .thb:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
 .chart text,.doc svg text{fill:var(--ink);font-size:12px}
 .chart .mut,.doc svg .mut{fill:var(--muted)}
 .chart .gl,.doc svg .gl{stroke:var(--grid);stroke-width:1}
@@ -257,6 +262,7 @@ function route() {
   try { h = decodeURIComponent(h); } catch (_) {}  // 網址含不合法的 % 時不要整頁空白
   const [id, sub] = h.split('/');
   $('#bnav').classList.remove('on');
+  if (id !== 'budget') teardown();
   if (id === 'kmgbf') openKmgbf(sub); else if (id === 'budget') openBudget(h.split('/').slice(1)); else openDoc(id, sub);
 }
 const toPage = p => { const e = p && document.getElementById('pg-' + p); if (e) e.scrollIntoView(); };
@@ -355,8 +361,21 @@ function tipOn(node, f) {
   node.addEventListener('pointerleave', hideVtip);
   node.addEventListener('focus', () => { const r = node.getBoundingClientRect(); showVtip(r.left + r.width / 2, r.top, ...f()); });
   node.addEventListener('blur', hideVtip);
+  if (!node.getAttribute('role')) node.setAttribute('role', 'img');
+  try { node.setAttribute('aria-label', f().filter(x => x != null && x !== '').join('，')); } catch (_) {}
   return node;
 }
+// 可點的 SVG 元素：滑鼠點擊之外，Enter／空白鍵也能觸發
+function clickable(node, fn) {
+  node.setAttribute('tabindex', '0'); node.setAttribute('role', 'button');
+  node.addEventListener('click', fn);
+  node.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(e); } });
+  return node;
+}
+// 預算頁重繪或離開時要釋放的資源（Leaflet 地圖、觀察器、全域監聽器）
+const TEARDOWN = [];
+const teardown = () => { for (const f of TEARDOWN.splice(0)) try { f(); } catch (_) {} };
+let partyShow = null;  // 查詢卡在畫面上時，點地圖只換查詢卡內容，不整頁重繪
 function legend(items) {
   return el('div', {class: 'legend', 'aria-hidden': 'true'}, ...items.map(([c, l]) => el('span', {}, el('i', {style: 'background:' + c}), l)));
 }
@@ -369,7 +388,7 @@ function csvDl(B, items) {
     else if (p.startsWith('doc:')) (B.csv[p.slice(4)] || []).forEach((c, k, a) => links.push(['csv/' + c, label + (a.length > 1 ? ' ' + (k + 1) : '')]));
   }
   links.forEach(([href, label], k) => out.append(k ? '、' : '', el('a', {href, download: ''}, label)));
-  return links.length ? out : null;
+  return links.length ? out : '';
 }
 function srcLine(B, parts) {
   // parts: [[docId, page, sym], …]；有 CSV 的頁面加下載連結
@@ -389,6 +408,7 @@ function openBudget(parts) {
   S.id = null; renderList();
   document.body.classList.add('reading');
   $('#knav').classList.remove('on'); $('#bnav').classList.add('on');
+  if (window.BUDGET && partyShow && parts?.[0] === 'party' && document.getElementById('party-card')) { partyShow(parts[1] || ''); document.getElementById('party-card').scrollIntoView(); return; }
   const go = () => { renderBudget(parts || []); };
   if (window.BUDGET) return go();
   $('#main').replaceChildren(el('div', {class: 'empty'}, '載入中…'));
@@ -398,11 +418,13 @@ function openBudget(parts) {
 }
 
 function renderBudget(parts) {
+  teardown();
   const B = window.BUDGET, box = el('div', {class: 'doc'});
-  const F = Object.fromEntries(B.funds.map(f => [f.key, f]));
+  const F = Object.fromEntries((B.funds || []).map(f => [f.key, f]));
+  const t1 = B.table1, totRow = t1?.rows.find(r => r.en === 'Total');
+  if (!F.COP || !F.CP || !F.NP || !totRow) { $('#main').replaceChildren(el('div', {class: 'empty'}, '預算資料不完整（缺少某個基金的分攤表或表 1），請重新產生 data/budget.js。')); return; }
   const cop = F.COP, sumNet = k => B.funds.reduce((s, f) => s + (f.net[k] || 0), 0);
-  const prevTotal = (B.years['2025']?.total || 0) + (B.years['2026']?.total || 0);
-  const t1 = B.table1, totRow = t1.rows.find(r => r.en === 'Total');
+  const prevTotal = (B.years?.['2025']?.total || 0) + (B.years?.['2026']?.total || 0);
   const staffNow = B.staff?.rows.find(r => r[0] === 'Total');
   box.append(el('div', {class: 'dhead'},
       el('div', {class: 'label'}, 'COP 17／CP-MOP 12／NP-MOP 6 預算文件（L 文件，尚未定案；公約文件的預算表仍在方括號內）'),
@@ -414,13 +436,13 @@ function renderBudget(parts) {
   const kpiCsv = csvDl(B, [['doc:' + t1.id + ':' + t1.page, 'CBD/COP/17/L.31/Rev.1 表 1'], ...B.funds.filter(f => f.key !== 'COP').map(f => ['doc:' + f.id + ':' + f.pages.t1, f.sym + ' 表 1'])]);
   box.append(el('div', {class: 'kpis'},
     el('div', {class: 'kpi'}, el('div', {class: 'l'}, '2027–2028 整合核心預算'), el('div', {class: 'v'}, nf(totRow.v[2])), el('div', {class: 'd'},
-      '千美元（' + twd(totRow.v[2] * 1000) + '）；2025–2026 為 ' + nf(prevTotal) + '（' + ((totRow.v[2] / prevTotal - 1) * 100 >= 0 ? '+' : '') + nf((totRow.v[2] / prevTotal - 1) * 100) + '%）')),
+      '千美元（' + twd(totRow.v[2] * 1000) + '）' + (prevTotal ? '；2025–2026 為 ' + nf(prevTotal) + '（' + ((totRow.v[2] / prevTotal - 1) * 100 >= 0 ? '+' : '') + nf((totRow.v[2] / prevTotal - 1) * 100) + '%）' : ''))),
     el('div', {class: 'kpi'}, el('div', {class: 'l'}, '締約方應分攤淨額（三基金，2027–2028）'), el('div', {class: 'v'}, nf(sumNet(2))), el('div', {class: 'd'}, '千美元（' + twd(sumNet(2) * 1000) + '）；扣除地主國捐助與動用準備金後')),
     el('div', {class: 'kpi'}, el('div', {class: 'l'}, '公約一般信託基金分攤國數'), el('div', {class: 'v'}, String(cop.contrib.rows.length)), el('div', {class: 'd'},
       'CP ' + F.CP.contrib.rows.length + '、NP ' + F.NP.contrib.rows.length + '（含歐盟）')),
     staffNow ? el('div', {class: 'kpi'}, el('div', {class: 'l'}, '秘書處核心預算員額'), el('div', {class: 'v'}, String(staffNow[2])), el('div', {class: 'd'}, '2025–2026 核定 ' + staffNow[1] + ' 個')) : null));
   if (kpiCsv) box.append(kpiCsv);
-  box.append(...[sankeyCard(B), rankCard(B), mapCard(B), trendCard(B), B.kmgbf ? kmgbfCard(B) : null, B.kmgbf ? yerevanCard(B) : null, partyCard(B, parts), tableCard(B), footer()].filter(Boolean));
+  box.append(...[sankeyCard(B), rankCard(B), mapCard(B), trendCard(B), B.kmgbf ? kmgbfCard(B) : null, B.kmgbf && B.years?.['2027'] ? yerevanCard(B) : null, partyCard(B, parts), tableCard(B), footer()].filter(Boolean));
   $('#main').replaceChildren(box);
   if (parts[0] === 'party') document.getElementById('party-card')?.scrollIntoView();
   else $('#main').scrollTop = 0;
@@ -445,7 +467,7 @@ function introCard(B, F) {
     el('h3', {style: 'margin-top:16px'}, '本屆相關決議草案'),
     el('p', {class: 'label'}, 'COP 17、CP-MOP 12、NP-MOP 6 於 2026 年 10 月 19–30 日在葉里溫合併舉行。以下三份是預算議題的會中決議草案（L 文件）：公約那份的預算金額與表 1–3 在方括號內；兩項議定書的金額沒有加方括號，但註腳說明待表 1 預算表通過後依最終表修正。'),
     el('ul', {style: 'margin:4px 0 0 18px;padding:0;line-height:1.7'},
-      el('li', {}, el('a', {href: '#' + F.COP.id}, F.COP.sym), '（公約行政管理、信託基金預算及秘書處功能審查）：採用 2027–2028 整合工作計畫與預算；核心信託基金 2027、2028 年金額待定；擬動用未支出餘額抵減分攤（金額在方括號內）；請執行秘書持續落實秘書處外部深度功能審查中與核心功能相關的建議；欠繳分攤兩年以上的締約方（低度開發國家與小島嶼開發中國家除外）不得擔任主席團或附屬機構成員；動用 20 萬美元（' + twd(200000) + '）支應數位序列資訊（DSI）閉會期間工作的段落整段仍在方括號內。'),
+      el('li', {}, el('a', {href: '#' + F.COP.id}, F.COP.sym), '（公約行政管理、信託基金預算及秘書處功能審查）：採用 2027–2028 整合工作計畫與預算；核心信託基金 2027、2028 年金額待定；擬動用未支出餘額抵減分攤（金額在方括號內）；請執行秘書持續落實秘書處外部深度功能審查中與核心功能相關的建議；欠繳分攤兩年以上的締約方（低度開發國家與小島嶼開發中國家除外）不得擔任締約方大會、議定書締約方會議或科學、技術和工藝諮詢附屬機構的主席團成員，也不得提名遵約委員會成員；動用 20 萬美元（' + twd(200000) + '）支應數位序列資訊（DSI）閉會期間工作的段落整段仍在方括號內。'),
       el('li', {}, el('a', {href: '#' + F.CP.id}, F.CP.sym), '（卡塔赫納議定書行政管理、信託基金預算及秘書處功能審查）：採用同一份整合預算與 72：15：13 分攤；核定議定書核心信託基金 2027 年 ' + usd(3181871) + '、2028 年 ' + usd(3691006) + '，即整合預算的 15%（金額待預算表通過後依最終表修正）；附件分攤表待公約與議定書統一的分攤比例表通過後才納入決定。'),
       el('li', {}, el('a', {href: '#' + F.NP.id}, F.NP.sym), '（名古屋議定書行政管理與信託基金預算）：同上，核定名古屋議定書一般信託基金 2027 年 ' + usd(2757622) + '、2028 年 ' + usd(3198872) + '，即整合預算的 13%（金額待預算表通過後依最終表修正）；附件分攤表同樣待統一分攤比例表通過後納入。')),
     el('p', {class: 'label'}, '決議草案的白話摘要與逐段中英對照，請點文件代碼。'));
@@ -476,7 +498,6 @@ function groupSums(rows, k) {
 }
 function flowT1(B, k) {
   const nodes = [], links = [], GZn = GZ();
-  const host = B.funds.reduce((s, f) => s - (f.host[k] || 0), 0), res = B.funds.reduce((s, f) => s - (f.reserve[k] || 0), 0);
   B.funds.forEach(f => nodes.push({id: 'p' + f.key, col: 0, label: '締約方・' + f.zh, color: FC[f.key]}));
   nodes.push({id: 'host', col: 0, label: '地主國捐助', color: 'var(--muted-fill)'}, {id: 'res', col: 0, label: '動用準備金', color: 'var(--muted-fill)'});
   B.funds.forEach(f => {
@@ -525,7 +546,7 @@ function sankey(nodes, links) {
     let y = (H - tot) / 2;
     c.forEach(n => { n.x = colX(ci); n.y = y; n.h = Math.max(n.in, n.out) * scale; n.oy = y; n.iy = y; y += n.h + gap; });
   });
-  const svg = sv('svg', {viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': '資金流向圖'});
+  const svg = sv('svg', {viewBox: `0 0 ${W} ${H}`, role: 'group', 'aria-label': '資金流向圖'});
   for (const l of links) {
     const a = N[l.s], b = N[l.t], h = l.v * scale, xa = a.x + nw, xb = b.x, xm = (xa + xb) / 2;
     const ya = a.oy, yb = b.iy; a.oy += h; b.iy += h;
@@ -588,7 +609,7 @@ function hbars(all, tot, color, n) {
   const rows = all.slice(0, n), rest = all.slice(n).reduce((s, r) => s + r.v, 0);
   if (rest > 0) rows.push({zh: '其他 ' + (all.length - n) + ' 個締約方', v: rest, other: true});
   const W = 880, rh = 24, lw = 190, H = rows.length * rh + 24, max = Math.max(...rows.map(r => r.v)), x = v => lw + (W - lw - 300) * v / max;
-  const svg = sv('svg', {viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': '締約方分攤額長條圖'});
+  const svg = sv('svg', {viewBox: `0 0 ${W} ${H}`, role: 'group', 'aria-label': '締約方分攤額長條圖'});
   rows.forEach((r, i) => {
     const y = 8 + i * rh;
     const b = sv('rect', {x: lw, y: y + 3, width: Math.max(2, x(r.v) - lw), height: rh - 8, rx: 4, fill: r.other ? 'var(--muted-fill)' : color});
@@ -603,7 +624,7 @@ function treemap(all, tot, color, n) {
   const items = all.slice(0, n).map(r => ({...r}));
   const rest = all.slice(n).reduce((s, r) => s + r.v, 0);
   if (rest > 0) items.push({zh: '其他', v: rest, other: true});
-  const W = 880, H = 420, svg = sv('svg', {viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': '締約方分攤額樹狀圖'});
+  const W = 880, H = 420, svg = sv('svg', {viewBox: `0 0 ${W} ${H}`, role: 'group', 'aria-label': '締約方分攤額樹狀圖'});
   // squarified treemap
   const area = items.map(r => r.v / tot * W * H);
   let x = 0, y = 0, w = W, h = H, i = 0;
@@ -622,7 +643,7 @@ function treemap(all, tot, color, n) {
       const rect = sv('rect', {x: rx + 1, y: ry + 1, width: Math.max(0, rw - 2), height: Math.max(0, rh2 - 2), rx: 3, fill: r.other ? 'var(--muted-fill)' : color, 'fill-opacity': op});
       tipOn(rect, () => [usd(r.v), r.zh, '占 ' + nf(r.v / tot * 100, 2) + '%']);
       svg.append(rect);
-      if (rw > 60 && rh2 > 30) svg.append(sv('text', {x: rx + 6, y: ry + 16, style: 'fill:var(--panel);font-weight:600'}, r.zh),
+      if (rw > 60 && rh2 > 30) svg.append(sv('text', {x: rx + 6, y: ry + 16, style: 'fill:var(--panel);font-weight:600'}, fitText(r.zh, rw - 12, 12)),
         sv('text', {x: rx + 6, y: ry + 30, style: 'fill:var(--panel)'}, nf(r.v / tot * 100, 1) + '%'));
     }
     if (w >= h) { x += thick; w -= thick; } else { y += thick; h -= thick; }
@@ -665,7 +686,7 @@ function shareExplain(fs) {
       el('li', {}, f.zh + '分攤表的締約方，聯合國分攤比例合計 ' + nf(un, 3) + '%' + (rows.some(r => /United States of America/.test(r.en)) ? '' : '（美國不是締約方）') + '，需換算成 100%。'),
       fixed.length ? el('li', {}, fixed.map(r => (r.zh || r.en) + '沒有聯合國分攤比例，固定為 ' + nf(r.v[1], 1) + '%').join('；') + '。') : null,
       top.length ? el('li', {}, top.map(r => r.zh || r.en).join('、') + '換算後會超過 22%，以 22% 為上限。') : null,
-      ldc.length ? el('li', {}, ldc.length + ' 個低度開發國家換算後會超過 0.01%，壓在 0.01%。') : null,
+      ldc.length ? el('li', {}, '原表中有 ' + ldc.length + ' 個低度開發國家換算後會超過 0.01%，分攤額壓在 0.01%。') : null,
       k ? el('li', {}, '其餘締約方依聯合國比例等比例放大約 ' + nf(k, 3) + ' 倍，使合計為 100%' + (ex ? '；例如' + (ex.zh || ex.en) + ' ' + nf(ex.v[0], 3) + '% → ' + nf(ex.v[1], 3) + '%' : '') + '。') : null,
       el('li', {}, '各締約方分攤額 = 調整後比例 × 該年應分攤總額（2027 年 ' + usd(T) + '）。'));
   };
@@ -681,19 +702,19 @@ function mapCard(B) {
   let map = null, geo = null, dots = null, cur = null;  // cur：目前指標下各國的 {o, v, color}
   const draw = () => {
     const W = window.WORLD;
-    if (!W || !window.L) return;
+    if (!W || !window.L || !geo) return;
     const fs = fund.value === 'ALL' ? B.funds : [B.funds.find(f => f.key === fund.value)];
     const val = new Map();  // geo 名稱（或 #代碼）→ 該國合計
     for (const f of fs) for (const r of f.contrib.rows) {
-      const k = r.geo || '#' + r.key, o = val.get(k) || {zh: r.zh || r.en, en: r.en, key: r.key, geo: r.geo, pt: r.pt, amt: 0, share: 0, prev: 0, hasPrev: true};
+      const k = r.geo || '#' + r.key, o = val.get(k) || {zh: r.zh || r.en, en: r.en, key: r.key, geo: r.geo, pt: r.pt, amt: 0, share: 0, prev: 0, amtP: 0};  // amtP：有上一期資料的基金的本期合計
       o.amt += r.v[4] || 0; o.share += fund.value === 'ALL' ? 0 : (r.v[1] || 0);
       const p = B.prev[f.key]?.v[r.key];
-      if (p == null) o.hasPrev = false; else o.prev += p;
+      if (p != null) { o.prev += p; o.amtP += r.v[4] || 0; }
       val.set(k, o);
     }
     const m = metric.value;
     if (m === 'share' && fund.value === 'ALL') { metric.value = 'amt'; return draw(); }
-    const get = o => m === 'amt' ? o.amt : m === 'share' ? o.share : (o.hasPrev && o.prev ? (o.amt / o.prev - 1) * 100 : null);
+    const get = o => m === 'amt' ? o.amt : m === 'share' ? o.share : (o.prev ? (o.amtP / o.prev - 1) * 100 : null);
     const vs = [...val.values()].map(get).filter(v => v != null).sort((a, b) => a - b);
     let color, labels;
     if (m === 'chg') {  // 雙向：減少偏藍、增加偏橘，0 附近為中性灰
@@ -701,7 +722,7 @@ function mapCard(B) {
       const steps = ['color-mix(in oklab, var(--s1) 90%, var(--panel))', 'color-mix(in oklab, var(--s1) 60%, var(--panel))', 'color-mix(in oklab, var(--s1) 30%, var(--panel))',
         'var(--mid)', 'color-mix(in oklab, var(--s2) 30%, var(--panel))', 'color-mix(in oklab, var(--s2) 60%, var(--panel))', 'color-mix(in oklab, var(--s2) 90%, var(--panel))'];
       color = v => steps[bins.filter(b => v > b).length];
-      labels = steps.map((c, i) => [c, i === 0 ? '< −25%' : i === steps.length - 1 ? '> +25%' : (bins[i - 1] > 0 ? '+' : '') + bins[i - 1] + ' ~ ' + (bins[i] > 0 ? '+' : '') + bins[i] + '%']);
+      labels = steps.map((c, i) => [c, i === 0 ? '≤ −25%' : i === steps.length - 1 ? '> +25%' : (bins[i - 1] > 0 ? '+' : '') + bins[i - 1] + ' ~ ' + (bins[i] > 0 ? '+' : '') + bins[i] + '%']);
     } else {  // 依分位數分 6 級（分攤額高度偏斜）
       const q = p => vs[Math.min(vs.length - 1, Math.floor(p * vs.length))];
       const bins = [q(1 / 6), q(2 / 6), q(3 / 6), q(4 / 6), q(5 / 6)];
@@ -734,7 +755,7 @@ function mapCard(B) {
   });
   const init = () => {
     const W = window.WORLD;
-    if (!W || !window.L) return;
+    if (!W || !window.L || !area.isConnected) return;  // 載入期間已離開預算頁
     map = L.map(area, {minZoom: 0, maxZoom: 7, zoomSnap: .25, worldCopyJump: false, maxBounds: [[-62, -200], [86, 200]], maxBoundsViscosity: .8, attributionControl: true});
     map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>').addAttribution('國界：Natural Earth');
     geo = L.geoJSON({type: 'FeatureCollection', features: W.f.map(f => ({type: 'Feature', properties: {n: f.n, zh: f.zh}, geometry: {type: 'MultiPolygon', coordinates: f.c}}))}, {
@@ -743,14 +764,15 @@ function mapCard(B) {
     dots = L.layerGroup().addTo(map);
     map.fitBounds([[-50, -165], [75, 175]]);
     draw();
-    new ResizeObserver(() => map.invalidateSize()).observe(area);
-    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
-    new MutationObserver(draw).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+    const ro = new ResizeObserver(() => map?.invalidateSize()), mq = matchMedia('(prefers-color-scheme: dark)'), mo = new MutationObserver(draw);
+    ro.observe(area); mq.addEventListener('change', draw);
+    mo.observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+    TEARDOWN.push(() => { ro.disconnect(); mq.removeEventListener('change', draw); mo.disconnect(); map.remove(); map = geo = dots = null; });
   };
   [fund, metric].forEach(x => x.addEventListener('change', draw));
   card.append(el('h3', {}, '地圖：各締約方分攤'), el('div', {class: 'ctrl'}, fund, metric), area, leg, small, explain,
     csvDl(B, [['h:contributions_by_fund_2025-2028.csv', '三基金各締約方分攤、比例與增減']]),
-    el('p', {class: 'label'}, '滾輪或雙指縮放、拖曳移動；放大後較容易點選小國，點擊國家可開啟查詢卡。分攤額與比例依分位數分 6 級（各國差距極大，分位數較能看出分布），顏色由淺到深代表由低到高（深色模式為由暗到亮）；增減以固定級距，減少偏藍、增加偏橘，±2% 以內為淺紫。國界取自 Natural Earth 1:110m，小國以 1:50m 國界的代表點畫成圓點（公有領域），僅供示意，不代表對任何領土主張的立場。'), src);
+    el('p', {class: 'label'}, '滾輪或雙指縮放、拖曳移動；放大後較容易點選小國，點擊國家可開啟查詢卡。分攤額與比例依分位數分 6 級（各國差距極大，分位數較能看出分布），顏色由淺到深代表由低到高（深色模式為由暗到亮）；增減以固定級距，減少偏藍、增加偏橘，±2% 以內為淺紫；三基金合計的增減只計有上一期資料的基金。國界取自 Natural Earth 1:110m，小國以 1:50m 國界的代表點畫成圓點（公有領域），僅供示意，不代表對任何領土主張的立場。'), src);
   area.append(el('p', {class: 'label', style: 'padding:12px'}, '地圖載入中…'));
   Promise.all([loadOnce('vendor/leaflet/leaflet.css', true), loadOnce('vendor/leaflet/leaflet.js'), window.WORLD ? 0 : loadOnce('data/worldmap.js')])
     .then(() => { area.replaceChildren(); requestAnimationFrame(init); })
@@ -766,7 +788,7 @@ function smallMultiples(series, years, unitLabel, srcNote) {
     if (ys.length < 2) continue;
     const W = 220, H = 120, vals = ys.map(y => pts[y]), max = Math.max(...vals) * 1.1, min = 0;
     const X = y => 14 + (W - 28) * (years.indexOf(y)) / (years.length - 1), Y = v => H - 22 - (H - 40) * (v - min) / (max - min);
-    const svg = sv('svg', {viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': name + ' 趨勢'});
+    const svg = sv('svg', {viewBox: `0 0 ${W} ${H}`, role: 'group', 'aria-label': name + ' 趨勢'});
     svg.append(sv('line', {x1: 10, x2: W - 10, y1: Y(0), y2: Y(0), class: 'gl'}));
     let d = '', prev = null;
     for (const y of ys) { d += (prev !== null && years.indexOf(y) - years.indexOf(prev) > 1 ? 'M' : d ? 'L' : 'M') + X(y) + ',' + Y(pts[y]); prev = y; }
@@ -778,9 +800,13 @@ function smallMultiples(series, years, unitLabel, srcNote) {
       svg.append(hit);
     }
     svg.append(sv('text', {x: X(years[0]), y: H - 6, class: 'mut', 'font-size': 10}, years[0]), sv('text', {x: X(years[years.length - 1]), y: H - 6, 'text-anchor': 'end', class: 'mut', 'font-size': 10}, years[years.length - 1]));
-    const a = pts[ys[0]], b = pts[ys[ys.length - 1]], chg = (b / a - 1) * 100;
+    // 比較首尾兩年期合計：單年比較會受締約方大會是否在該年召開影響（例如 2019 年沒有大會、2028 年有）
+    const y0 = years[0], y1 = years[1], z0 = years[years.length - 2], z1 = years[years.length - 1];
+    const bien = [y0, y1, z0, z1].every(y => pts[y] != null);
+    const a = bien ? pts[y0] + pts[y1] : pts[ys[0]], b = bien ? pts[z0] + pts[z1] : pts[ys[ys.length - 1]], chg = (b / a - 1) * 100;
+    const la = bien ? y0 + '–' + y1.slice(2) : ys[0], lb = bien ? z0 + '–' + z1.slice(2) : ys[ys.length - 1];
     wrap.append(el('div', {class: 'kpi'}, el('div', {class: 'l'}, name),
-      el('div', {class: 'd'}, ys[0] + ' ' + nf(a, 0) + ' → ' + ys[ys.length - 1] + ' ' + nf(b, 0) + ' ' + unitLabel + ' ', el('b', {class: chg >= 0 ? 'up' : 'down'}, (chg >= 0 ? '+' : '') + nf(chg) + '%')), svg));
+      el('div', {class: 'd'}, la + ' ' + nf(a, 0) + ' → ' + lb + ' ' + nf(b, 0) + ' ' + unitLabel + ' ', el('b', {class: chg >= 0 ? 'up' : 'down'}, (chg >= 0 ? '+' : '') + nf(chg) + '%')), svg));
   }
   return el('div', {}, unitNote(unitLabel + '（年度金額；每張小圖縱軸各自從 0 開始）'), wrap, srcNote ? el('p', {class: 'label'}, srcNote) : null);
 }
@@ -792,7 +818,7 @@ function trendCard(B) {
   const W = 880, H = 300, ml = 56, mb = 40, mt = 24, bw = 46, cx = i => ml + 20 + i * ((W - ml - 40) / Y.length);
   const max = Math.ceil(Math.max(...Object.values(B.years).map(o => o.total)) / 5000) * 5000;
   const yv = v => H - mb - (H - mb - mt) * v / max;
-  const svg = sv('svg', {viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': '2019–2028 年度整合預算堆疊長條圖'});
+  const svg = sv('svg', {viewBox: `0 0 ${W} ${H}`, role: 'group', 'aria-label': '2019–2028 年度整合預算堆疊長條圖'});
   for (let v = 0; v <= max; v += 5000) svg.append(sv('line', {x1: ml, x2: W - 10, y1: yv(v), y2: yv(v), class: 'gl'}), sv('text', {x: ml - 6, y: yv(v) + 4, 'text-anchor': 'end', class: 'mut'}, nf(v, 0)));
   Y.forEach((y, i) => {
     const o = B.years[y], x = cx(i);
@@ -812,7 +838,7 @@ function trendCard(B) {
   // 淨額折線（單一數列，不需圖例）
   const yrs = Y.filter(y => B.years[y]?.net), nmax = Math.ceil(Math.max(...yrs.map(y => B.years[y].net)) / 5000) * 5000, H2 = 200;
   const ny = v => H2 - 32 - (H2 - 56) * v / nmax;
-  const svg2 = sv('svg', {viewBox: `0 0 ${W} ${H2}`, role: 'img', 'aria-label': '公約締約方應分攤淨額折線圖'});
+  const svg2 = sv('svg', {viewBox: `0 0 ${W} ${H2}`, role: 'group', 'aria-label': '公約締約方應分攤淨額折線圖'});
   for (let v = 0; v <= nmax; v += 5000) svg2.append(sv('line', {x1: ml, x2: W - 10, y1: ny(v), y2: ny(v), class: 'gl'}), sv('text', {x: ml - 6, y: ny(v) + 4, 'text-anchor': 'end', class: 'mut'}, nf(v, 0)));
   const pts = yrs.map(y => [cx(Y.indexOf(y)) + bw / 2, ny(B.years[y].net), y]);
   const seg = [];  // 缺年份時折線斷開
@@ -836,16 +862,16 @@ function trendCard(B) {
       ...per.map(p => el('td', {}, p.get(g) === null ? '—' : String(p.get(g))))))));
   card.append(el('h3', {}, '2019–2028 年度預算趨勢'),
     unitNote('千美元（年度金額）'), el('div', {class: 'chart'}, svg), legend(B.groups.map(([k, z]) => [GC[k], z])),
-    el('p', {class: 'label'}, '每年的整合核心預算（千美元），依支出項目歸為六類；各期用語不同，歸類方式見 tools/review_site.py 的 GROUPS。因 COVID-19 疫情，第十五屆締約方大會延後並分兩階段舉行，2021、2022 年各以一年期暫行預算支應：2021 年由第二次特別締約方大會決議 EM-2/1（2020 年 11 月，線上）核定，2022 年由決議 15/1 核定，兩年的三方分攤比例都是 74：15：11。2027、2028 為本屆提案。長條上方數字是年度總計；週轉金準備為負的年度（2021 年釋出 390.3、2027 年釋出 182.3 千美元）不畫入堆疊，所以長條會略高於總計。'),
+    el('p', {class: 'label'}, '每年的整合核心預算（千美元），依支出項目歸為六類；各期用語不同，歸類方式見 tools/review_site.py 的 GROUPS。因 COVID-19 疫情，第十五屆締約方大會延後並分兩階段舉行，2021、2022 年各以一年期暫行預算支應：2021 年由第二次特別締約方大會決議 EM-2/1（2020 年 11 月，線上）核定，2022 年由決議 15/1 核定，兩年的三方分攤比例都是 74：15：11（2019–2020 年依決議 14/37 亦同；2023 年起依決議 15/34 改為 72：15：13）。2027、2028 為本屆提案。長條上方數字是年度總計；週轉金準備為負的年度（2021 年釋出 390.3、2027 年釋出 182.3 千美元）不畫入堆疊，所以長條會略高於總計。'),
     el('h3', {style: 'margin-top:16px'}, '經費用在哪些工作：依組成部分'),
     smallMultiples(Object.entries(B.comp_names).map(([k, z], i) => [z, ['var(--s3)', 'var(--s4)', 'var(--s1)', 'var(--s5)'][i], Object.fromEntries(Object.entries(B.comp).map(([y, o]) => [y, o.v[k]]))]),
-      Y, '千美元', '「C. 工作計畫」是落實昆明－蒙特婁全球生物多樣性綱要等實質工作的經費；A 為締約方大會與附屬機構會議，B 為執行秘書辦公室等行政領導，D 為會議服務與行政支援。各期組成部分的名稱略有不同：D 在 2019–2026 年的決議稱「行政支援」（Administrative support），本屆提案改稱「計畫與會議支援」。2021、2022 年暫行預算沒有依組成部分的表（只有依處室分列的表 2b），所以小圖在這兩年斷開。'),
+      Y, '千美元', '「C. 工作計畫」是落實昆明－蒙特婁全球生物多樣性綱要等實質工作的經費；A 為締約方大會與附屬機構會議，B 為執行秘書辦公室等行政領導，D 為會議服務與行政支援。各期組成部分的名稱略有不同：D 在 2019–2026 年的決議稱「行政支援」（Administrative support），本屆提案改稱「計畫與會議支援」。2021、2022 年暫行預算沒有依組成部分的表（只有依處室分列的表 2b），所以小圖在這兩年斷開。A 在有締約方大會的年度明顯較高，單年比較會受開會年份影響，所以變化率比較兩年期合計（2019–2020 對 2027–2028）。'),
     el('h3', {style: 'margin-top:16px'}, '各支出類別的變化'),
     smallMultiples(B.groups.filter(([k]) => !['special', 'wcr'].includes(k)).map(([k, z]) => [z, GC[k], Object.fromEntries(Object.entries(B.years).map(([y, o]) => [y, o.groups[k]]))]),
-      Y, '千美元', '每張小圖各自的縱軸從 0 開始；標示第一年與最後一年的變化。特別項目與週轉金準備每年差異大，見上方堆疊圖。'),
+      Y, '千美元', '每張小圖各自的縱軸從 0 開始；變化率比較第一個與最後一個兩年期的合計。特別項目與週轉金準備每年差異大，見上方堆疊圖。'),
     el('h3', {style: 'margin-top:16px'}, '公約締約方應分攤淨額'), unitNote('千美元（年度金額）'), el('div', {class: 'chart'}, svg2),
     el('h3', {style: 'margin-top:16px'}, '秘書處核心預算員額'), unitNote('員額數（個）'), el('div', {class: 'dtwrap', style: 'max-height:none'}, st),
-    srcLine(B, [...B.decisions.filter(d => !/^(CP|NP)/.test(d.ref)).map(d => [d.url, 0, '決議 ' + d.ref]), [B.table1.id, B.table1.page, 'CBD/COP/17/L.31/Rev.1 表 1'],
+    srcLine(B, [...B.decisions.filter(d => !/^(CP|NP)/.test(d.ref)).map(d => [d.url, 0, '決議 ' + d.ref]), [B.table1.id, B.table1.page, 'CBD/COP/17/L.31/Rev.1 表 1'], [B.table1.id, 11, 'CBD/COP/17/L.31/Rev.1 表 3（員額）'],
       ...(B.comp_src ? [[B.comp_src.id, B.comp_src.page, 'CBD/COP/17/L.31/Rev.1 表 2']] : [])]),
     csvDl(B, [['h:budget_by_year.csv', '2019–2028 年度預算（依支出類別，含公約應分攤淨額）'], ['h:budget_by_component.csv', '依組成部分'], ['h:secretariat_staffing.csv', '秘書處員額']]));
   return card;
@@ -888,7 +914,14 @@ function outwardText(r, a, text, attrs = {}) {
   const [x, y] = [r * Math.sin(a), -r * Math.cos(a)];
   return sv('text', {x, y, 'text-anchor': flip ? 'end' : 'start', 'dominant-baseline': 'central', transform: `rotate(${flip ? deg + 90 : deg - 90} ${x} ${y})`, ...attrs}, text);
 }
-const fitText = (s, px, size = 11) => { const n = Math.floor(px / size); return n < 2 ? '' : s.length <= n ? s : s.slice(0, n - 1) + '…'; };
+const cw = (ch, size) => (ch.charCodeAt(0) < 0x2e80 ? .6 : 1) * size;  // 半形字約 0.6 個全形字寬
+const textW = (s, size) => [...s].reduce((a, ch) => a + cw(ch, size), 0);
+const fitText = (s, px, size = 11) => {
+  if (textW(s, size) <= px) return s;
+  let out = '', used = cw('…', size);
+  for (const ch of s) { if (used + cw(ch, size) > px) break; out += ch; used += cw(ch, size); }
+  return out.length < 2 ? '' : out + '…';
+};
 
 // 旭日圖：中心＝需求總額 → 分類 → 目標 → 預算主題；點扇形放大、點中心返回
 function kmgbfSunburst(agg, tot, nm, lab, onPick) {
@@ -908,7 +941,7 @@ function kmgbfSunburst(agg, tot, nm, lab, onPick) {
   (function part(n, x0) { n.x0 = x0; n.x1 = x0 + n.value / tot; let x = x0; (n.children || []).forEach(c => { part(c, x); x = c.x1; }); })(root, 0);
   const R = [0, 86, 158, 222, 300], S = 860, LEAF0 = 26, LEAF = 160;  // 最外圈（預算主題）長度＝基本 26＋依金額最多 160
   const wrap = el('div'), crumb = el('div', {class: 'label', style: 'min-height:1.6em'});
-  const svg = sv('svg', {viewBox: `${-S / 2} ${-S / 2} ${S} ${S}`, role: 'img', 'aria-label': '自願信託基金需求依 KMGBF 分類、目標與主題的旭日圖', style: 'max-width:760px;display:block;margin:0 auto'});
+  const svg = sv('svg', {viewBox: `${-S / 2} ${-S / 2} ${S} ${S}`, role: 'group', 'aria-label': '自願信託基金需求依 KMGBF 分類、目標與主題的旭日圖', style: 'max-width:760px;display:block;margin:0 auto'});
   const fills = d => d === 1 ? 1 : d === 2 ? .72 : .45;  // 越外圈越淡，同一分類同一色相
   const render = f => {
     svg.replaceChildren();
@@ -920,16 +953,16 @@ function kmgbfSunburst(agg, tot, nm, lab, onPick) {
       if (d >= 1 && d <= 3 && n.x1 > f.x0 && n.x0 < f.x1) {
         const leaf = !n.children?.length;
         const a0 = ang(Math.max(n.x0, f.x0)), a1 = ang(Math.min(n.x1, f.x1)), r0 = R[d], r1 = leaf ? R[d] + LEAF0 + LEAF * n.value / vmax : R[d + 1] - 2;
-        const path = sv('path', {d: arcPath(r0, r1, a0 + .003, a1 - .003), fill: n.color, 'fill-opacity': leaf ? .5 : fills(d), stroke: 'var(--panel)', 'stroke-width': 1});
+        const pd = Math.min(.003, (a1 - a0) / 4), path = sv('path', {d: arcPath(r0, r1, a0 + pd, a1 - pd), fill: n.color, 'fill-opacity': leaf ? .5 : fills(d), stroke: 'var(--panel)', 'stroke-width': 1});
         tipOn(path, () => [usd(n.value), n.long || n.full || n.name, '占需求合計 ' + nf(n.value / tot * 100, 1) + '%' + (n.children?.length ? '；點擊放大' : '')]);
         path.style.cursor = n.children?.length ? 'zoom-in' : 'pointer';
-        path.addEventListener('click', () => { hideVtip(); n.children?.length ? render(n) : onPick(n.parent.key, n.parent.o); });
+        clickable(path, () => { hideVtip(); n.children?.length ? render(n) : onPick(n.parent.key, n.parent.o); });
         svg.append(path);
         const mid = (a0 + a1) / 2, rm = (r0 + r1) / 2, arcLen = (a1 - a0) * rm;
         const cls = {class: d === 1 ? 'sb-on' : 'sb-lb', 'font-size': d === 1 ? 12 : 11, 'pointer-events': 'none'};
         const full = n.tname || n.name;  // 目標圈弧長夠時顯示「目標 21｜資訊流通」
-        if (!leaf && arcLen > full.length * 12 + 16) svg.append(tangentText(rm, mid, full, cls));
-        else if (!leaf && arcLen > n.name.length * 12 + 10) svg.append(tangentText(rm, mid, n.name, cls));
+        if (!leaf && arcLen > textW(full, 12) + 16) svg.append(tangentText(rm, mid, full, cls));
+        else if (!leaf && arcLen > textW(n.name, 12) + 10) svg.append(tangentText(rm, mid, n.name, cls));
         else if (leaf && (a1 - a0) * (r0 + 10) > 12) {  // 主題：由內緣向外排字，長度隨扇形變長
           const t = fitText(n.name, r1 - r0 - 10, 11);
           if (t) svg.append(outwardText(r0 + 6, mid, t, cls));
@@ -943,7 +976,7 @@ function kmgbfSunburst(agg, tot, nm, lab, onPick) {
     };
     walk(f);
     const c = sv('circle', {r: R[1] - 3, fill: f.depth ? f.color : 'var(--soft)', 'fill-opacity': f.depth ? .9 : 1, style: 'cursor:' + (f.parent ? 'zoom-out' : 'default')});
-    c.addEventListener('click', () => f.parent && render(f.parent));
+    if (f.parent) { c.setAttribute('aria-label', '返回上一層：' + (f.parent.long || f.parent.name)); clickable(c, () => render(f.parent)); }
     svg.append(c, sv('text', {y: -10, 'text-anchor': 'middle', class: f.depth ? 'sb-on' : '', 'font-size': 12, 'font-weight': 600, 'pointer-events': 'none'}, fitText(f.depth === 2 ? f.name : f.name, 150, 12)),
       sv('text', {y: 10, 'text-anchor': 'middle', class: f.depth ? 'sb-on' : 'mut', 'font-size': 12, 'pointer-events': 'none'}, nf(f.value, 0) + ' 美元'),
       sv('text', {y: 28, 'text-anchor': 'middle', class: f.depth ? 'sb-on' : 'mut', 'font-size': 10.5, 'pointer-events': 'none'}, f.parent ? '點中心返回' : nf(f.value / tot * 100, 0) + '%'));
@@ -960,7 +993,7 @@ function kmgbfWheel(agg, tot, short, onPick) {
   const S = 820, gap = 4 * Math.PI / 180, step = (2 * Math.PI - 3 * gap) / 23;
   const rIn = 128, rNum = 146, rB0 = 166, L = 150, rLab = rB0 + L + 12;
   const max = Math.max(...Array.from({length: 23}, (_, i) => agg.get('T' + (i + 1))?.tot || 0));
-  const svg = sv('svg', {viewBox: `${-S / 2} ${-S / 2} ${S} ${S}`, role: 'img', 'aria-label': 'KMGBF 23 項目標的自願信託基金需求目標輪', style: 'max-width:820px;display:block;margin:0 auto'});
+  const svg = sv('svg', {viewBox: `${-S / 2} ${-S / 2} ${S} ${S}`, role: 'group', 'aria-label': 'KMGBF 23 項目標的自願信託基金需求目標輪', style: 'max-width:820px;display:block;margin:0 auto'});
   const secOf = n => n <= 8 ? 0 : n <= 13 ? 1 : 2;
   const a0Of = n => (n - 1) * step + secOf(n) * gap;
   // 內圈：三大類扇形與名稱
@@ -981,9 +1014,9 @@ function kmgbfWheel(agg, tot, short, onPick) {
     svg.append(sv('circle', {cx, cy, r: 13, fill: v ? 'var(--panel)' : 'var(--grid)', stroke: v ? sec.color : 'var(--muted-fill)', 'stroke-width': 2}),
       sv('text', {x: cx, y: cy, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': 11.5, 'font-weight': 700, class: v ? '' : 'mut'}, String(n)));
     const len = v ? Math.max(4, L * v / max) : 6;
-    const bar = sv('path', {d: arcPath(rB0, rB0 + len, a0 + .015, a1 - .015), fill: v ? sec.color : 'none', stroke: v ? 'none' : 'var(--muted-fill)', 'stroke-dasharray': v ? null : '3 2'});
+    const pd = Math.min(.015, (a1 - a0) / 4), bar = sv('path', {d: arcPath(rB0, rB0 + len, a0 + pd, a1 - pd), fill: v ? sec.color : 'none', stroke: v ? 'none' : 'var(--muted-fill)', 'stroke-dasharray': v ? null : '3 2'});
     tipOn(bar, () => v ? [usd(v), '目標 ' + n + '｜' + (short[t] || ''), '占需求合計 ' + nf(v / tot * 100, 1) + '%；點擊列出主題'] : ['無經費需求', '目標 ' + n + '｜' + (short[t] || ''), '決議 16/28 表 4 中沒有對應的主題']);
-    if (v) { bar.style.cursor = 'pointer'; bar.addEventListener('click', () => onPick(t, o)); }
+    if (v) { bar.style.cursor = 'pointer'; clickable(bar, () => onPick(t, o)); }
     svg.append(bar, outwardText(Math.max(rB0 + len + 8, rB0 + 40), m, fitText(short[t] || '', 110, 11) + (v ? '　' + nf(v / tot * 100, 1) + '%' : ''), {'font-size': 11, class: v ? '' : 'mut'}));
   }
   return svg;
@@ -1012,6 +1045,7 @@ function kmgbfCard(B) {
     const secLeg = legend(KSECT.map(s => [s.color, s.name]));
     if (view.value !== 'bar') {
       area.replaceChildren(view.value === 'sun' ? kmgbfSunburst(agg, tot, nm, lab, (t, o) => show(t, o)) : kmgbfWheel(agg, tot, K.short, (t, o) => show(t, o)));
+      requestAnimationFrame(() => { area.scrollLeft = (area.scrollWidth - area.clientWidth) / 2; });  // 窄螢幕：圓形圖預設捲到中央
       leg.replaceChildren(secLeg);
       viewNote.replaceChildren(view.value === 'sun' ? '扇形角度＝金額；最外圈預算主題的長度也依金額變長（以目前畫面中最大的主題為最長）。由內而外：KMGBF 分類、目標、預算主題（多目標主題已平均分配）。點扇形放大、點中心返回；點最外圈的主題可列出該目標的明細。'
         : '23 項目標等分成圈，依三大類分色；放射長條長度＝金額，虛線空位表示決議 16/28 表 4 中沒有對應主題。長期目標與跨目標／程序不屬於 23 項目標，金額見旭日圖或長條圖。');
@@ -1021,7 +1055,7 @@ function kmgbfCard(B) {
     }
     leg.replaceChildren(legend([['var(--s1)', '公約'], ['var(--s2)', '卡塔赫納議定書'], ['var(--s3)', '名古屋議定書'], ['var(--muted-fill)', '跨目標／程序']]));
     viewNote.replaceChildren();
-    const narrow = innerWidth < 640;  // 窄螢幕：標籤在上、長條在下，字才不會被縮得太小
+    const narrow = matchMedia('(max-width: 639px)').matches;  // 窄螢幕：標籤在上、長條在下，字才不會被縮得太小
     const W = narrow ? 360 : 880, rh = narrow ? 38 : 22, lw = narrow ? 0 : 250, hh = 26, x = v => (W - lw - (narrow ? 120 : 290)) * v / max, by = narrow ? 18 : 0;
     let y = 4;
     const items = [];
@@ -1032,7 +1066,7 @@ function kmgbfCard(B) {
       for (const t of ts) { items.push(['b', t, y]); y += rh; }
       y += 6;
     }
-    const svg = sv('svg', {viewBox: `0 0 ${W} ${y + 4}`, role: 'img', 'aria-label': '自願信託基金需求依 KMGBF 目標分配長條圖'});
+    const svg = sv('svg', {viewBox: `0 0 ${W} ${y + 4}`, role: 'group', 'aria-label': '自願信託基金需求依 KMGBF 目標分配長條圖'});
     for (const [k, t, yy] of items) {
       if (k === 'h') { svg.append(sv('text', {x: 0, y: yy + 17, style: 'font-weight:600'}, t)); continue; }
       const o = agg.get(t), muted = t === '跨目標' || t === '程序';
@@ -1043,7 +1077,7 @@ function kmgbfCard(B) {
         const w = Math.max(1, x(v) - 2);
         const r = sv('rect', {x: x0, y: yy + by + 3, width: w, height: (narrow ? 22 : rh) - 7, rx: 3, fill: muted ? 'var(--muted-fill)' : FC[f]});
         tipOn(r, () => [usd(v), nm(t) + '・' + ({COP: '公約', CP: '卡塔赫納議定書', NP: '名古屋議定書'})[f], o.items.filter(([r]) => FK[r.fund] === f).map(([r]) => r.zh).join('、')]);
-        r.style.cursor = 'pointer'; r.addEventListener('click', () => show(t, o));
+        r.style.cursor = 'pointer'; clickable(r, () => show(t, o));
         svg.append(r); x0 += w + 2;
       }
       svg.append(sv('text', {x: x0 + 6, y: yy + by + 15, class: 'mut'}, nf(o.tot, 0) + '（' + nf(o.tot / tot * 100, 1) + '%' + (narrow ? '' : '；' + twd(o.tot)) + '）'));
@@ -1062,10 +1096,12 @@ function kmgbfCard(B) {
   };
   const show = (t, o) => {
     detail.replaceChildren(el('h4', {style: 'margin:8px 0 4px'}, nm(t) + '：' + usd(o.tot)), unitNote('美元'),
-      el('ul', {style: 'margin:0 0 0 18px;padding:0;line-height:1.7'}, ...o.items.sort((a, b) => b[1] - a[1]).map(([r, v]) =>
+      el('ul', {style: 'margin:0 0 0 18px;padding:0;line-height:1.7'}, ...o.items.slice().sort((a, b) => b[1] - a[1]).map(([r, v]) =>
         el('li', {}, r.zh + '（' + r.fund + '）' + usd(v) + (r.t.length > 1 ? '，為 ' + nf(r.amt, 0) + ' 平均分給 ' + r.t.length + ' 項：' + r.t.map(lab).join('、') : '')))));
   };
   fund.addEventListener('change', draw); view.addEventListener('change', draw);
+  const nq = matchMedia('(max-width: 639px)'), relayout = () => { if (view.value === 'bar') draw(); };  // 轉向或改視窗寬度時重排長條圖
+  nq.addEventListener('change', relayout); TEARDOWN.push(() => nq.removeEventListener('change', relayout));
   const noamt = K.rows.filter(r => r.amt == null);
   card.append(el('h3', {}, '自願信託基金需求對應 KMGBF 目標'),
     el('p', {class: 'label'}, '決議 16/28 表 4 列出「支持公約及其議定書額外核定活動特別自願信託基金」2025–2026 年各主題的經費需求。這是希望各方自願捐助的需求，不是核心預算的實際支出；本屆 L.31/Rev.1 的 2027–2028 年對應表（表 4）仍是預留位置（PLACE HOLDER，', el('a', {href: '#' + B.table1.id + '/p012'}, '第 12 頁'), '），所以此處用上一期數字。'),
@@ -1073,7 +1109,7 @@ function kmgbfCard(B) {
     el('p', {class: 'label'}, '主題與目標的對應由本團逐項判斷，不是決議原文。一個主題對應多個目標時，金額平均分給所有對應目標（主要與次要目標同權）；跨目標與程序性主題另列，不分配。百分比為占所選基金需求合計（' +
       '公約 17,622,600、卡塔赫納議定書 1,098,350、名古屋議定書 696,300 美元）的比例。'),
     el('details', {}, el('summary', {class: 'label', style: 'cursor:pointer'}, '各主題的對應與分配（資料表）'), tbl),
-    noamt.length ? el('p', {class: 'label'}, '決議 15/34 另有 ' + noamt.length + ' 個主題（表中沒有金額，不列入上圖）：' + noamt.map(r => r.zh + '（' + r.t.map(lab).join('、') + '）').join('；') + '。') : null,
+    noamt.length ? el('p', {class: 'label'}, '決議 15/34 另有 ' + noamt.length + ' 個主題（表中沒有金額，不列入上圖）：' + noamt.map(r => r.zh + '（' + r.t.map(lab).join('、') + '）').join('；') + '。') : '',
     csvDl(B, [['h:kmgbf_allocation_by_target.csv', '依目標彙整'], ['h:kmgbf_voluntary_needs_mapping.csv', '各主題金額與對應目標']]),
     srcLine(B, [[K.url, 0, '決議 16/28 表 4'], ...(B.decisions.find(d => d.ref === '15/34') ? [[B.decisions.find(d => d.ref === '15/34').url, 0, '決議 15/34']] : [])]));
   draw();
@@ -1100,21 +1136,21 @@ function yerevanCard(B) {
     ['(g) 建置全球報告資訊儀表板', false], ['(h) 協助改善國家監測與知識管理系統', false]];
   const card = el('section', {class: 'card', id: 'yerevan'});
   card.append(el('h3', {}, 'Yerevan Pathway 與預算'),
-    el('p', {}, 'Yerevan Pathway 是 COP 17 對昆明－蒙特婁全球生物多樣性綱要第一次集體進展全球檢視的協商回應，訂出 2030 年前的優先行動。全球檢視的結論是全球無法在 2030 年前達成 23 項目標。它不是另一份獨立文件，而是全球檢視決議中呼籲各國加速行動的章節（決議草案 ',
+    el('p', {}, 'Yerevan Pathway 是 COP 17 對昆明－蒙特婁全球生物多樣性綱要第一次集體進展全球檢視的協商回應，訂出 2030 年前的優先行動。全球檢視的結論是全球進度落後，沒有走在 2030 年達成 23 項目標的軌道上；若不迅速加速集體執行，目標將無法達成（L.15 第 6 段）。它不是另一份獨立文件，而是全球檢視決議中呼籲各國加速行動的章節（決議草案 ',
       el('a', {href: pg(6)}, 'CBD/COP/17/L.15 第 14–49 段'), '）。'),
-    el('div', {class: 'note'}, '正式決議文本尚未公布；以下段落依決議草案 L.15（2026-10-29），方括號段落的最終寫法待確認。依 Carbon Brief 報導，有害補貼一段由「敦促」軟化為「鼓勵」並加上「依國情」，驅動因素一段大幅刪減。'),
+    el('div', {class: 'note'}, '正式決議文本尚未公布；以下段落依決議草案 L.15（2026-10-29），方括號段落的最終寫法待確認：第 26 段（有害誘因）、第 45 段（區域對話）與第 49(e) 段在 L.15 中整段都在方括號內。依 Carbon Brief 報導，有害補貼一段由「敦促」軟化為「鼓勵」並加上「依國情」，驅動因素一段大幅刪減。'),
     el('div', {class: 'dtwrap', style: 'max-height:none'}, el('table', {class: 'dt'},
       el('thead', {}, el('tr', {}, el('th', {class: 't'}, '面向'), el('th', {class: 't'}, '主要內容'))),
       el('tbody', {}, ...AREAS.map(([a, p, t]) => el('tr', {}, el('td', {class: 't'}, el('a', {href: pg(p)}, a)), el('td', {class: 't'}, t)))))),
     el('h3', {style: 'margin-top:16px'}, '交辦秘書處的工作'),
     el('div', {class: 'dtwrap', style: 'max-height:none'}, el('table', {class: 'dt'},
       el('thead', {}, el('tr', {}, el('th', {class: 't'}, 'L.15 第 49 段'), el('th', {class: 't'}, '是否「視資源而定」'))),
-      el('tbody', {}, ...TASKS.map(([t, r]) => el('tr', {}, el('td', {class: 't'}, t), el('td', {class: 't', style: r ? 'color:var(--warn);font-weight:600' : ''}, r ? '是：核心預算未編列，需自願捐助' : '否')))))),
+      el('tbody', {}, ...TASKS.map(([t, r]) => el('tr', {}, el('td', {class: 't'}, t), el('td', {class: 't', style: r ? 'color:var(--warn);font-weight:600' : ''}, r ? '是（通常意味需另尋資源，多為自願捐助；推論）' : '否')))))),
     el('h3', {style: 'margin-top:16px'}, '預算撐得起嗎？'),
     el('ul', {style: 'margin:4px 0 0 18px;padding:0;line-height:1.75'},
-      el('li', {}, '核心預算小幅成長：2027–2028 年整合核心預算 ' + kusd(cur) + '，比 2025–2026 年名目增加 ' + nf((cur / prev - 1) * 100) + '%；方括號中的替代方案為零名目成長。員額由 87 增為 91。'),
+      el('li', {}, '核心預算小幅成長：2027–2028 年整合核心預算 ' + kusd(cur) + '，比 2025–2026 年名目增加 ' + nf((cur / prev - 1) * 100) + '%；方括號中的替代方案（表 1.alt）標為「改良型零名目成長」，但總需求仍由 44,435.4 增為 45,299.3 千美元（+1.9%）。員額由 87 增為 91。'),
       el('li', {}, '支撐 Pathway 的自願經費尚未編列：決議 16/28 表 4 中與 Pathway 最直接相關的 ' + pw.length + ' 個主題（監測與檢討機制、資訊交換機制、能力建構、資源動員等），上一期需求合計 ' + usd(sub) + '，占自願信託基金需求的 ' + nf(sub / tot * 100, 1) + '%；本屆 2027–2028 年的對應表仍是預留位置（PLACE HOLDER）。'),
-      el('li', {}, '區域對話沒有估算經費：參與信託基金是為締約方大會與附屬機構會議編列，第 45 段邀請的區域與次區域對話未見成本。'),
+      el('li', {}, '區域對話沒有估算經費：參與信託基金是為締約方大會與附屬機構會議編列，第 45 段（整段仍在方括號內）邀請的區域與次區域對話未見成本。'),
       el('li', {}, '量級落差：大會期間宣布近 20 億美元新資金（CBD 新聞稿），而目標 19(a) 要求國際資金 2025 年每年至少 200 億美元。Pathway 把重心放在各國的財政與預算協調（第 32 段）與國家生物多樣性財務計畫（第 21 段）。')),
     el('div', {class: 'note', style: 'margin-top:10px'}, el('b', {}, '判斷：'), '核心預算撐得住秘書處的基本運作與下一輪檢視程序，但撐不起 Pathway 期待的「加速」——區域對話、同儕學習、監測系統支援與能力建構目前都沒有可靠財源，成敗取決於自願捐助、GEF 撥款與各國自己的預算。'),
     el('p', {class: 'label'}, '值得追蹤：2027–2028 年自願信託基金表 4 的內容與捐助到位情形；GEF-9 生物多樣性撥款的實際分配；有害誘因改革在各國預算上的變化；正式決議文本。'),
@@ -1151,7 +1187,7 @@ function partyCard(B, parts) {
     if (ys.length > 1) {
       const W = 880, H = 180, max = Math.max(...ys.map(y => h[y])) * 1.15, ml = 24 + 8.5 * nf(max, 0).length;  // 左邊界依縱軸最大數字的位數調整，避免截斷
       const X = y => ml + 20 + (W - ml - 50) * (+y - 2019) / 9, Yv = v => H - 30 - (H - 50) * v / max;
-      line = sv('svg', {viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': n.zh + ' 歷年公約分攤額'});
+      line = sv('svg', {viewBox: `0 0 ${W} ${H}`, role: 'group', 'aria-label': n.zh + ' 歷年公約分攤額'});
       const step = Math.pow(10, Math.floor(Math.log10(max / 3))), tk = Math.ceil(max / 4 / step) * step;
       for (let v = 0; v < max; v += tk) line.append(sv('line', {x1: ml, x2: W - 20, y1: Yv(v), y2: Yv(v), class: 'gl'}), sv('text', {x: ml - 4, y: Yv(v) + 4, 'text-anchor': 'end', class: 'mut'}, nf(v, 0)));
       let d = '', prevY = null;
@@ -1169,7 +1205,7 @@ function partyCard(B, parts) {
       el('div', {class: 'dtwrap', style: 'max-height:none'}, el('table', {class: 'dt'},
         el('thead', {}, el('tr', {}, ...['基金', '聯合國分攤比例（%）', '調整後比例（%）', '2027（美元）', '2028（美元）', '2027–2028（美元）', '2025–2026（美元）', '增減（%）'].map(x => el('th', {}, x)))),
         el('tbody', {}, ...rows))), el('p', {class: 'label'}, '滑過金額可看新臺幣概估（' + fxNote() + '）。'),
-      line ? el('div', {}, el('div', {class: 'label', style: 'margin-top:8px'}, '公約一般信託基金歷年分攤額（美元；2021、2022 年為暫行預算）'), el('div', {class: 'chart'}, line)) : null);
+      line ? el('div', {}, el('div', {class: 'label', style: 'margin-top:8px'}, '公約一般信託基金歷年分攤額（美元；2021、2022 年為暫行預算）'), el('div', {class: 'chart'}, line)) : '');
   };
   inp.addEventListener('change', () => {
     const parts = inp.value.split('｜').map(x => x.trim()).filter(Boolean);
@@ -1178,6 +1214,8 @@ function partyCard(B, parts) {
   card.append(el('h3', {}, '查詢單一締約方'), el('div', {class: 'ctrl'}, inp, dl), out,
     srcLine(B, [...B.funds.map(f => [f.id, f.pages.ct, f.sym + ' 分攤表']), ...Object.values(B.prev).map(p => [p.url, 0, '決議 ' + p.ref])]),
     csvDl(B, [['h:contributions_by_fund_2025-2028.csv', '三基金各締約方分攤（含上一期）'], ['h:convention_contributions_by_party.csv', '公約各締約方 2019–2028 歷年分攤']]));
+  partyShow = name => show(byName.get(pnorm(name)) || byName.get(name) || '');
+  TEARDOWN.push(() => { partyShow = null; });
   const init = parts[0] === 'party' ? (byName.get(pnorm(parts[1] || '')) || '') : '';  // route() 已解碼，不再解碼一次
   setTimeout(() => show(init), 0);
   return card;
@@ -1241,13 +1279,21 @@ function tableCard(B) {
         return c < 0 ? `background:linear-gradient(to right, transparent ${50 - w}%, color-mix(in oklab, ${col} 45%, transparent) ${50 - w}% 50%, transparent 50%)`
           : `background:linear-gradient(to right, transparent 50%, color-mix(in oklab, ${col} 45%, transparent) 50% ${50 + w}%, transparent ${50 + w}%)`;
       }
+      const [lo, hi] = rng[k];
+      if (c === 0) return null;
+      if (lo < 0) {  // 含負值的欄：以 0 為中心的雙向資料條（負值橘色），不套用對數比例
+        const span = Math.max(hi, 0) - lo, z = -lo / span * 100, w = Math.abs(c) / span * 100, col = c < 0 ? 'var(--s2)' : 'var(--s1)';
+        if (fmtSel.value === 'heat') return `background:color-mix(in oklab, ${col} ${Math.round(8 + Math.abs(c) / Math.max(-lo, hi) * 62)}%, transparent)`;
+        const [a, b] = c < 0 ? [z - w, z] : [z, z + w];
+        return `background:linear-gradient(to right, transparent ${a.toFixed(1)}%, color-mix(in oklab, ${col} 32%, transparent) ${a.toFixed(1)}% ${b.toFixed(1)}%, transparent ${b.toFixed(1)}%)`;
+      }
       const f = Math.max(0, Math.min(1, frac(k, c)));
       if (fmtSel.value === 'heat') return `background:color-mix(in oklab, var(--s1) ${Math.round(8 + f * 62)}%, transparent)`;
       return `background:linear-gradient(to right, color-mix(in oklab, var(--s1) 32%, transparent) ${(f * 100).toFixed(1)}%, transparent ${(f * 100).toFixed(1)}%)`;
     };
     wrap.replaceChildren(el('table', {class: 'dt'},
-      el('thead', {}, el('tr', {}, ...cols.map(([c, t], k) => el('th', {class: t || '', 'aria-sort': sortK === k ? (asc ? 'ascending' : 'descending') : null,
-        onclick: () => { if (sortK === k) asc = !asc; else { sortK = k; asc = !!t; } draw(); }}, c)))),
+      el('thead', {}, el('tr', {}, ...cols.map(([c, t], k) => el('th', {class: t || '', 'aria-sort': sortK === k ? (asc ? 'ascending' : 'descending') : null},
+        el('button', {type: 'button', class: 'thb', onclick: () => { if (sortK === k) asc = !asc; else { sortK = k; asc = !!t; } draw(); }}, c))))),
       el('tbody', {}, ...r.map(x => el('tr', {}, ...x.map((c, k) => el('td', {class: cols[k][1] || (k === 9 && c !== null ? (c >= 0 ? 'up' : 'down') : ''), style: cellStyle(k, c),
         title: typeof c === 'number' && /美元/.test(cols[k][0]) ? twd(c * (/千美元/.test(cols[k][0]) ? 1000 : 1)) : null},
         typeof c === 'number' ? k === 9 && cols.length === 10 ? (c >= 0 ? '+' : '') + nf(c) : nf(c, dec[k]) : (c ?? '—'))))))));
@@ -1255,13 +1301,13 @@ function tableCard(B) {
   exp.addEventListener('click', () => {
     const esc = v => { let t = String(v ?? ''); if (typeof v === 'string' && /^[=+\-@]/.test(t)) t = "'" + t; return '"' + t.replace(/"/g, '""') + '"'; };  // 避免試算表把文字當公式
     const text = '﻿' + [cols.map(c => c[0]), ...view()].map(r => r.map(esc).join(',')).join('\r\n');
-    const a = el('a', {href: URL.createObjectURL(new Blob([text], {type: 'text/csv'})), download: 'cbd-cop17-' + ds.value.toLowerCase() + '.csv'});
-    document.body.append(a); a.click(); a.remove();
+    const url = URL.createObjectURL(new Blob([text], {type: 'text/csv'})), a = el('a', {href: url, download: 'cbd-cop17-' + ds.value.toLowerCase() + '.csv'});
+    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 0);
   });
   ds.addEventListener('change', build); q.addEventListener('input', draw);
   fmtSel.addEventListener('change', draw); scaleSel.addEventListener('change', draw);
   card.append(el('h3', {}, '互動表格'), el('div', {class: 'ctrl'}, ds, q, fmtSel, scaleSel, exp), wrap,
-    el('p', {class: 'label'}, '點欄名排序；篩選會套用到匯出。滑過金額可看新臺幣概估（' + fxNote() + '）。增減為 2027–2028 合計與上一期（2025–2026）合計相比。資料條與色階以整欄的最大值為基準（對數比例讓小額也看得出差異；增減以 ±50% 為滿格）。'), src);
+    el('p', {class: 'label'}, '點欄名排序；篩選會套用到匯出。滑過金額可看新臺幣概估（' + fxNote() + '）。增減為 2027–2028 合計與上一期（2025–2026）合計相比。資料條與色階以整欄的最大值為基準（對數比例讓小額也看得出差異；增減以 ±50% 為滿格；含負值的欄改以 0 為中心的雙向資料條，負值為橘色，不套用對數比例）。'), src);
   build();
   return card;
 }
