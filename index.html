@@ -321,9 +321,17 @@ function sv(tag, attrs = {}, ...kids) {
   return e;
 }
 const nf = (v, d = 1) => v === null || v === undefined || isNaN(v) ? '—' : Number(v).toLocaleString('zh-TW', {minimumFractionDigits: d, maximumFractionDigits: d});
-const usd = v => nf(v, 0) + ' 美元';
-const kusd = v => nf(v, 1) + ' 千美元';
-const unitNote = t => el('div', {class: 'label', style: 'margin:2px 0 4px'}, '單位：' + t);
+// 新臺幣概估（匯率見 BUDGET.fx）：億元取 2 位、萬元取整數
+const twd = v => {
+  const r = window.BUDGET?.fx?.rate;
+  if (!r || v == null) return '';
+  const n = Math.abs(v * r), s = v < 0 ? '−' : '';
+  return '約新臺幣 ' + s + (n >= 1e8 ? nf(n / 1e8, 2) + ' 億元' : n >= 1e4 ? nf(Math.round(n / 1e4), 0) + ' 萬元' : nf(Math.round(n), 0) + ' 元');
+};
+const usd = v => nf(v, 0) + ' 美元' + (twd(v) ? '（' + twd(v) + '）' : '');
+const kusd = v => nf(v, 1) + ' 千美元' + (twd(v * 1000) ? '（' + twd(v * 1000) + '）' : '');
+const fxNote = () => { const f = window.BUDGET?.fx; return f ? '新臺幣為概估，以 1 美元 ＝ ' + f.rate + ' 新臺幣換算（中央銀行公布 ' + f.date + ' 銀行間收盤匯率）' : ''; };
+const unitNote = t => el('div', {class: 'label', style: 'margin:2px 0 4px'}, '單位：' + t + (/美元/.test(t) && fxNote() ? '；' + fxNote() : ''));
 const pnorm = s => s.replace(/’/g, "'").normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
 const FC = {COP: 'var(--s1)', CP: 'var(--s2)', NP: 'var(--s3)'};
 const GC = {staff: 'var(--s1)', meet: 'var(--s2)', ops: 'var(--s3)', special: 'var(--s4)', psc: 'var(--s5)', wcr: 'var(--s6)'};
@@ -393,8 +401,8 @@ function renderBudget(parts) {
   box.append(introCard(B, F));
   box.append(el('div', {class: 'kpis'},
     el('div', {class: 'kpi'}, el('div', {class: 'l'}, '2027–2028 整合核心預算'), el('div', {class: 'v'}, nf(totRow.v[2])), el('div', {class: 'd'},
-      '千美元；2025–2026 為 ' + nf(prevTotal) + '（' + ((totRow.v[2] / prevTotal - 1) * 100 >= 0 ? '+' : '') + nf((totRow.v[2] / prevTotal - 1) * 100) + '%）')),
-    el('div', {class: 'kpi'}, el('div', {class: 'l'}, '締約方應分攤淨額（三基金，2027–2028）'), el('div', {class: 'v'}, nf(sumNet(2))), el('div', {class: 'd'}, '千美元；扣除地主國捐助與動用準備金後')),
+      '千美元（' + twd(totRow.v[2] * 1000) + '）；2025–2026 為 ' + nf(prevTotal) + '（' + ((totRow.v[2] / prevTotal - 1) * 100 >= 0 ? '+' : '') + nf((totRow.v[2] / prevTotal - 1) * 100) + '%）')),
+    el('div', {class: 'kpi'}, el('div', {class: 'l'}, '締約方應分攤淨額（三基金，2027–2028）'), el('div', {class: 'v'}, nf(sumNet(2))), el('div', {class: 'd'}, '千美元（' + twd(sumNet(2) * 1000) + '）；扣除地主國捐助與動用準備金後')),
     el('div', {class: 'kpi'}, el('div', {class: 'l'}, '公約一般信託基金分攤國數'), el('div', {class: 'v'}, String(cop.contrib.rows.length)), el('div', {class: 'd'},
       'CP ' + F.CP.contrib.rows.length + '、NP ' + F.NP.contrib.rows.length + '（含歐盟）')),
     staffNow ? el('div', {class: 'kpi'}, el('div', {class: 'l'}, '秘書處核心預算員額'), el('div', {class: 'v'}, String(staffNow[2])), el('div', {class: 'd'}, '2025–2026 核定 ' + staffNow[1] + ' 個')) : null));
@@ -423,7 +431,7 @@ function introCard(B, F) {
     el('h3', {style: 'margin-top:16px'}, '本屆相關決議草案'),
     el('p', {class: 'label'}, 'COP 17、CP-MOP 12、NP-MOP 6 於 2026 年 10 月 19–30 日在葉里溫合併舉行。以下三份是預算議題的會中決議草案（L 文件），預算金額與附表仍在方括號內。'),
     el('ul', {style: 'margin:4px 0 0 18px;padding:0;line-height:1.7'},
-      el('li', {}, el('a', {href: '#' + F.COP.id}, F.COP.sym), '（公約行政管理、信託基金預算及秘書處功能審查）：採用 2027–2028 整合工作計畫與預算；核心信託基金 2027、2028 年金額待定；擬動用未支出餘額抵減分攤（金額在方括號內）；請執行秘書持續落實秘書處外部深度功能審查中與核心功能相關的建議；欠繳分攤兩年以上的締約方（低度開發國家與小島嶼開發中國家除外）不得擔任主席團或附屬機構成員；動用 20 萬美元支應數位序列資訊（DSI）閉會期間工作的段落整段仍在方括號內。'),
+      el('li', {}, el('a', {href: '#' + F.COP.id}, F.COP.sym), '（公約行政管理、信託基金預算及秘書處功能審查）：採用 2027–2028 整合工作計畫與預算；核心信託基金 2027、2028 年金額待定；擬動用未支出餘額抵減分攤（金額在方括號內）；請執行秘書持續落實秘書處外部深度功能審查中與核心功能相關的建議；欠繳分攤兩年以上的締約方（低度開發國家與小島嶼開發中國家除外）不得擔任主席團或附屬機構成員；動用 20 萬美元（' + twd(200000) + '）支應數位序列資訊（DSI）閉會期間工作的段落整段仍在方括號內。'),
       el('li', {}, el('a', {href: '#' + F.CP.id}, F.CP.sym), '（卡塔赫納議定書行政管理、信託基金預算及秘書處功能審查）：採用同一份整合預算與 72：15：13 分攤；議定書核心信託基金 2027、2028 年金額與附件分攤表待定。'),
       el('li', {}, el('a', {href: '#' + F.NP.id}, F.NP.sym), '（名古屋議定書行政管理與信託基金預算）：同上，名古屋議定書一般信託基金 2027、2028 年核心計畫預算與附件分攤表待定。')),
     el('p', {class: 'label'}, '決議草案的白話摘要與逐段中英對照，請點文件代碼。'));
@@ -554,8 +562,8 @@ function rankCard(B) {
   };
   [fund, yr, view].forEach(x => x.addEventListener('change', draw));
   const unit = el('div');
-  [fund, yr, view].forEach(x => x.addEventListener('change', () => unit.replaceChildren(unitNote(view.value === 'bar' ? '美元（括號內為占該基金分攤總額的 %）' : '面積代表分攤額（美元），格內數字為占分攤總額的 %'))));
-  unit.append(unitNote('美元（括號內為占該基金分攤總額的 %）'));
+  [fund, yr, view].forEach(x => x.addEventListener('change', () => unit.replaceChildren(unitNote(view.value === 'bar' ? '美元（括號內為占該基金分攤總額的 % 與新臺幣概估）' : '面積代表分攤額（美元），格內數字為占分攤總額的 %'))));
+  unit.append(unitNote('美元（括號內為占該基金分攤總額的 % 與新臺幣概估）'));
   card.append(el('h3', {}, '各締約方分攤多少'), el('div', {class: 'ctrl'}, fund, yr, view), unit, area, info, src);
   draw();
   return card;
@@ -563,7 +571,7 @@ function rankCard(B) {
 function hbars(all, tot, color, n) {
   const rows = all.slice(0, n), rest = all.slice(n).reduce((s, r) => s + r.v, 0);
   if (rest > 0) rows.push({zh: '其他 ' + (all.length - n) + ' 個締約方', v: rest, other: true});
-  const W = 880, rh = 24, lw = 190, H = rows.length * rh + 24, max = Math.max(...rows.map(r => r.v)), x = v => lw + (W - lw - 140) * v / max;
+  const W = 880, rh = 24, lw = 190, H = rows.length * rh + 24, max = Math.max(...rows.map(r => r.v)), x = v => lw + (W - lw - 300) * v / max;
   const svg = sv('svg', {viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': '締約方分攤額長條圖'});
   rows.forEach((r, i) => {
     const y = 8 + i * rh;
@@ -571,7 +579,7 @@ function hbars(all, tot, color, n) {
     tipOn(b, () => [usd(r.v), r.zh + (r.en && r.en !== r.zh ? '（' + r.en + '）' : ''),
       '占 ' + nf(r.v / tot * 100, 2) + '%' + (r.scale ? '；' + Object.entries(r.scale).map(([k, s]) => k + ' 聯合國比例 ' + nf(s[0], 3) + '% → 調整後 ' + nf(s[1], 3) + '%').join('；') : '')]);
     svg.append(sv('text', {x: lw - 8, y: y + rh / 2 + 4, 'text-anchor': 'end'}, r.zh), b,
-      sv('text', {x: x(r.v) + 6, y: y + rh / 2 + 4, class: 'mut'}, nf(r.v, 0) + '（' + nf(r.v / tot * 100, 1) + '%）'));
+      sv('text', {x: x(r.v) + 6, y: y + rh / 2 + 4, class: 'mut'}, nf(r.v, 0) + '（' + nf(r.v / tot * 100, 1) + '%；' + twd(r.v) + '）'));
   });
   return svg;
 }
@@ -623,11 +631,15 @@ function cssColor(v) {
 }
 // 「調整後分攤比例」說明：規則取自分攤表欄名與決議第 7 段；四條規則與倍數由表中數字反推，逐列重算皆吻合
 function shareExplain(fs) {
+  const basis = {
+    COP: '公約決議草案（L.31/Rev.1）第 7 段規定以聯合國分攤比例（聯合國大會第 79/249 號決議）為基礎；聯合國通過 2028–2030 年新比例後，2028 年改用新比例。',
+    CP: '卡塔赫納議定書決議草案（CP-MOP 12 L.13）第 4 段規定以聯合國分攤比例（聯合國大會第 79/249 號決議）為基礎；附件分攤表待公約與議定書統一的分攤比例表通過後才納入決定。',
+    NP: '名古屋議定書決議草案（NP-MOP 6 L.11）第 4 段規定以聯合國分攤比例（聯合國大會第 79/249 號決議）為基礎；附件分攤表待公約與議定書統一的分攤比例表通過後才納入決定。'};
   const head = [el('b', {}, '調整後分攤比例是什麼？'), el('br'),
-    '分攤表欄名為「上限 22%，低度開發國家不超過 0.01%」。決議第 7 段規定以聯合國分攤比例（聯合國大會第 79/249 號決議）為基礎；聯合國通過 2028–2030 年新比例後，2028 年改用新比例。由表中數字可知調整方式：']
+    '分攤表欄名為「上限 22%，低度開發國家不超過 0.01%」。' + (fs.length > 1 ? '三份決議草案都規定以聯合國分攤比例（聯合國大會第 79/249 號決議）為基礎（公約第 7 段、兩項議定書第 4 段）。' : basis[fs[0].key]) + '由表中數字可知調整方式：']
   const one = f => {
     const rows = f.contrib.rows, un = rows.reduce((s, r) => s + (r.v[0] || 0), 0);
-    const fixed = rows.filter(r => r.v[0] == null), top = rows.filter(r => r.v[1] === 22);
+    const fixed = rows.filter(r => !r.v[0] && r.v[1]), top = rows.filter(r => r.v[1] === 22);
     const T = rows.reduce((s, r) => s + (r.v[2] || 0), 0);
     const ldc = rows.filter(r => r.v[0] && Math.abs(r.v[2] - T * 0.0001) <= 1 && r.v[0] * 100 / un > 0.01);
     const free = rows.filter(r => r.v[0] >= 0.1 && !top.includes(r)).sort((a, b) => b.v[0] - a.v[0]);
@@ -639,10 +651,10 @@ function shareExplain(fs) {
       top.length ? el('li', {}, top.map(r => r.zh || r.en).join('、') + '換算後會超過 22%，以 22% 為上限。') : null,
       ldc.length ? el('li', {}, ldc.length + ' 個低度開發國家換算後會超過 0.01%，壓在 0.01%。') : null,
       k ? el('li', {}, '其餘締約方依聯合國比例等比例放大約 ' + nf(k, 3) + ' 倍，使合計為 100%' + (ex ? '；例如' + (ex.zh || ex.en) + ' ' + nf(ex.v[0], 3) + '% → ' + nf(ex.v[1], 3) + '%' : '') + '。') : null,
-      el('li', {}, '各締約方分攤額 = 調整後比例 × 該年應分攤總額（' + nf(T, 0) + ' 美元，2027 年）。'));
+      el('li', {}, '各締約方分攤額 = 調整後比例 × 該年應分攤總額（2027 年 ' + usd(T) + '）。'));
   };
   if (fs.length > 1) return [...head, ...fs.map(f => el('div', {style: 'margin-top:6px'}, el('b', {}, f.zh), one(f)))];
-  return [...head, one(fs[0]), el('div', {class: 'label'}, '前四點的規則原文只寫在欄名中，倍數與固定比例是由表中數字反推，逐列重算皆與原表一致。')];
+  return [...head, one(fs[0]), el('div', {class: 'label'}, '原文只在欄名寫出 22% 與 0.01% 兩個上限；固定比例、受上限影響的國家與放大倍數由表中數字反推，依此逐列重算皆與原表一致（容許四捨五入至小數 3 位）。')];
 }
 function mapCard(B) {
   const card = el('section', {class: 'card'}), area = el('div', {class: 'chart', style: 'aspect-ratio:16/10;max-height:560px;width:100%;border-radius:8px;background:var(--bg);isolation:isolate'}), leg = el('div', {class: 'legend'}), small = el('div', {class: 'label'});
@@ -689,7 +701,7 @@ function mapCard(B) {
     dots.clearLayers();
     for (const {o, v, c} of cur.values()) if (!o.geo && o.pt)
       dots.addLayer(L.circleMarker(o.pt, {radius: 5, fillColor: c, fillOpacity: 1, color: cssColor('var(--ink)'), weight: 1}).on(evts(() => ({o, v}))));
-    const unit = m === 'amt' ? '單位：美元（2027–2028 兩年合計）' : m === 'share' ? '單位：%' : '單位：%（2027–2028 相對 2025–2026）';
+    const unit = m === 'amt' ? '單位：美元（2027–2028 兩年合計；' + fxNote() + '）' : m === 'share' ? '單位：%' : '單位：%（2027–2028 相對 2025–2026）';
     leg.replaceChildren(el('span', {}, unit), ...labels.map(([c, l]) => el('span', {}, el('i', {style: 'background:' + c}), l)), el('span', {}, el('i', {style: 'background:var(--grid)'}), '非締約方或無資料'),
       el('span', {}, el('i', {style: 'background:var(--panel);border:1px solid var(--ink);border-radius:50%'}), '圓點：地圖上太小的國家'));
     const off = [...val.values()].filter(o => !o.geo && !o.pt).sort((a, b) => (get(b) ?? -1e9) - (get(a) ?? -1e9));
@@ -745,7 +757,7 @@ function smallMultiples(series, years, unitLabel, srcNote) {
     for (const y of ys) {
       svg.append(sv('circle', {cx: X(y), cy: Y(pts[y]), r: 3, fill: color}));
       const hit = sv('rect', {x: X(y) - 10, y: 0, width: 20, height: H - 16, fill: 'transparent'});
-      tipOn(hit, () => [nf(pts[y], 1) + ' ' + unitLabel, y + ' ' + name, +y >= 2027 ? '本屆提案' : '']);
+      tipOn(hit, () => [unitLabel === '千美元' ? kusd(pts[y]) : nf(pts[y], 1) + ' ' + unitLabel, y + ' ' + name, +y >= 2027 ? '本屆提案' : '']);
       svg.append(hit);
     }
     svg.append(sv('text', {x: X(years[0]), y: H - 6, class: 'mut', 'font-size': 10}, years[0]), sv('text', {x: X(years[years.length - 1]), y: H - 6, 'text-anchor': 'end', class: 'mut', 'font-size': 10}, years[years.length - 1]));
@@ -786,7 +798,7 @@ function trendCard(B) {
   const svg2 = sv('svg', {viewBox: `0 0 ${W} ${H2}`, role: 'img', 'aria-label': '公約締約方應分攤淨額折線圖'});
   for (let v = 0; v <= nmax; v += 5000) svg2.append(sv('line', {x1: ml, x2: W - 10, y1: ny(v), y2: ny(v), class: 'gl'}), sv('text', {x: ml - 6, y: ny(v) + 4, 'text-anchor': 'end', class: 'mut'}, nf(v, 0)));
   const pts = yrs.map(y => [cx(Y.indexOf(y)) + bw / 2, ny(B.years[y].net), y]);
-  const seg = [];  // 2021 沒有資料：折線斷開
+  const seg = [];  // 缺年份時折線斷開
   pts.forEach((p, k) => { if (k && +p[2] - +pts[k - 1][2] > 1) seg.push(null); seg.push(p); });
   let d = '', pen = false;
   for (const p of seg) { if (!p) { pen = false; continue; } d += (pen ? 'L' : 'M') + p[0] + ',' + p[1]; pen = true; }
@@ -807,10 +819,10 @@ function trendCard(B) {
       ...per.map(p => el('td', {}, p.get(g) === null ? '—' : String(p.get(g))))))));
   card.append(el('h3', {}, '2019–2028 年度預算趨勢'),
     unitNote('千美元（年度金額）'), el('div', {class: 'chart'}, svg), legend(B.groups.map(([k, z]) => [GC[k], z])),
-    el('p', {class: 'label'}, '每年的整合核心預算（千美元），依支出項目歸為六類；各期用語不同，歸類方式見 tools/review_site.py 的 GROUPS。2021 年沒有年度預算決議（決議 15/1 表 1 為 2019–2020 預算結轉情形）；2022 年為暫行預算。2027、2028 為本屆提案。長條上方數字是年度總計；週轉金準備為負的年度（2027 年釋出 182.3 千美元）不畫入堆疊，所以長條會略高於總計。'),
+    el('p', {class: 'label'}, '每年的整合核心預算（千美元），依支出項目歸為六類；各期用語不同，歸類方式見 tools/review_site.py 的 GROUPS。因 COVID-19 疫情，第十五屆締約方大會延後並分兩階段舉行，2021、2022 年各以一年期暫行預算支應：2021 年由第二次特別締約方大會決議 EM-2/1（2020 年 11 月，線上）核定，2022 年由決議 15/1 核定，兩年的三方分攤比例都是 74：15：11。2027、2028 為本屆提案。長條上方數字是年度總計；週轉金準備為負的年度（2021 年釋出 390.3、2027 年釋出 182.3 千美元）不畫入堆疊，所以長條會略高於總計。'),
     el('h3', {style: 'margin-top:16px'}, '經費用在哪些工作：依組成部分'),
     smallMultiples(Object.entries(B.comp_names).map(([k, z], i) => [z, ['var(--s3)', 'var(--s4)', 'var(--s1)', 'var(--s5)'][i], Object.fromEntries(Object.entries(B.comp).map(([y, o]) => [y, o.v[k]]))]),
-      Y, '千美元', '「C. 工作計畫」是落實昆明－蒙特婁全球生物多樣性綱要等實質工作的經費；A 為締約方大會與附屬機構會議，B 為執行秘書辦公室等行政領導，D 為會議服務與行政支援。各期組成部分的名稱略有不同（早期 D 為「行政支援」）。2021、2022 年沒有依組成部分的表。'),
+      Y, '千美元', '「C. 工作計畫」是落實昆明－蒙特婁全球生物多樣性綱要等實質工作的經費；A 為締約方大會與附屬機構會議，B 為執行秘書辦公室等行政領導，D 為會議服務與行政支援。各期組成部分的名稱略有不同（早期 D 為「行政支援」）。2021、2022 年暫行預算沒有依組成部分的表（只有依處室分列的表 2b），所以小圖在這兩年斷開。'),
     el('h3', {style: 'margin-top:16px'}, '各支出類別的變化'),
     smallMultiples(B.groups.filter(([k]) => !['special', 'wcr'].includes(k)).map(([k, z]) => [z, GC[k], Object.fromEntries(Object.entries(B.years).map(([y, o]) => [y, o.groups[k]]))]),
       Y, '千美元', '每張小圖各自的縱軸從 0 開始；標示第一年與最後一年的變化。特別項目與週轉金準備每年差異大，見上方堆疊圖。'),
@@ -840,7 +852,7 @@ function kmgbfCard(B) {
     }
     const tot = rows.reduce((s, r) => s + r.amt, 0), max = Math.max(...[...agg.values()].map(o => o.tot));
     const narrow = innerWidth < 640;  // 窄螢幕：標籤在上、長條在下，字才不會被縮得太小
-    const W = narrow ? 360 : 880, rh = narrow ? 38 : 22, lw = narrow ? 0 : 250, hh = 26, x = v => (W - lw - (narrow ? 120 : 150)) * v / max, by = narrow ? 18 : 0;
+    const W = narrow ? 360 : 880, rh = narrow ? 38 : 22, lw = narrow ? 0 : 250, hh = 26, x = v => (W - lw - (narrow ? 120 : 290)) * v / max, by = narrow ? 18 : 0;
     let y = 4;
     const items = [];
     for (const [title, test] of SECT) {
@@ -864,7 +876,7 @@ function kmgbfCard(B) {
         r.style.cursor = 'pointer'; r.addEventListener('click', () => show(t, o));
         svg.append(r); x0 += w + 2;
       }
-      svg.append(sv('text', {x: x0 + 6, y: yy + by + 15, class: 'mut'}, nf(o.tot, 0) + '（' + nf(o.tot / tot * 100, 1) + '%）'));
+      svg.append(sv('text', {x: x0 + 6, y: yy + by + 15, class: 'mut'}, nf(o.tot, 0) + '（' + nf(o.tot / tot * 100, 1) + '%' + (narrow ? '' : '；' + twd(o.tot)) + '）'));
     }
     area.replaceChildren(svg);
     detail.replaceChildren(el('p', {class: 'label'}, '點長條可列出這個目標分到哪些主題的金額。'));
@@ -872,13 +884,13 @@ function kmgbfCard(B) {
     tbl.replaceChildren(el('table', {class: 'dt'},
       el('thead', {}, el('tr', {}, ...['主題', '基金', '金額（美元）', '對應目標', '每個目標分得（美元）'].map(h => el('th', {class: /主題|基金|對應/.test(h) ? 't' : ''}, h)))),
       el('tbody', {}, ...rows.slice().sort((a, b) => b.amt - a.amt).map(r => el('tr', {},
-        el('td', {class: 't', title: r.en}, r.zh), el('td', {class: 't'}, r.fund), el('td', {}, nf(r.amt, 0)),
-        el('td', {class: 't'}, r.t.map(lab).join('、')), el('td', {}, nf(r.amt / r.t.length, 0)))))));
+        el('td', {class: 't', title: r.en}, r.zh), el('td', {class: 't'}, r.fund), el('td', {title: twd(r.amt)}, nf(r.amt, 0)),
+        el('td', {class: 't'}, r.t.map(lab).join('、')), el('td', {title: twd(r.amt / r.t.length)}, nf(r.amt / r.t.length, 0)))))), el('p', {class: 'label'}, '滑過金額可看新臺幣概估。'));
   };
   const show = (t, o) => {
     detail.replaceChildren(el('h4', {style: 'margin:8px 0 4px'}, nm(t) + '：' + usd(o.tot)), unitNote('美元'),
       el('ul', {style: 'margin:0 0 0 18px;padding:0;line-height:1.7'}, ...o.items.sort((a, b) => b[1] - a[1]).map(([r, v]) =>
-        el('li', {}, r.zh + '（' + r.fund + '）' + nf(v, 0) + (r.t.length > 1 ? '，為 ' + nf(r.amt, 0) + ' 平均分給 ' + r.t.length + ' 項：' + r.t.map(lab).join('、') : '')))));
+        el('li', {}, r.zh + '（' + r.fund + '）' + usd(v) + (r.t.length > 1 ? '，為 ' + nf(r.amt, 0) + ' 平均分給 ' + r.t.length + ' 項：' + r.t.map(lab).join('、') : '')))));
   };
   fund.addEventListener('change', draw);
   const noamt = K.rows.filter(r => r.amt == null);
@@ -911,8 +923,9 @@ function partyCard(B, parts) {
     const rows = B.funds.map(f => {
       const r = f.contrib.rows.find(r => r.key === key), p = B.prev[f.key]?.v[key];
       return el('tr', {}, el('td', {class: 't'}, f.zh), el('td', {}, r ? nf(r.v[0], 3) : '—'), el('td', {}, r ? nf(r.v[1], 3) : '—'),
-        el('td', {}, r ? nf(r.v[2], 0) : '非締約方'), el('td', {}, r ? nf(r.v[3], 0) : '—'), el('td', {}, r ? nf(r.v[4], 0) : '—'),
-        el('td', {}, p !== undefined && p !== null ? nf(p, 0) : '—'),
+        el('td', {title: r ? twd(r.v[2]) : null}, r ? nf(r.v[2], 0) : '非締約方'), el('td', {title: r ? twd(r.v[3]) : null}, r ? nf(r.v[3], 0) : '—'),
+        el('td', {title: r ? twd(r.v[4]) : null}, r ? nf(r.v[4], 0) : '—'),
+        el('td', {title: p != null ? twd(p) : null}, p !== undefined && p !== null ? nf(p, 0) : '—'),
         el('td', {class: r && p ? (r.v[4] >= p ? 'up' : 'down') : ''}, r && p ? (r.v[4] >= p ? '+' : '') + nf((r.v[4] / p - 1) * 100) + '%' : '—'));
     });
     const h = B.partyHist[key] || {}, ys = Object.keys(h).sort();
@@ -936,8 +949,8 @@ function partyCard(B, parts) {
     out.replaceChildren(el('h4', {style: 'margin:8px 0'}, n.zh + '　', el('span', {class: 'label', lang: 'en'}, n.en + (n.region ? '｜' + n.region : ''))),
       el('div', {class: 'dtwrap', style: 'max-height:none'}, el('table', {class: 'dt'},
         el('thead', {}, el('tr', {}, ...['基金', '聯合國分攤比例（%）', '調整後比例（%）', '2027（美元）', '2028（美元）', '2027–2028（美元）', '2025–2026（美元）', '增減（%）'].map(x => el('th', {}, x)))),
-        el('tbody', {}, ...rows))),
-      line ? el('div', {}, el('div', {class: 'label', style: 'margin-top:8px'}, '公約一般信託基金歷年分攤額（美元；2021 年沒有年度預算）'), el('div', {class: 'chart'}, line)) : null);
+        el('tbody', {}, ...rows))), el('p', {class: 'label'}, '滑過金額可看新臺幣概估（' + fxNote() + '）。'),
+      line ? el('div', {}, el('div', {class: 'label', style: 'margin-top:8px'}, '公約一般信託基金歷年分攤額（美元；2021、2022 年為暫行預算）'), el('div', {class: 'chart'}, line)) : null);
   };
   inp.addEventListener('change', () => {
     const parts = inp.value.split('｜').map(x => x.trim()).filter(Boolean);
@@ -1013,7 +1026,8 @@ function tableCard(B) {
     wrap.replaceChildren(el('table', {class: 'dt'},
       el('thead', {}, el('tr', {}, ...cols.map(([c, t], k) => el('th', {class: t || '', 'aria-sort': sortK === k ? (asc ? 'ascending' : 'descending') : null,
         onclick: () => { if (sortK === k) asc = !asc; else { sortK = k; asc = !!t; } draw(); }}, c)))),
-      el('tbody', {}, ...r.map(x => el('tr', {}, ...x.map((c, k) => el('td', {class: cols[k][1] || (k === 9 && c !== null ? (c >= 0 ? 'up' : 'down') : ''), style: cellStyle(k, c)},
+      el('tbody', {}, ...r.map(x => el('tr', {}, ...x.map((c, k) => el('td', {class: cols[k][1] || (k === 9 && c !== null ? (c >= 0 ? 'up' : 'down') : ''), style: cellStyle(k, c),
+        title: typeof c === 'number' && /美元/.test(cols[k][0]) ? twd(c * (/千美元/.test(cols[k][0]) ? 1000 : 1)) : null},
         typeof c === 'number' ? k === 9 && cols.length === 10 ? (c >= 0 ? '+' : '') + nf(c) : nf(c, dec[k]) : (c ?? '—'))))))));
   };
   exp.addEventListener('click', () => {
@@ -1025,7 +1039,7 @@ function tableCard(B) {
   ds.addEventListener('change', build); q.addEventListener('input', draw);
   fmtSel.addEventListener('change', draw); scaleSel.addEventListener('change', draw);
   card.append(el('h3', {}, '互動表格'), el('div', {class: 'ctrl'}, ds, q, fmtSel, scaleSel, exp), wrap,
-    el('p', {class: 'label'}, '點欄名排序；篩選會套用到匯出。增減為 2027–2028 合計與上一期（2025–2026）合計相比。資料條與色階以整欄的最大值為基準（對數比例讓小額也看得出差異；增減以 ±50% 為滿格）。'), src);
+    el('p', {class: 'label'}, '點欄名排序；篩選會套用到匯出。滑過金額可看新臺幣概估（' + fxNote() + '）。增減為 2027–2028 合計與上一期（2025–2026）合計相比。資料條與色階以整欄的最大值為基準（對數比例讓小額也看得出差異；增減以 ±50% 為滿格）。'), src);
   build();
   return card;
 }
