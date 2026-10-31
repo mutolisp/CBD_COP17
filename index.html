@@ -420,7 +420,7 @@ function renderBudget(parts) {
       'CP ' + F.CP.contrib.rows.length + '、NP ' + F.NP.contrib.rows.length + '（含歐盟）')),
     staffNow ? el('div', {class: 'kpi'}, el('div', {class: 'l'}, '秘書處核心預算員額'), el('div', {class: 'v'}, String(staffNow[2])), el('div', {class: 'd'}, '2025–2026 核定 ' + staffNow[1] + ' 個')) : null));
   if (kpiCsv) box.append(kpiCsv);
-  box.append(...[sankeyCard(B), rankCard(B), mapCard(B), trendCard(B), B.kmgbf ? kmgbfCard(B) : null, partyCard(B, parts), tableCard(B), footer()].filter(Boolean));
+  box.append(...[sankeyCard(B), rankCard(B), mapCard(B), trendCard(B), B.kmgbf ? kmgbfCard(B) : null, B.kmgbf ? yerevanCard(B) : null, partyCard(B, parts), tableCard(B), footer()].filter(Boolean));
   $('#main').replaceChildren(box);
   if (parts[0] === 'party') document.getElementById('party-card')?.scrollIntoView();
   else $('#main').scrollTop = 0;
@@ -1077,6 +1077,51 @@ function kmgbfCard(B) {
     csvDl(B, [['h:kmgbf_allocation_by_target.csv', '依目標彙整'], ['h:kmgbf_voluntary_needs_mapping.csv', '各主題金額與對應目標']]),
     srcLine(B, [[K.url, 0, '決議 16/28 表 4'], ...(B.decisions.find(d => d.ref === '15/34') ? [[B.decisions.find(d => d.ref === '15/34').url, 0, '決議 15/34']] : [])]));
   draw();
+  return card;
+}
+
+// ---- Yerevan Pathway 與預算：全球檢視決議（L.15 第 14–49 段）對照預算草案 ----
+function yerevanCard(B) {
+  const L15 = '6ae38db57de9589330b2f72d', pg = n => '#' + L15 + '/p' + String(n).padStart(3, '0');
+  const K = B.kmgbf, tot = K.rows.filter(r => r.amt).reduce((s, r) => s + r.amt, 0);
+  const PW = ['Mechanisms for planning, monitoring, reporting and review', 'Monitoring framework', 'Clearing-house mechanism and knowledge management',
+    'Capacity-building and development, technical and scientific cooperation', 'Scientific and technical needs', 'Financial mechanism', 'Resource mobilization', 'Mainstreaming of biodiversity'];
+  const pw = PW.map(en => K.rows.find(r => r.amt && r.en.startsWith(en))).filter(Boolean), sub = pw.reduce((s, r) => s + r.amt, 0);
+  const cur = B.years['2027'].total + B.years['2028'].total, prev = B.years['2025'].total + B.years['2026'].total;
+  const AREAS = [['加速行動與執行', 6, '提高企圖心、處理生物多樣性流失的根本驅動因素、邀請國家政府以外的行為者加速貢獻'],
+    ['擴大範圍與涵蓋', 7, '儘快提交更新的國家生物多樣性策略與行動計畫、國家目標與第七次國家報告；鼓勵自願制定國家生物多樣性財務計畫'],
+    ['強化執行手段', 7, '承認執行手段不足是最常見的障礙；鼓勵改革有害誘因；強烈鼓勵已開發國家增加支援；要求 GEF 簡化申請'],
+    ['全政府參與', 8, '強化包括財政與預算在內的跨部會協調，促進政策一致性'],
+    ['全社會參與', 9, '原住民族與地方社區、女性、青年、地方政府、企業與金融界的參與'],
+    ['強化監測與知識', 9, '補強國家監測與知識管理系統，讓生態系類主要指標可以運作'],
+    ['交辦秘書處', 10, '8 項工作，其中 3 項「視資源而定」（下表）']];
+  const TASKS = [['(a) 檢討工作計畫時納入全球檢視的發現', false], ['(b) 透過資訊交換機制促進經驗分享', false], ['(c) 在下次 COP 前的執行附屬機構會議提出經驗彙整', true],
+    ['(d) 協調同儕學習與能力建構', true], ['(e) 舉辦全球檢視與 Yerevan Pathway 的區域對話', true], ['(f) 讓國家計畫與報告更易取得', false],
+    ['(g) 建置全球報告資訊儀表板', false], ['(h) 協助改善國家監測與知識管理系統', false]];
+  const card = el('section', {class: 'card', id: 'yerevan'});
+  card.append(el('h3', {}, 'Yerevan Pathway 與預算'),
+    el('p', {}, 'Yerevan Pathway 是 COP 17 對昆明－蒙特婁全球生物多樣性綱要第一次集體進展全球檢視的協商回應，訂出 2030 年前的優先行動。全球檢視的結論是全球無法在 2030 年前達成 23 項目標。它不是另一份獨立文件，而是全球檢視決議中呼籲各國加速行動的章節（決議草案 ',
+      el('a', {href: pg(6)}, 'CBD/COP/17/L.15 第 14–49 段'), '）。'),
+    el('div', {class: 'note'}, '正式決議文本尚未公布；以下段落依決議草案 L.15（2026-10-29），方括號段落的最終寫法待確認。依 Carbon Brief 報導，有害補貼一段由「敦促」軟化為「鼓勵」並加上「依國情」，驅動因素一段大幅刪減。'),
+    el('div', {class: 'dtwrap', style: 'max-height:none'}, el('table', {class: 'dt'},
+      el('thead', {}, el('tr', {}, el('th', {class: 't'}, '面向'), el('th', {class: 't'}, '主要內容'))),
+      el('tbody', {}, ...AREAS.map(([a, p, t]) => el('tr', {}, el('td', {class: 't'}, el('a', {href: pg(p)}, a)), el('td', {class: 't'}, t)))))),
+    el('h3', {style: 'margin-top:16px'}, '交辦秘書處的工作'),
+    el('div', {class: 'dtwrap', style: 'max-height:none'}, el('table', {class: 'dt'},
+      el('thead', {}, el('tr', {}, el('th', {class: 't'}, 'L.15 第 49 段'), el('th', {class: 't'}, '是否「視資源而定」'))),
+      el('tbody', {}, ...TASKS.map(([t, r]) => el('tr', {}, el('td', {class: 't'}, t), el('td', {class: 't', style: r ? 'color:var(--warn);font-weight:600' : ''}, r ? '是：核心預算未編列，需自願捐助' : '否')))))),
+    el('h3', {style: 'margin-top:16px'}, '預算撐得起嗎？'),
+    el('ul', {style: 'margin:4px 0 0 18px;padding:0;line-height:1.75'},
+      el('li', {}, '核心預算小幅成長：2027–2028 年整合核心預算 ' + kusd(cur) + '，比 2025–2026 年名目增加 ' + nf((cur / prev - 1) * 100) + '%；方括號中的替代方案為零名目成長。員額由 87 增為 91。'),
+      el('li', {}, '支撐 Pathway 的自願經費尚未編列：決議 16/28 表 4 中與 Pathway 最直接相關的 ' + pw.length + ' 個主題（監測與檢討機制、資訊交換機制、能力建構、資源動員等），上一期需求合計 ' + usd(sub) + '，占自願信託基金需求的 ' + nf(sub / tot * 100, 1) + '%；本屆 2027–2028 年的對應表仍是預留位置（PLACE HOLDER）。'),
+      el('li', {}, '區域對話沒有估算經費：參與信託基金是為締約方大會與附屬機構會議編列，第 45 段邀請的區域與次區域對話未見成本。'),
+      el('li', {}, '量級落差：大會期間宣布近 20 億美元新資金（CBD 新聞稿），而目標 19(a) 要求國際資金 2025 年每年至少 200 億美元。Pathway 把重心放在各國的財政與預算協調（第 32 段）與國家生物多樣性財務計畫（第 21 段）。')),
+    el('div', {class: 'note', style: 'margin-top:10px'}, el('b', {}, '判斷：'), '核心預算撐得住秘書處的基本運作與下一輪檢視程序，但撐不起 Pathway 期待的「加速」——區域對話、同儕學習、監測系統支援與能力建構目前都沒有可靠財源，成敗取決於自願捐助、GEF 撥款與各國自己的預算。'),
+    el('p', {class: 'label'}, '值得追蹤：2027–2028 年自願信託基金表 4 的內容與捐助到位情形；GEF-9 生物多樣性撥款的實際分配；有害誘因改革在各國預算上的變化；正式決議文本。'),
+    csvDl(B, [['h:kmgbf_voluntary_needs_mapping.csv', '自願信託基金各主題需求']]),
+    el('div', {class: 'src'}, '資料來源：', el('a', {href: pg(6)}, 'CBD/COP/17/L.15 第 6–11 頁'), '；', el('a', {href: '#' + B.table1.id + '/p008'}, 'CBD/COP/17/L.31/Rev.1 表 1'), '；',
+      el('a', {href: K.url, target: '_blank', rel: 'noopener'}, '決議 16/28 表 4 ↗'), '；', el('a', {href: 'https://www.cbd.int/doc/press/2026/pr-2026-10-31-cop17-en.pdf', target: '_blank', rel: 'noopener'}, 'CBD 新聞稿 2026-10-31 ↗'),
+      '；Carbon Brief, COP17: Key outcomes（第二手）'));
   return card;
 }
 
