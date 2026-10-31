@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COP17 文件對照</title>
+<meta name="description" content="CBD COP17 會議文件英文原文與正體中文翻譯對照檢閱（非官方翻譯）">
+<style>
+:root{--bg:#f7f7f4;--panel:#fff;--ink:#1d2321;--muted:#5d6763;--line:#dfe3df;--accent:#1f6f5c;--accent-ink:#fff;--soft:#e8f2ee;--warn:#9a5b00;--warn-bg:#fff4e0;--edit:#fff8d6;--edit-line:#e2c64a;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121615;--panel:#1a201e;--ink:#e3e8e5;--muted:#9aa5a0;--line:#2c3532;--accent:#5cc2a4;--accent-ink:#0d1412;--soft:#1f2e29;--warn:#f0b35a;--warn-bg:#2e2412;--edit:#2f2a12;--edit-line:#8a7520}}
+:root[data-theme="dark"]{--bg:#121615;--panel:#1a201e;--ink:#e3e8e5;--muted:#9aa5a0;--line:#2c3532;--accent:#5cc2a4;--accent-ink:#0d1412;--soft:#1f2e29;--warn:#f0b35a;--warn-bg:#2e2412;--edit:#2f2a12;--edit-line:#8a7520}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.65 -apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;overflow-x:hidden}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--accent)}
+header.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--line);min-height:56px}
+header.top h1{font-size:16px;margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.count{display:inline-block;min-width:22px;padding:0 6px;margin-left:6px;border-radius:11px;background:var(--warn);color:var(--panel);font-size:12px;line-height:22px;text-align:center}
+.wrap{display:grid;grid-template-columns:340px 1fr;height:calc(100% - 57px)}
+aside{border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;min-height:0}
+.filters{padding:12px 16px;border-bottom:1px solid var(--line);display:grid;gap:8px}
+.filters input{width:100%;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{min-height:36px;padding:0 12px;border:1px solid var(--line);border-radius:18px;background:var(--panel);font-size:13px}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.list{overflow:auto;flex:1}
+.item{display:block;width:100%;text-align:left;padding:10px 16px;border:0;border-bottom:1px solid var(--line);background:none;min-height:56px}
+.item:hover{background:var(--soft)}
+.item.on{background:var(--soft);box-shadow:inset 3px 0 var(--accent)}
+.item .sym{font-size:12px;color:var(--muted)}
+.item .t{display:block;font-weight:600;font-size:14px}
+.item .e{display:block;font-size:12px;color:var(--muted)}
+.tag{display:inline-block;font-size:11px;padding:0 6px;border-radius:4px;border:1px solid var(--line);color:var(--muted);margin-left:4px;vertical-align:1px}
+main{overflow:auto;min-width:0}
+.doc{max-width:1400px;margin:0 auto;padding:16px}
+.empty{padding:48px 16px;color:var(--muted);text-align:center}
+.dhead h2{font-size:20px;margin:4px 0}
+.dhead .en{color:var(--muted);margin:0}
+.links{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.links a{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:8px;text-decoration:none;background:var(--panel)}
+.note{font-size:13px;color:var(--warn);background:var(--warn-bg);border-radius:8px;padding:8px 12px;margin:8px 0}
+section.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:12px 0}
+section.card h3{font-size:15px;margin:0 0 6px}
+.sumf{position:relative;border-radius:6px;padding:4px 6px;margin:0 -6px;cursor:pointer}
+.sumf:hover{background:var(--soft)}
+.sumf.edited{background:var(--edit);outline:1px solid var(--edit-line)}
+.sumf ul{margin:4px 0;padding-left:20px}
+.label{font-size:12px;color:var(--muted)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{min-height:40px;padding:0 12px;border:0;background:var(--panel)}
+.seg button.on{background:var(--accent);color:var(--accent-ink)}
+.page{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;margin:12px 0;overflow:hidden}
+.page .pno{grid-column:1/-1;font-size:12px;color:var(--muted);padding:4px 12px;border-bottom:1px solid var(--line);background:var(--soft)}
+.page pre{margin:0;padding:12px;font:12.5px/1.5 var(--mono);white-space:pre;overflow:auto;border-right:1px solid var(--line);min-width:0}
+.zh{padding:8px 12px;min-width:0}
+.blk{position:relative;border-radius:6px;padding:4px 6px;margin:2px -6px;cursor:pointer;overflow-x:auto}
+.blk:hover{background:var(--soft)}
+.blk p{margin:.3em 0}
+.blk table{border-collapse:collapse;font-size:13px}
+.blk td,.blk th{border:1px solid var(--line);padding:2px 6px}
+.blk.edited{background:var(--edit);outline:1px solid var(--edit-line);white-space:pre-wrap}
+.badge{position:absolute;top:2px;right:4px;font-size:11px;color:var(--warn)}
+.editor{background:var(--panel);border:1px solid var(--accent);border-radius:8px;padding:8px;margin:4px -6px;cursor:auto}
+.editor textarea{width:100%;min-height:120px;border:1px solid var(--line);border-radius:6px;padding:8px;background:var(--bg);resize:vertical}
+.editor input{width:100%;min-height:44px;border:1px solid var(--line);border-radius:6px;padding:0 8px;background:var(--bg);margin-top:6px}
+.editor .row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.editor .orig{font-size:12px;color:var(--muted);white-space:pre-wrap;max-height:8em;overflow:auto;border-left:3px solid var(--line);padding-left:8px;margin-bottom:6px}
+body.v-en .page{grid-template-columns:1fr}body.v-en .zh{display:none}body.v-en .page pre{border-right:0}
+body.v-zh .page{grid-template-columns:1fr}body.v-zh .page pre{display:none}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);padding:0;width:min(760px,calc(100% - 32px));max-height:calc(100% - 64px)}
+dialog::backdrop{background:rgba(0,0,0,.4)}
+.dlg{padding:16px;display:grid;gap:10px}
+.dlg h3{margin:0}
+.pend{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px}
+.pend .old{color:var(--muted);text-decoration:line-through;white-space:pre-wrap}
+.pend .new{white-space:pre-wrap}
+.pend .hd{display:flex;justify-content:space-between;gap:8px;align-items:center}
+footer{font-size:12px;color:var(--muted);padding:16px;border-top:1px solid var(--line);margin-top:24px}
+.back{display:none}
+@media (max-width:900px){
+  .wrap{grid-template-columns:1fr}
+  aside{display:flex}
+  main{display:none}
+  body.reading aside{display:none}
+  body.reading main{display:block}
+  body.reading .back{display:inline-block}
+  .page{grid-template-columns:1fr}
+  .page pre{border-right:0;border-bottom:1px solid var(--line)}
+  body.v-en .zh,body.v-zh .page pre{display:none}
+}
+</style>
+</head>
+<body class="v-both">
+<header class="top">
+  <button class="btn back" id="back" aria-label="回到清單">‹ 清單</button>
+  <h1>COP17 文件對照：英文原文／正體中文</h1>
+  <button class="btn" id="pending">待送出修正<span class="count" id="cnt">0</span></button>
+</header>
+<div class="wrap">
+  <aside>
+    <div class="filters">
+      <input id="q" type="search" placeholder="搜尋代碼、英文或中文標題" aria-label="搜尋">
+      <div class="chips" id="fm"></div>
+      <div class="chips" id="ft"></div>
+    </div>
+    <div class="list" id="list"></div>
+  </aside>
+  <main id="main"><div class="empty">從左側選一份文件開始檢閱。點中文段落即可修正翻譯。</div></main>
+</div>
+<dialog id="dlg"><div class="dlg" id="dlgc"></div></dialog>
+<script>
+'use strict';
+const REPO = 'https://github.com/mutolisp/CBD_COP17';
+const KEY = 'cbd-cop17-review-edits-v1';
+window.DOCS = {};
+const MEET = [['', '全部'], ['COP-17', 'COP 17'], ['CP-MOP-12', 'CP-MOP 12'], ['NP-MOP-06', 'NP-MOP 6']];
+const NAT = [['', '全部類型'], ['limited', 'L 文件'], ['crp', 'CRP'], ['non-paper', 'non-paper'], ['official', '會前文件']];
+const NATL = Object.fromEntries(NAT);
+const S = {m: '', t: '', q: '', id: null};
+const $ = s => document.querySelector(s);
+const el = (tag, attrs = {}, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') e.className = v; else if (k === 'html') e.innerHTML = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v);
+  }
+  for (const c of kids.flat()) if (c != null) e.append(c);
+  return e;
+};
+const ymd = s => new Date(Date.parse(s) + 4 * 3600e3).toISOString().slice(0, 10);  // 葉里溫時間
+
+let EDITS = {};
+let storeOK = true;
+try { EDITS = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { storeOK = false; }
+function saveEdits() {
+  try { localStorage.setItem(KEY, JSON.stringify(EDITS)); storeOK = true; } catch (e) { storeOK = false; }
+  $('#cnt').textContent = Object.keys(EDITS).length;
+}
+
+function chips(box, opts, key) {
+  box.replaceChildren(...opts.map(([v, l]) => el('button', {class: 'chip' + (S[key] === v ? ' on' : ''), onclick: () => { S[key] = v; chips(box, opts, key); renderList(); }}, l)));
+}
+function renderList() {
+  const norm = s => s.toLowerCase().replace(/[.\s]/g, '');  // 代碼有 L.31／L31 兩種寫法
+  const q = norm(S.q);
+  const rows = IDX.filter(d => (!S.m || d.meeting === S.m) && (!S.t || d.nature === S.t) &&
+    (!q || norm(d.sym + d.title + d.title_zh).includes(q)));
+  $('#list').replaceChildren(...rows.map(d => el('button', {class: 'item' + (d.id === S.id ? ' on' : ''), onclick: () => { location.hash = d.id; }},
+    el('span', {class: 'sym'}, (d.sym || '（無文件代碼）') + '　' + ymd(d.pub)),
+    el('span', {class: 'tag'}, NATL[d.nature] || d.nature), d.full ? null : el('span', {class: 'tag'}, '只有摘要'),
+    el('span', {class: 't'}, d.title_zh || d.title), el('span', {class: 'e'}, d.title))),
+    rows.length ? '' : el('div', {class: 'empty'}, '沒有符合的文件'));
+}
+
+function load(id) {
+  return new Promise((ok, bad) => {
+    if (window.DOCS[id]) return ok(window.DOCS[id]);
+    const s = el('script', {src: 'data/' + id + '.js'});
+    s.onload = () => window.DOCS[id] ? ok(window.DOCS[id]) : bad();
+    s.onerror = bad;
+    document.head.append(s);
+  });
+}
+
+function openDoc(id) {
+  const meta = IDX.find(d => d.id === id);
+  S.id = meta ? id : null;
+  document.body.classList.toggle('reading', !!meta);
+  renderList();
+  if (!meta) { $('#main').replaceChildren(el('div', {class: 'empty'}, '從左側選一份文件開始檢閱。點中文段落即可修正翻譯。')); return; }
+  $('#main').replaceChildren(el('div', {class: 'empty'}, '載入中…'));
+  load(id).then(doc => renderDoc(meta, doc), () => $('#main').replaceChildren(el('div', {class: 'empty'}, '無法載入這份文件。')));
+}
+
+function renderDoc(m, doc) {
+  const box = el('div', {class: 'doc'});
+  box.append(el('div', {class: 'dhead'},
+    el('div', {class: 'label'}, [m.sym || '（無文件代碼）', MEET.find(x => x[0] === m.meeting)?.[1], NATL[m.nature], m.group, '發布 ' + ymd(m.pub)].filter(Boolean).join('・')),
+    el('h2', {}, m.title_zh || m.title), el('p', {class: 'en', lang: 'en'}, m.title)),
+    el('div', {class: 'links'}, el('a', {href: m.url, target: '_blank', rel: 'noopener'}, 'CBD 原文 PDF ↗')),
+    el('div', {class: 'note'}, '中文為非官方翻譯（AI 翻譯' + (m.reviewed ? '，經 Claude Haiku 逐頁對照原文審查' : '') + '），未經 CBD 秘書處審定，以英文原文為準。發現錯誤請點該段修正。'));
+  if (doc.summary) box.append(renderSummary(m, doc));
+  if (doc.pages.length) {
+    box.append(el('div', {class: 'toolbar'}, el('div', {class: 'seg', role: 'group', 'aria-label': '顯示方式'},
+      ...[['both', '並排'], ['en', '英文'], ['zh', '中文']].map(([v, l]) => el('button', {class: document.body.classList.contains('v-' + v) ? 'on' : '', onclick: e => {
+        document.body.classList.remove('v-both', 'v-en', 'v-zh'); document.body.classList.add('v-' + v);
+        e.target.parentNode.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === e.target));
+      }}, l)))));
+    for (const pg of doc.pages) {
+      const zh = el('div', {class: 'zh', lang: 'zh-Hant-TW'});
+      pg.blocks.forEach((b, i) => zh.append(renderBlock(m, pg, b, i)));
+      box.append(el('div', {class: 'page'}, el('div', {class: 'pno'}, '第 ' + parseInt(pg.p.slice(1), 10) + ' 頁'),
+        el('pre', {lang: 'en'}, pg.en), zh));
+    }
+  } else {
+    box.append(el('div', {class: 'note'}, '會前正式文件只提供白話摘要，全文請看 CBD 原文。'));
+  }
+  box.append(footer());
+  $('#main').replaceChildren(box);
+  $('#main').scrollTop = 0;
+}
+
+function renderBlock(m, pg, b, i) {
+  const k = pg.zh + '#' + i;
+  const ed = EDITS[k];
+  const node = ed ? el('div', {class: 'blk edited', title: '已修正，點擊再修改'}, ed.new, el('span', {class: 'badge'}, '已修正'))
+                  : el('div', {class: 'blk', title: '點擊修正這段翻譯', html: b.html});
+  node.addEventListener('click', e => { if (e.target.closest('a')) return; node.replaceWith(editor(m, pg, b, i, node)); });
+  return node;
+}
+
+function editor(m, pg, b, i, node) {
+  const k = pg.zh + '#' + i;
+  const ta = el('textarea', {'aria-label': '修正後的譯文'}); ta.value = EDITS[k]?.new ?? b.md;
+  const rs = el('input', {type: 'text', placeholder: '修正說明（例如：數字錯誤、漏譯、用語）', 'aria-label': '修正說明'}); rs.value = EDITS[k]?.reason || '';
+  const back = () => box.replaceWith(renderBlock(m, pg, b, i));
+  const box = el('div', {class: 'editor', onclick: e => e.stopPropagation()},
+    el('div', {class: 'label'}, '原譯文'), el('div', {class: 'orig'}, b.md), ta, rs,
+    b.dup ? el('div', {class: 'note'}, '這段文字在本頁重複出現，維護者可能需要手動套用，請在說明中註明位置。') : null,
+    el('div', {class: 'row'},
+      el('button', {class: 'btn primary', onclick: () => {
+        const v = ta.value.replace(/\s+$/, '');
+        if (v === b.md) delete EDITS[k];
+        else EDITS[k] = {kind: 'page', id: m.id, sym: m.sym || m.title, p: pg.p, zh: pg.zh, pre: b.pre || '', old: b.md, new: v, reason: rs.value.trim(), en: pg.en.replace(/\s+/g, ' ').slice(0, 200), dup: !!b.dup};
+        saveEdits(); back();
+        if (!storeOK) alertNote('瀏覽器無法儲存修正（可能是無痕模式），請在離開前先下載 JSON 或送出 Issue。');
+      }}, '儲存'),
+      el('button', {class: 'btn', onclick: back}, '取消'),
+      EDITS[k] ? el('button', {class: 'btn', onclick: () => { delete EDITS[k]; saveEdits(); back(); }}, '復原原譯文') : null));
+  setTimeout(() => ta.focus(), 0);
+  return box;
+}
+
+const SUMF = [['title_zh', '中文標題', false], ['what', '這份文件在做什麼', false], ['points', '重點', true], ['open', '尚未達成共識', true]];
+function renderSummary(m, doc) {
+  const k = 'sum:' + m.id;
+  const cur = EDITS[k]?.fixed || doc.summary;
+  const sec = el('section', {class: 'card'}, el('h3', {}, '白話摘要'),
+    el('div', {class: 'label'}, 'AI 依英文原文產生' + (doc.summaryReviewed ? '，經 Claude Haiku 對照原文審查' : '') + '，僅供參考。點擊可修正。'));
+  const body = el('div', {class: 'sumf' + (EDITS[k] ? ' edited' : ''), title: '點擊修正摘要'});
+  for (const [f, l, list] of SUMF) {
+    const v = cur[f];
+    if (list ? !(v && v.length) : !v) continue;
+    body.append(el('div', {class: 'label'}, l), list ? el('ul', {}, v.map(x => el('li', {}, x))) : el('p', {style: 'margin:.2em 0'}, v));
+  }
+  if (EDITS[k]) body.append(el('span', {class: 'badge'}, '已修正'));
+  body.addEventListener('click', () => body.replaceWith(sumEditor(m, doc, sec)));
+  sec.append(body);
+  return sec;
+}
+function sumEditor(m, doc, sec) {
+  const k = 'sum:' + m.id;
+  const cur = EDITS[k]?.fixed || doc.summary;
+  const inputs = {};
+  const box = el('div', {class: 'editor'});
+  for (const [f, l, list] of SUMF) {
+    const ta = el('textarea', {'aria-label': l, style: 'min-height:' + (list ? '140px' : '60px')});
+    ta.value = list ? (cur[f] || []).join('\n') : (cur[f] || '');
+    inputs[f] = ta;
+    box.append(el('div', {class: 'label'}, l + (list ? '（一行一項）' : '')), ta);
+  }
+  const rs = el('input', {type: 'text', placeholder: '修正說明', 'aria-label': '修正說明'}); rs.value = EDITS[k]?.reason || '';
+  const done = () => sec.replaceWith(renderSummary(m, doc));
+  box.append(rs, el('div', {class: 'row'},
+    el('button', {class: 'btn primary', onclick: () => {
+      const fixed = {};
+      for (const [f, , list] of SUMF) fixed[f] = list ? inputs[f].value.split('\n').map(s => s.trim()).filter(Boolean) : inputs[f].value.trim();
+      if (JSON.stringify(fixed) === JSON.stringify(doc.summary)) delete EDITS[k];
+      else EDITS[k] = {kind: 'summary', id: m.id, sym: m.sym || m.title, fixed, reason: rs.value.trim()};
+      saveEdits(); done();
+    }}, '儲存'),
+    el('button', {class: 'btn', onclick: done}, '取消'),
+    EDITS[k] ? el('button', {class: 'btn', onclick: () => { delete EDITS[k]; saveEdits(); done(); }}, '復原原摘要') : null));
+  return box;
+}
+
+function payload() {
+  const all = Object.values(EDITS);
+  return {
+    source: REPO, at: new Date().toISOString(),
+    fixes: all.filter(x => x.kind === 'page').map(x => ({zh: x.zh, type: 'user', severity: '', old: (x.pre || '') + x.old, new: (x.pre || '') + x.new, en: x.en, reason: x.reason})),  // pre 讓 old 在頁內唯一
+    summaries: all.filter(x => x.kind === 'summary').map(x => ({id: x.id, ok: false, issues: x.reason ? [x.reason] : [], fixed: x.fixed}))
+  };
+}
+function download() {
+  const blob = new Blob([JSON.stringify(payload(), null, 1)], {type: 'application/json'});
+  const a = el('a', {href: URL.createObjectURL(blob), download: 'cop17-translation-fixes-' + new Date().toISOString().slice(0, 16).replace(/[:T]/g, '') + '.json'});
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function issue() {
+  const all = Object.values(EDITS);
+  const syms = [...new Set(all.map(x => x.sym))];
+  const title = '翻譯修正：' + syms.slice(0, 3).join('、') + (syms.length > 3 ? ' 等 ' + syms.length + ' 份' : '') + '（' + all.length + ' 處）';
+  const lines = all.map(x => '- ' + x.sym + (x.p ? ' ' + x.p : ' 摘要') + (x.reason ? '：' + x.reason : ''));
+  const json = JSON.stringify(payload(), null, 1);
+  const body = '從檢閱網站送出的翻譯修正。\n\n' + lines.join('\n') + '\n\n<details><summary>修正內容（JSON，可直接用 cbd_docs.py review-apply／summary-apply 套用）</summary>\n\n```json\n' + json + '\n```\n</details>\n';
+  let url = REPO + '/issues/new?labels=translation-fix&title=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(body);
+  if (url.length <= 7000) { window.open(url, '_blank', 'noopener'); return; }
+  const short = '從檢閱網站送出的翻譯修正（內容較長，請把剪貼簿裡的 JSON 貼在下方）。\n\n' + lines.slice(0, 40).join('\n') + '\n\n```json\n（請貼上）\n```\n';
+  url = REPO + '/issues/new?labels=translation-fix&title=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(short);
+  const go = () => window.open(url, '_blank', 'noopener');
+  if (navigator.clipboard?.writeText) navigator.clipboard.writeText(json).then(() => { alertNote('修正內容較長，已複製 JSON 到剪貼簿；請在開啟的 Issue 中貼上。'); go(); }, () => { alertNote('無法複製到剪貼簿，請改用「下載 JSON」再附加到 Issue。'); go(); });
+  else { alertNote('請改用「下載 JSON」，再把檔案附加到 Issue。'); go(); }
+}
+function alertNote(msg) {
+  const n = el('div', {class: 'note', role: 'status', style: 'position:fixed;left:16px;right:16px;bottom:16px;z-index:9;max-width:640px;margin:0 auto;box-shadow:0 4px 16px rgba(0,0,0,.2)'}, msg);
+  document.body.append(n); setTimeout(() => n.remove(), 6000);
+}
+function showPending() {
+  const all = Object.entries(EDITS);
+  const c = $('#dlgc');
+  c.replaceChildren(el('h3', {}, '待送出修正（' + all.length + '）'),
+    el('div', {class: 'label'}, '修正暫存在這個瀏覽器。送出 Issue 需要 GitHub 帳號；也可以下載 JSON 寄給維護者。Issue 內容會公開。'),
+    ...all.map(([k, x]) => el('div', {class: 'pend'},
+      el('div', {class: 'hd'}, el('strong', {}, x.sym + (x.p ? '　' + x.p : '　白話摘要')),
+        el('button', {class: 'btn', onclick: () => { delete EDITS[k]; saveEdits(); showPending(); if (S.id) openDoc(S.id); }}, '刪除')),
+      x.reason ? el('div', {class: 'label'}, x.reason) : null,
+      x.kind === 'page' ? [el('div', {class: 'old'}, x.old.slice(0, 300)), el('div', {class: 'new'}, x.new.slice(0, 300))]
+                        : el('div', {class: 'new'}, x.fixed.what))),
+    all.length ? null : el('div', {class: 'empty'}, '目前沒有修正。點文件中的中文段落即可修正。'),
+    el('div', {class: 'row', style: 'display:flex;flex-wrap:wrap;gap:8px'},
+      el('button', {class: 'btn primary', onclick: issue, ...(all.length ? {} : {disabled: ''})}, '送出 GitHub Issue'),
+      el('button', {class: 'btn', onclick: download, ...(all.length ? {} : {disabled: ''})}, '下載 JSON'),
+      el('button', {class: 'btn', onclick: () => $('#dlg').close()}, '關閉')));
+  if (!$('#dlg').open) $('#dlg').showModal();
+}
+function footer() {
+  return el('footer', {},
+    el('p', {}, '英文原文：CBD 秘書處正式文件。依 ', el('a', {href: 'https://www.cbd.int/copyright/', target: '_blank', rel: 'noopener'}, 'CBD 版權說明'),
+      '，正式文件屬公有領域；此處照原文抽出文字，未改動內容，出處為 cbd.int，請以原始 PDF 為準。'),
+    el('p', {}, '正體中文：臺灣代表團以 AI（gemma4:26b）翻譯並經 Claude Haiku 對照審查，非官方翻譯，未經 CBD 秘書處審定，以英文原文為準；翻譯與摘要以 CC0 1.0 釋出。'),
+    el('p', {}, el('a', {href: REPO, target: '_blank', rel: 'noopener'}, 'GitHub repo'), '　·　', el('a', {href: REPO + '/issues', target: '_blank', rel: 'noopener'}, '修正回報（Issues）')));
+}
+
+chips($('#fm'), MEET, 'm');
+chips($('#ft'), NAT, 't');
+$('#q').addEventListener('input', e => { S.q = e.target.value; renderList(); });
+$('#pending').addEventListener('click', showPending);
+$('#back').addEventListener('click', () => { history.replaceState(null, '', location.pathname + location.search); openDoc(null); });
+window.addEventListener('hashchange', () => openDoc(decodeURIComponent(location.hash.slice(1))));
+saveEdits();
+const s = el('script', {src: 'data/index.js'});
+s.onload = () => { renderList(); openDoc(decodeURIComponent(location.hash.slice(1))); };
+s.onerror = () => $('#list').replaceChildren(el('div', {class: 'empty'}, '找不到 data/index.js，請先執行 tools/review_site.py。'));
+document.head.append(s);
+</script>
+</body>
+</html>
