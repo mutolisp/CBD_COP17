@@ -18,6 +18,12 @@
   - `pdf_url`：CBD 原文 PDF。
 - `<文件代碼>/p013-t8.csv`：第 13 頁起的第 8 張表。沒有文件代碼的非正式文件（non-paper）以議程項目與版次命名，例如 `non-paper-item-17-c-v-2/`。
 
+- `history/`：預算頁的歷年資料，由 `review_site.py` 產生。
+  - `budget_by_year.csv`：2019–2028 年度整合核心預算（千美元），依支出項目分為六類，附公約締約方應分攤淨額與來源決議。2021、2022 年為暫行預算（決議 EM-2/1、15/1）。
+  - `convention_contributions_by_party.csv`：公約一般信託基金各締約方歷年分攤額（美元）。
+  - `secretariat_staffing.csv`：秘書處核心預算員額。
+  - `kmgbf_voluntary_needs_mapping.csv`：決議 16/28 表 4 自願信託基金各主題需求（美元，不含 13% 計畫支援費用）與本團判斷的 KMGBF 對應目標；多目標主題平均分配。對應不是決議原文。
+
 ## 格式
 
 - 編碼為 UTF-8 含 BOM，Excel 可以直接開啟中文。
