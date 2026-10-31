@@ -125,6 +125,7 @@ a.kg{text-decoration:underline 1px dotted;text-underline-offset:3px}
 :root{--m1:#d9f0a3;--m2:#a1dab4;--m3:#41b6c4;--m4:#2c7fb8;--m5:#253494;--m6:#081d58;--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--s5:#e87ba4;--s6:#008300;--muted-fill:#b9c0bc;--grid:#e6e9e6}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--m1:#1f3d5c;--m2:#1d6e8f;--m3:#2a9d8f;--m4:#69c27a;--m5:#c4df5a;--m6:#fde725;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--s5:#d55181;--s6:#008300;--muted-fill:#56605b;--grid:#2c3532}}
 :root[data-theme="dark"]{--m1:#1f3d5c;--m2:#1d6e8f;--m3:#2a9d8f;--m4:#69c27a;--m5:#c4df5a;--m6:#fde725;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--s5:#d55181;--s6:#008300;--muted-fill:#56605b;--grid:#2c3532}
+.leaflet-container{font:inherit}.leaflet-bar a{background:var(--panel);color:var(--ink);border-color:var(--line)}.leaflet-bar a:hover{background:var(--soft)}.leaflet-control-attribution{background:color-mix(in oklab,var(--panel) 80%,transparent)!important;color:var(--muted)}.leaflet-control-attribution a{color:var(--accent)}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:12px 0}
 .kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
 .kpi .v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
@@ -575,21 +576,34 @@ function treemap(all, tot, color, n) {
   return svg;
 }
 
-// ---- 地圖模式：各締約方分攤額／比例／增減，依國界著色 ----
+// ---- 地圖模式：各締約方分攤額／比例／增減，依國界著色（Leaflet；不載入底圖圖磚，離線也能用） ----
+function loadOnce(src, css) {
+  loadOnce.p = loadOnce.p || {};
+  return loadOnce.p[src] = loadOnce.p[src] || new Promise((ok, no) => {
+    const n = css ? el('link', {rel: 'stylesheet', href: src}) : el('script', {src});
+    n.onload = ok; n.onerror = () => no(new Error(src)); document.head.append(n);
+  });
+}
+// Leaflet 的 SVG 屬性不吃 CSS 變數，先換算成實際顏色
+function cssColor(v) {
+  const p = cssColor.p || (cssColor.p = document.body.appendChild(el('i', {style: 'display:none'})));
+  p.style.color = ''; p.style.color = v;
+  return getComputedStyle(p).color;
+}
 function mapCard(B) {
-  const card = el('section', {class: 'card'}), area = el('div', {class: 'chart'}), leg = el('div', {class: 'legend'}), small = el('div', {class: 'label'});
+  const card = el('section', {class: 'card'}), area = el('div', {class: 'chart', style: 'height:min(62vh,520px);border-radius:8px;background:var(--bg)'}), leg = el('div', {class: 'legend'}), small = el('div', {class: 'label'});
   const fund = el('select', {'aria-label': '基金'}, ...B.funds.map(f => el('option', {value: f.key}, f.zh + '一般信託基金')), el('option', {value: 'ALL'}, '三基金合計'));
   const metric = el('select', {'aria-label': '指標'}, el('option', {value: 'amt'}, '2027–2028 分攤額（美元）'), el('option', {value: 'share'}, '調整後分攤比例（%）'),
     el('option', {value: 'chg'}, '與 2025–2026 相比的增減（%）'));
   const src = el('div');
-  const view = {x: 0, y: 0, k: 1};  // 縮放與平移狀態，切換指標時保留
+  let map = null, geo = null, dots = null, cur = null;  // cur：目前指標下各國的 {o, v, color}
   const draw = () => {
     const W = window.WORLD;
-    if (!W) { area.replaceChildren(el('p', {class: 'label'}, '地圖資料載入中…')); return; }
+    if (!W || !window.L) return;
     const fs = fund.value === 'ALL' ? B.funds : [B.funds.find(f => f.key === fund.value)];
-    const val = new Map();  // geo 名稱 → {zh, en, key, v}
+    const val = new Map();  // geo 名稱（或 #代碼）→ 該國合計
     for (const f of fs) for (const r of f.contrib.rows) {
-      const k = r.geo || '#' + r.key, o = val.get(k) || {zh: r.zh || r.en, en: r.en, key: r.key, geo: r.geo, amt: 0, share: 0, prev: 0, hasPrev: true};
+      const k = r.geo || '#' + r.key, o = val.get(k) || {zh: r.zh || r.en, en: r.en, key: r.key, geo: r.geo, pt: r.pt, amt: 0, share: 0, prev: 0, hasPrev: true};
       o.amt += r.v[4] || 0; o.share += fund.value === 'ALL' ? 0 : (r.v[1] || 0);
       const p = B.prev[f.key]?.v[r.key];
       if (p == null) o.hasPrev = false; else o.prev += p;
@@ -599,95 +613,64 @@ function mapCard(B) {
     if (m === 'share' && fund.value === 'ALL') { metric.value = 'amt'; return draw(); }
     const get = o => m === 'amt' ? o.amt : m === 'share' ? o.share : (o.hasPrev && o.prev ? (o.amt / o.prev - 1) * 100 : null);
     const vs = [...val.values()].map(get).filter(v => v != null).sort((a, b) => a - b);
-    let color, bins, labels;
+    let color, labels;
     if (m === 'chg') {  // 雙向：減少偏藍、增加偏橘，0 附近為中性灰
-      bins = [-25, -10, -2, 2, 10, 25];
+      const bins = [-25, -10, -2, 2, 10, 25];
       const steps = ['color-mix(in oklab, var(--s1) 90%, var(--panel))', 'color-mix(in oklab, var(--s1) 60%, var(--panel))', 'color-mix(in oklab, var(--s1) 30%, var(--panel))',
         'var(--muted-fill)', 'color-mix(in oklab, var(--s2) 30%, var(--panel))', 'color-mix(in oklab, var(--s2) 60%, var(--panel))', 'color-mix(in oklab, var(--s2) 90%, var(--panel))'];
       color = v => steps[bins.filter(b => v > b).length];
       labels = steps.map((c, i) => [c, i === 0 ? '< −25%' : i === steps.length - 1 ? '> +25%' : (bins[i - 1] > 0 ? '+' : '') + bins[i - 1] + ' ~ ' + (bins[i] > 0 ? '+' : '') + bins[i] + '%']);
-    } else {  // 單一色相由淺到深，依分位數分 6 級（分攤額高度偏斜）
+    } else {  // 依分位數分 6 級（分攤額高度偏斜）
       const q = p => vs[Math.min(vs.length - 1, Math.floor(p * vs.length))];
-      bins = [q(1 / 6), q(2 / 6), q(3 / 6), q(4 / 6), q(5 / 6)];
+      const bins = [q(1 / 6), q(2 / 6), q(3 / 6), q(4 / 6), q(5 / 6)];
       const steps = ['var(--m1)', 'var(--m2)', 'var(--m3)', 'var(--m4)', 'var(--m5)', 'var(--m6)'];  // 多色相有序色階，相鄰級距較好分辨
       color = v => steps[bins.filter(b => v > b).length];
       const f = v => m === 'amt' ? nf(v, 0) : nf(v, 3);
       labels = steps.map((c, i) => [c, i === 0 ? '≤ ' + f(bins[0]) : i === steps.length - 1 ? '> ' + f(bins[4]) : f(bins[i - 1]) + ' ~ ' + f(bins[i])]);
     }
-    const svg = sv('svg', {viewBox: `0 0 ${W.w} ${W.h}`, role: 'img', 'aria-label': '各締約方分攤世界地圖', style: 'background:var(--bg);border-radius:8px'});
-    const fmt = (o, v) => v == null ? '無上一期資料' : m === 'amt' ? usd(v) : m === 'share' ? nf(v, 3) + '%' : (v >= 0 ? '+' : '') + nf(v) + '%';
-    for (const f of W.f) {
-      const o = val.get(f.n), v = o ? get(o) : null;
-      const p = sv('path', {d: f.d, fill: o ? (v == null ? 'var(--grid)' : color(v)) : 'var(--grid)', stroke: 'var(--panel)', 'stroke-width': .5, 'vector-effect': 'non-scaling-stroke'});
-      tipOn(p, () => o ? [fmt(o, v), o.zh + '（' + o.en + '）', '點擊查看這個締約方'] : [(f.zh || f.n) + (f.n === 'Taiwan' ? '' : ''), '非締約方', f.n]);
-      if (o) { p.style.cursor = 'pointer'; p.addEventListener('click', () => { if (!svg._dragged) location.hash = '#budget/party/' + encodeURIComponent(o.en); }); }
-      svg.append(p);
-    }
-    area.replaceChildren(zoomable(svg, W.w, W.h, view));
-    leg.replaceChildren(...labels.map(([c, l]) => el('span', {}, el('i', {style: 'background:' + c}), l)), el('span', {}, el('i', {style: 'background:var(--grid)'}), '非締約方或無資料'));
-    const off = [...val.values()].filter(o => !o.geo).sort((a, b) => (get(b) ?? -1e9) - (get(a) ?? -1e9));
-    small.replaceChildren('地圖比例尺（1:110m）無法顯示的締約方：', off.map(o => o.zh + ' ' + fmt(o, get(o))).join('、'), '。');
+    const fmt = v => v == null ? '無上一期資料' : m === 'amt' ? usd(v) : m === 'share' ? nf(v, 3) + '%' : (v >= 0 ? '+' : '') + nf(v) + '%';
+    const none = cssColor('var(--grid)'), edge = cssColor('var(--panel)');
+    cur = new Map([...val].map(([k, o]) => { const v = get(o); return [k, {o, v, c: v == null ? none : cssColor(color(v))}]; }));
+    geo.setStyle(ft => ({fillColor: cur.get(ft.properties.n)?.c || none, fillOpacity: 1, color: edge, weight: .6}));
+    dots.clearLayers();
+    for (const {o, v, c} of cur.values()) if (!o.geo && o.pt)
+      dots.addLayer(L.circleMarker(o.pt, {radius: 5, fillColor: c, fillOpacity: 1, color: cssColor('var(--ink)'), weight: 1}).on(evts(() => ({o, v}))));
+    const unit = m === 'amt' ? '單位：美元（2027–2028 兩年合計）' : m === 'share' ? '單位：%' : '單位：%（2027–2028 相對 2025–2026）';
+    leg.replaceChildren(el('span', {}, unit), ...labels.map(([c, l]) => el('span', {}, el('i', {style: 'background:' + c}), l)), el('span', {}, el('i', {style: 'background:var(--grid)'}), '非締約方或無資料'),
+      el('span', {}, el('i', {style: 'background:var(--panel);border:1px solid var(--ink);border-radius:50%'}), '圓點：地圖上太小的國家'));
+    const off = [...val.values()].filter(o => !o.geo && !o.pt).sort((a, b) => (get(b) ?? -1e9) - (get(a) ?? -1e9));
+    small.replaceChildren(...(off.length ? ['地圖上無法標示的締約方：', off.map(o => o.zh + ' ' + fmt(get(o))).join('、'), '。'] : []));
     src.replaceChildren(srcLine(B, [...fs.map(f => [f.id, f.pages.ct, f.sym + ' 分攤表']), ...(m === 'chg' ? Object.values(B.prev).map(p => [p.url, 0, '決議 ' + p.ref]) : [])]));
+    evts.fmt = fmt;
+  };
+  // 滑過顯示數值、點擊開啟查詢卡；f() 回傳 {o, v} 或非締約方的 {name}
+  const evts = f => ({
+    mousemove: e => { const d = f(); showVtip(e.originalEvent.clientX, e.originalEvent.clientY, ...(d.o ? [evts.fmt(d.v), d.o.zh + '（' + d.o.en + '）', '點擊查看這個締約方'] : [d.zh || d.name, '非締約方', d.name])); },
+    mouseout: hideVtip,
+    click: () => { const d = f(); if (d.o) location.hash = '#budget/party/' + encodeURIComponent(d.o.en); },
+  });
+  const init = () => {
+    const W = window.WORLD;
+    if (!W || !window.L) return;
+    map = L.map(area, {minZoom: 1, maxZoom: 7, zoomSnap: .5, worldCopyJump: false, maxBounds: [[-62, -200], [86, 200]], maxBoundsViscosity: .8, attributionControl: true});
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>').addAttribution('國界：Natural Earth');
+    geo = L.geoJSON({type: 'FeatureCollection', features: W.f.map(f => ({type: 'Feature', properties: {n: f.n, zh: f.zh}, geometry: {type: 'MultiPolygon', coordinates: f.c}}))}, {
+      onEachFeature: (ft, layer) => layer.on(evts(() => cur?.get(ft.properties.n) || {name: ft.properties.n, zh: ft.properties.zh})),
+    }).addTo(map);
+    dots = L.layerGroup().addTo(map);
+    map.fitBounds([[-50, -165], [75, 175]]);
+    draw();
+    new ResizeObserver(() => map.invalidateSize()).observe(area);
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
   };
   [fund, metric].forEach(x => x.addEventListener('change', draw));
   card.append(el('h3', {}, '地圖：各締約方分攤'), el('div', {class: 'ctrl'}, fund, metric), area, leg, small,
-    el('p', {class: 'label'}, '分攤額與比例依分位數分 6 級（各國差距極大，分位數較能看出分布），顏色由淺到深代表由低到高（深色模式為由暗到亮）；增減以固定級距，減少偏藍、增加偏橘。點擊國家可開啟查詢卡。國界取自 Natural Earth 1:110m（公有領域），僅供示意，不代表對任何領土主張的立場。'), src);
-  if (window.WORLD) draw();
-  else { const s = el('script', {src: 'data/worldmap.js'}); s.onload = draw; s.onerror = () => area.replaceChildren(el('p', {class: 'label'}, '找不到 data/worldmap.js。')); document.head.append(s); draw(); }
+    el('p', {class: 'label'}, '滾輪或雙指縮放、拖曳移動；放大後較容易點選小國，點擊國家可開啟查詢卡。分攤額與比例依分位數分 6 級（各國差距極大，分位數較能看出分布），顏色由淺到深代表由低到高（深色模式為由暗到亮）；增減以固定級距，減少偏藍、增加偏橘。國界取自 Natural Earth 1:110m，小國以 1:50m 國界的代表點畫成圓點（公有領域），僅供示意，不代表對任何領土主張的立場。'), src);
+  area.append(el('p', {class: 'label', style: 'padding:12px'}, '地圖載入中…'));
+  Promise.all([loadOnce('vendor/leaflet/leaflet.css', true), loadOnce('vendor/leaflet/leaflet.js'), window.WORLD ? 0 : loadOnce('data/worldmap.js')])
+    .then(() => { area.replaceChildren(); requestAnimationFrame(init); })
+    .catch(e => area.replaceChildren(el('p', {class: 'label', style: 'padding:12px'}, '地圖資料載入失敗：' + e.message)));
   return card;
-}
-
-// 地圖縮放與平移：滾輪／雙指縮放、拖曳平移、＋－與重設按鈕；以 viewBox 實作，線寬不隨縮放改變
-function zoomable(svg, W, H, view) {
-  const apply = () => {
-    view.k = Math.max(1, Math.min(12, view.k));
-    const w = W / view.k, h = H / view.k;
-    view.x = Math.max(0, Math.min(W - w, view.x)); view.y = Math.max(0, Math.min(H - h, view.y));
-    svg.setAttribute('viewBox', `${view.x} ${view.y} ${w} ${h}`);
-  };
-  const zoomAt = (f, cx, cy) => {  // cx、cy：以畫面比例表示的縮放中心（0–1）
-    const w = W / view.k, h = H / view.k;
-    const px = view.x + cx * w, py = view.y + cy * h;
-    view.k *= f;
-    view.x = px - cx * W / view.k; view.y = py - cy * H / view.k;
-    apply();
-  };
-  const rel = e => { const r = svg.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; };
-  svg.style.touchAction = 'none';
-  svg.style.cursor = 'grab';
-  svg.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.deltaY < 0 ? 1.25 : 0.8, ...rel(e)); }, {passive: false});
-  const pts = new Map();
-  let start = null, pinch = null;
-  svg.addEventListener('pointerdown', e => {
-    pts.set(e.pointerId, e); svg._dragged = false;
-    if (pts.size === 1) start = {x: e.clientX, y: e.clientY, vx: view.x, vy: view.y};
-    if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = {d: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY), k: view.k}; }
-  });
-  svg.addEventListener('pointermove', e => {
-    if (!pts.has(e.pointerId)) return;
-    pts.set(e.pointerId, e);
-    const r = svg.getBoundingClientRect();
-    if (pts.size === 2 && pinch) {
-      const [a, b] = [...pts.values()], d = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
-      const f = pinch.k * d / pinch.d / view.k;
-      zoomAt(f, ((a.clientX + b.clientX) / 2 - r.left) / r.width, ((a.clientY + b.clientY) / 2 - r.top) / r.height);
-      svg._dragged = true;
-    } else if (start) {
-      const dx = e.clientX - start.x, dy = e.clientY - start.y;
-      if (Math.abs(dx) + Math.abs(dy) > 4) { svg._dragged = true; svg.style.cursor = 'grabbing'; hideVtip(); }
-      view.x = start.vx - dx / r.width * W / view.k; view.y = start.vy - dy / r.height * H / view.k;
-      apply();
-    }
-  });
-  const end = e => { pts.delete(e.pointerId); if (pts.size < 2) pinch = null; if (!pts.size) { start = null; svg.style.cursor = 'grab'; setTimeout(() => { svg._dragged = false; }, 0); } };
-  svg.addEventListener('pointerup', end); svg.addEventListener('pointercancel', end); svg.addEventListener('pointerleave', end);
-  apply();
-  const btn = (t, l, f) => el('button', {class: 'btn', type: 'button', 'aria-label': l, title: l, style: 'min-width:44px', onclick: f}, t);
-  return el('div', {style: 'position:relative'}, svg,
-    el('div', {style: 'position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:4px'},
-      btn('＋', '放大', () => zoomAt(1.5, .5, .5)), btn('－', '縮小', () => zoomAt(1 / 1.5, .5, .5)),
-      btn('⟲', '重設縮放', () => { view.k = 1; view.x = 0; view.y = 0; apply(); })),
-    el('div', {class: 'label', style: 'margin-top:4px'}, '滾輪或雙指縮放、拖曳移動；放大後較容易點選小國。'));
 }
 
 // ---- 小倍數折線：每個類別一張小圖，標示首尾變化（比堆疊圖更容易看出各類趨勢） ----
