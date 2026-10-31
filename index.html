@@ -21,7 +21,10 @@ header.top h1{font-size:16px;margin:0;flex:1;min-width:0;white-space:nowrap;over
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .btn:disabled{opacity:.5;cursor:default}
 .count{display:inline-block;min-width:22px;padding:0 6px;margin-left:6px;border-radius:11px;background:var(--warn);color:var(--panel);font-size:12px;line-height:22px;text-align:center}
-.wrap{display:grid;grid-template-columns:340px 1fr;height:calc(100% - 57px)}
+.wrap{display:grid;grid-template-columns:340px 1fr;height:calc(100% - 57px);transition:grid-template-columns .2s}
+body.side-off .wrap{grid-template-columns:0 1fr}
+body.side-off aside{visibility:hidden;border-right:0}
+.side{min-width:44px;padding:0 10px}
 aside{border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;min-height:0}
 .filters{padding:12px 16px;border-bottom:1px solid var(--line);display:grid;gap:8px}
 .filters input{width:100%;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
@@ -64,6 +67,13 @@ section.card h3{font-size:15px;margin:0 0 6px}
 .ep.hl,.blk.hl,.blk.hl:hover{background:var(--hl)}
 .editor.hl{box-shadow:0 0 0 3px var(--hl)}
 mark.term{background:none;color:var(--term);font-weight:700;text-decoration:underline 2px;text-underline-offset:3px}
+a.dec{text-decoration:underline 1px dashed;text-underline-offset:3px;white-space:nowrap}
+a.dec::after{content:"↗";font-size:.75em;margin-left:1px}
+.cv{text-decoration:underline 1px var(--accent);text-underline-offset:3px;cursor:help}
+body.cv-off .cv{text-decoration:none;cursor:inherit}
+#tip{position:fixed;z-index:10;max-width:min(360px,calc(100% - 32px));background:var(--panel);color:var(--ink);border:1px solid var(--accent);border-radius:8px;padding:6px 10px;font-size:13px;line-height:1.5;box-shadow:0 4px 14px rgba(0,0,0,.18);pointer-events:none;display:none}
+#tip.on{display:block}
+#tip small{display:block;color:var(--muted);font-size:11px}
 #toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13px;z-index:9;display:none}
 #toast.on{display:block}
 .zh{padding:8px 12px;min-width:0}
@@ -98,6 +108,9 @@ footer{font-size:12px;color:var(--muted);padding:16px;border-top:1px solid var(-
   body.reading aside{display:none}
   body.reading main{display:block}
   body.reading .back{display:inline-block}
+  .side{display:none}
+  body.side-off .wrap{grid-template-columns:1fr}
+  body.side-off aside{visibility:visible}
   .page{grid-template-columns:1fr}
   .enp{border-right:0;border-bottom:1px solid var(--line)}
   body.v-en .zh,body.v-zh .enp{display:none}
@@ -107,6 +120,7 @@ footer{font-size:12px;color:var(--muted);padding:16px;border-top:1px solid var(-
 <body class="v-both">
 <header class="top">
   <button class="btn back" id="back" aria-label="回到清單">‹ 清單</button>
+  <button class="btn side" id="side" aria-label="收合文件清單" aria-expanded="true" title="收合／展開文件清單">«</button>
   <h1>COP17 文件對照：英文原文／正體中文</h1>
   <button class="btn" id="pending">待送出修正<span class="count" id="cnt">0</span></button>
 </header>
@@ -122,6 +136,7 @@ footer{font-size:12px;color:var(--muted);padding:16px;border-top:1px solid var(-
   <main id="main"><div class="empty">從左側選一份文件開始檢閱。點中文段落即可修正翻譯；滑過或選取中文時，對應的英文會以螢光標示。</div></main>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
+<div id="tip" role="tooltip"></div>
 <dialog id="dlg"><div class="dlg" id="dlgc"></div></dialog>
 <script>
 'use strict';
@@ -199,11 +214,15 @@ function renderDoc(m, doc) {
       ...[['both', '並排'], ['en', '英文'], ['zh', '中文']].map(([v, l]) => el('button', {class: document.body.classList.contains('v-' + v) ? 'on' : '', onclick: e => {
         document.body.classList.remove('v-both', 'v-en', 'v-zh'); document.body.classList.add('v-' + v);
         e.target.parentNode.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === e.target));
-      }}, l)))));
+      }}, l))),
+      el('button', {class: 'btn', 'aria-pressed': String(!document.body.classList.contains('cv-off')), onclick: e => {
+        const off = document.body.classList.toggle('cv-off'); e.target.setAttribute('aria-pressed', String(!off));
+        try { localStorage.setItem(KEY + '-cv', off ? 'off' : 'on'); } catch (_) {}
+      }}, '用語底線')));
     for (const pg of doc.pages) {
       const zh = el('div', {class: 'zh', lang: 'zh-Hant-TW'});
       const en = el('div', {class: 'enp', lang: 'en'});
-      pg.eps = pg.en.map(e => en.appendChild(el('div', {class: 'ep' + (e.tb ? ' tb' : '')}, e.t)));
+      pg.eps = pg.en.map(e => en.appendChild(renderEp(el('div', {class: 'ep' + (e.tb ? ' tb' : '')}), e.t)));
       pg.eps.forEach((d, j) => {
         const zs = () => [...zh.children].filter(n => pg.blocks[n.dataset.i]?.en?.includes(j));
         d.addEventListener('mouseenter', () => zs().forEach(n => n.classList.add('hl-soft')));
@@ -251,26 +270,80 @@ function termRe(en) {
   const p = fold(en).replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+').replace(/[-‐‑–]/g, '[-‐‑–\\s]?');
   return '(?<![a-z])' + p + (/[a-z]$/.test(p) ? '(?:s|es)?' : '') + '(?![a-z])';
 }
-function markTerms(d, t, ens) {
-  if (!ens.length) { d.textContent = t; return 0; }
-  let f = '';
-  const map = [];
-  for (let i = 0; i < t.length; i++) { const c = fold(t[i]) || t[i]; for (const _ of c) map.push(i); f += c; }
-  map.push(t.length);
-  const re = new RegExp(ens.map(termRe).join('|'), 'g'), esc = x => x.replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c]));
-  let html = '', last = 0, n = 0;
-  for (const m of f.matchAll(re)) {
-    if (!m[0]) continue;
-    const a = map[m.index], b = map[m.index + m[0].length];
-    html += esc(t.slice(last, a)) + '<mark class="term">' + esc(t.slice(a, b)) + '</mark>'; last = b; n++;
+// 在元素的文字節點裡找 re（en：去重音、小寫後比對），符合處換成 make(原文, 前一字, 後一字) 產生的元素；make 回傳 null 則略過
+function wrap(root, re, en, make) {
+  const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [];
+  while (tw.nextNode()) nodes.push(tw.currentNode);
+  let n = 0;
+  for (const node of nodes) {
+    const t = node.data, map = [];
+    let f = t;
+    if (en) { f = ''; for (let i = 0; i < t.length; i++) { const c = fold(t[i]) || t[i]; for (const _ of c) map.push(i); f += c; } map.push(t.length); }
+    const frag = document.createDocumentFragment();
+    let last = 0;
+    for (const m of f.matchAll(re)) {
+      if (!m[0]) continue;
+      const a = en ? map[m.index] : m.index, b = en ? map[m.index + m[0].length] : m.index + m[0].length;
+      const e = make(t.slice(a, b), t[a - 1] || '', t[b] || '');
+      if (!e) continue;
+      frag.append(t.slice(last, a), e); last = b; n++;
+    }
+    if (last) { frag.append(t.slice(last)); node.replaceWith(frag); }
   }
-  d.innerHTML = html + esc(t.slice(last));
   return n;
+}
+// 固定用語（翻譯用語表、原文對照、外交部國名）：兩邊加底線，滑過顯示另一語言
+let CV = null;
+const norm = x => fold(x).replace(/[-‐‑–\s]+/g, ' ');
+function cv() {
+  if (CV || !window.VOCAB) return CV;
+  const zh = new Map(), en = new Map(), vars = new Set();
+  for (const [z, es, k] of window.VOCAB) {
+    zh.set(z, {es, k});
+    for (const e of es) { vars.add(e); const f = norm(e); if (!en.has(f)) en.set(f, []); en.get(f).push({z, e, k}); }
+  }
+  const esc = x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), byLen = (a, b) => b.length - a.length;
+  CV = {zh, en, zre: new RegExp('(?:' + [...zh.keys()].sort(byLen).map(esc).join('|') + ')(?!洋)', 'g'),
+        ere: new RegExp([...vars].sort(byLen).map(termRe).join('|'), 'g')};
+  return CV;
+}
+const acro = e => /^[A-Z][A-Z.]+$/.test(e);
+function cvSpan(tip, kind, text) {
+  const s = el('span', {class: 'cv'}, text);
+  s.dataset.tip = tip; s.dataset.kind = kind;
+  return s;
+}
+function cvZh(root) {
+  const c = cv();
+  if (c) wrap(root, c.zre, false, (t, pre, post) => { if (pre === '/' || post === '/') return null; const v = c.zh.get(t); return v && cvSpan(v.es.join(' / '), v.k, t); });
+  return root;
+}
+function cvEn(root) {
+  const c = cv();
+  if (c) wrap(root, c.ere, true, (t, pre, post) => {
+    if (pre === '/' || post === '/') return null;  // 文件代碼（CBD/COP/17/…）不算
+    const f = norm(t), hit = (c.en.get(f) || c.en.get(f.replace(/e?s$/, '')) || []).filter(x => !acro(x.e) || t.replace(/s$/, '') === x.e);
+    return hit.length ? cvSpan([...new Set(hit.map(x => x.z))].sort((a, b) => a.length - b.length).join('、'), hit[0].k, t) : null;  // 縮寫須大小寫相符（避免 us → US）
+  });
+  return root;
+}
+// 過去決議編號 → CBD 官方連結（tools/decision_links.py 逐一連線確認過）；只在提到 decision／決議 的段落
+const DEC_RE = /(?<![\w/.-])(?:(?:CP|NP)-\d{1,2}\/\d{1,3}|BS-[IVX]{1,5}\/\d{1,3}|[IVX]{1,5}\/\d{1,3}|1[4-6]\/\d{1,3})(?![\d/]|\.\d)/g;
+function decLinks(root) {
+  const D = window.DECS;
+  if (!D || !/decision|決議/i.test(root.textContent)) return root;
+  wrap(root, DEC_RE, false, t => D[t] ? el('a', {class: 'dec', href: D[t], target: '_blank', rel: 'noopener', title: '決議 ' + t + '（CBD 官方原文）'}, t) : null);
+  return root;
+}
+function renderEp(d, t) { d.textContent = t; return cvEn(decLinks(d)); }
+function markTerms(d, t, ens) {
+  renderEp(d, t);
+  return ens.length ? wrap(d, new RegExp(ens.map(termRe).join('|'), 'g'), true, x => el('mark', {class: 'term'}, x)) : 0;
 }
 let FOCUS = null;
 function clearFocus() {
   if (!FOCUS) return;
-  FOCUS.pg.eps.forEach((d, j) => { d.classList.remove('hl'); if (d.querySelector('mark')) d.textContent = FOCUS.pg.en[j].t; });
+  FOCUS.pg.eps.forEach((d, j) => { d.classList.remove('hl'); if (d.querySelector('mark')) renderEp(d, FOCUS.pg.en[j].t); });
   FOCUS.node?.classList.remove('hl');
   FOCUS = null;
 }
@@ -302,7 +375,7 @@ function renderBlock(m, pg, b, i) {
   const k = pg.zh + '#' + i;
   const ed = EDITS[k];
   const node = ed ? el('div', {class: 'blk edited', title: '已修正，點擊再修改'}, ed.new, el('span', {class: 'badge'}, '已修正'))
-                  : el('div', {class: 'blk', title: '點擊修正這段翻譯', html: b.html});
+                  : cvZh(decLinks(el('div', {class: 'blk', title: '點擊修正這段翻譯', html: b.html})));
   node.dataset.i = i;
   const soft = on => (b.en || []).forEach(j => pg.eps[j]?.classList.toggle('hl-soft', on));
   node.addEventListener('mouseenter', () => soft(true));
@@ -355,7 +428,8 @@ function renderSummary(m, doc) {
     body.append(el('div', {class: 'label'}, l), list ? el('ul', {}, v.map(x => el('li', {}, x))) : el('p', {style: 'margin:.2em 0'}, v));
   }
   if (EDITS[k]) body.append(el('span', {class: 'badge'}, '已修正'));
-  body.addEventListener('click', () => body.replaceWith(sumEditor(m, doc, sec)));
+  decLinks(body);
+  body.addEventListener('click', e => { if (!e.target.closest('a')) body.replaceWith(sumEditor(m, doc, sec)); });
   sec.append(body);
   return sec;
 }
@@ -452,11 +526,37 @@ $('#pending').addEventListener('click', showPending);
 $('#back').addEventListener('click', () => { history.replaceState(null, '', location.pathname + location.search); openDoc(null); });
 window.addEventListener('hashchange', () => openDoc(decodeURIComponent(location.hash.slice(1))));
 saveEdits();
+try { if (localStorage.getItem(KEY + '-cv') === 'off') document.body.classList.add('cv-off'); } catch (_) {}
+// 桌機版文件清單可收合，記住狀態
+function side(off) {
+  document.body.classList.toggle('side-off', off);
+  $('#side').textContent = off ? '☰ 清單' : '«';
+  $('#side').setAttribute('aria-expanded', String(!off));
+  $('#side').setAttribute('aria-label', off ? '展開文件清單' : '收合文件清單');
+}
+try { side(localStorage.getItem(KEY + '-side') === 'off'); } catch (_) {}
+$('#side').addEventListener('click', () => {
+  const off = !document.body.classList.contains('side-off');
+  side(off);
+  try { localStorage.setItem(KEY + '-side', off ? 'off' : 'on'); } catch (_) {}
+});
+// 先載詞彙（固定用語底線要用），再載文件清單
 const s = el('script', {src: 'data/index.js'});
 s.onload = () => { renderList(); openDoc(decodeURIComponent(location.hash.slice(1))); };
 s.onerror = () => $('#list').replaceChildren(el('div', {class: 'empty'}, '找不到 data/index.js，請先執行 tools/review_site.py。'));
-document.head.append(s);
-document.head.append(el('script', {src: 'data/terms.js'}));
+const tv = el('script', {src: 'data/terms.js'});
+tv.onload = tv.onerror = () => document.head.append(s);
+document.head.append(tv);
+const tip = $('#tip');
+document.addEventListener('mouseover', e => {
+  const c = e.target.closest?.('.cv');
+  if (!c || document.body.classList.contains('cv-off')) { tip.classList.remove('on'); return; }
+  tip.replaceChildren(c.dataset.tip, el('small', {}, c.dataset.kind));
+  tip.classList.add('on');
+  const r = c.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+  tip.style.left = Math.max(8, Math.min(r.left, innerWidth - w - 8)) + 'px';
+  tip.style.top = (r.bottom + h + 12 > innerHeight ? r.top - h - 6 : r.bottom + 6) + 'px';
+});
 document.addEventListener('keydown', e => { if (e.key === 'Escape') clearFocus(); });
 </script>
 </body>

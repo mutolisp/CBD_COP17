@@ -8,6 +8,8 @@
 - 線上：GitHub Pages 開啟後，網址為 `https://mutolisp.github.io/CBD_COP17/`。
 - 本機：直接用瀏覽器開啟 `index.html` 即可，不需要伺服器。
 - 英文依段落重排（只合併 PDF 斷行，不改文字；表格保留原版面）。滑過或點選中文段落時，對應的英文段落會以黃色螢光標示；選取中文詞彙時，英文對應詞會以粗體洋紅色標示（依翻譯用語表、決議動詞、外交部國名與數字比對）。
+- 固定用語（翻譯用語表、原文對照、外交部國名）在中英文都加底線，滑鼠移到上面會顯示另一語言的對應詞；可用「用語底線」按鈕關閉。左側文件清單可用左上角按鈕收合。
+- 過去決議編號（如 15/4、XII/17、CP-10/4、NP-5/3、BS-V/11）連到 CBD 官方原文。每個連結都已連線確認：決議 PDF 須出現該編號；早期決議沒有 PDF，改連 CBD 決議頁，並確認頁面標題相符。查不到的編號不加連結。本屆決議（17/…）尚未發布，所以沒有連結。
 - 點任一中文段落或白話摘要即可修正，修正會暫存在瀏覽器。到「待送出修正」可以：
   - **送出 GitHub Issue**：需要 GitHub 帳號，Issue 內容會公開；
   - **下載 JSON**：寄給維護者。
@@ -20,7 +22,8 @@
 # 1. 從 Issue 複製 JSON 存成 fixes.json，套用（會擋簡體字、外文、中國大陸用語與不唯一的原文）
 python tools/cbd_docs.py review-apply fixes.json
 python tools/cbd_docs.py summary-apply fixes.json
-# 2. 重新產生網站
+# 2. 查新出現的決議編號連結，再重新產生網站
+python tools/decision_links.py
 python tools/review_site.py --out ../CBD_COP17
 # 3. commit、push
 ```
