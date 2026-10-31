@@ -21,7 +21,10 @@
 - `history/`：預算頁的歷年資料，由 `review_site.py` 產生。
   - `budget_by_year.csv`：2019–2028 年度整合核心預算（千美元），依支出項目分為六類，附公約締約方應分攤淨額與來源決議。2021、2022 年為暫行預算（決議 EM-2/1、15/1）。
   - `convention_contributions_by_party.csv`：公約一般信託基金各締約方歷年分攤額（美元）。
+  - `budget_by_component.csv`：依組成部分（A–D）的年度預算（千美元）；2021、2022 年暫行預算沒有這種表。
+  - `contributions_by_fund_2025-2028.csv`：三個基金各締約方的分攤比例、2027–2028 分攤額、2025–2026 分攤額與增減（美元）。
   - `secretariat_staffing.csv`：秘書處核心預算員額。
+  - `kmgbf_allocation_by_target.csv`：上項依目標彙整、分基金（美元）。
   - `kmgbf_voluntary_needs_mapping.csv`：決議 16/28 表 4 自願信託基金各主題需求（美元，不含 13% 計畫支援費用）與本團判斷的 KMGBF 對應目標；多目標主題平均分配。對應不是決議原文。
 
 ## 格式

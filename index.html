@@ -359,6 +359,17 @@ function tipOn(node, f) {
 function legend(items) {
   return el('div', {class: 'legend', 'aria-hidden': 'true'}, ...items.map(([c, l]) => el('span', {}, el('i', {style: 'background:' + c}), l)));
 }
+// 「下載 CSV」列：items 為 [路徑, 說明]；路徑以 h: 開頭者在 csv/history/，doc:<id>:<頁> 取該頁的文件表格 CSV
+function csvDl(B, items) {
+  const out = el('div', {class: 'src'}, '下載 CSV：');
+  const links = [];
+  for (const [p, label] of items) {
+    if (p.startsWith('h:')) links.push(['csv/history/' + p.slice(2), label]);
+    else if (p.startsWith('doc:')) (B.csv[p.slice(4)] || []).forEach((c, k, a) => links.push(['csv/' + c, label + (a.length > 1 ? ' ' + (k + 1) : '')]));
+  }
+  links.forEach(([href, label], k) => out.append(k ? '、' : '', el('a', {href, download: ''}, label)));
+  return links.length ? out : null;
+}
 function srcLine(B, parts) {
   // parts: [[docId, page, sym], …]；有 CSV 的頁面加下載連結
   const out = el('div', {class: 'src'}, '資料來源：');
@@ -399,6 +410,7 @@ function renderBudget(parts) {
     el('div', {class: 'note'}, '數字以英文原文為準，金額除另註明外為千美元。三份文件是同一份整合預算：公約、卡塔赫納議定書、名古屋議定書依 ' +
       B.funds.map(f => f.pct + '%').join('／') + ' 分攤。過去各期數字取自預算決議（' + B.decisions.map(d => d.ref).join('、') + '），每一列都可連回原文。'));
   box.append(introCard(B, F));
+  const kpiCsv = csvDl(B, [['doc:' + t1.id + ':' + t1.page, 'CBD/COP/17/L.31/Rev.1 表 1'], ...B.funds.filter(f => f.key !== 'COP').map(f => ['doc:' + f.id + ':' + f.pages.t1, f.sym + ' 表 1'])]);
   box.append(el('div', {class: 'kpis'},
     el('div', {class: 'kpi'}, el('div', {class: 'l'}, '2027–2028 整合核心預算'), el('div', {class: 'v'}, nf(totRow.v[2])), el('div', {class: 'd'},
       '千美元（' + twd(totRow.v[2] * 1000) + '）；2025–2026 為 ' + nf(prevTotal) + '（' + ((totRow.v[2] / prevTotal - 1) * 100 >= 0 ? '+' : '') + nf((totRow.v[2] / prevTotal - 1) * 100) + '%）')),
@@ -406,6 +418,7 @@ function renderBudget(parts) {
     el('div', {class: 'kpi'}, el('div', {class: 'l'}, '公約一般信託基金分攤國數'), el('div', {class: 'v'}, String(cop.contrib.rows.length)), el('div', {class: 'd'},
       'CP ' + F.CP.contrib.rows.length + '、NP ' + F.NP.contrib.rows.length + '（含歐盟）')),
     staffNow ? el('div', {class: 'kpi'}, el('div', {class: 'l'}, '秘書處核心預算員額'), el('div', {class: 'v'}, String(staffNow[2])), el('div', {class: 'd'}, '2025–2026 核定 ' + staffNow[1] + ' 個')) : null));
+  if (kpiCsv) box.append(kpiCsv);
   box.append(...[sankeyCard(B), rankCard(B), mapCard(B), trendCard(B), B.kmgbf ? kmgbfCard(B) : null, partyCard(B, parts), tableCard(B), footer()].filter(Boolean));
   $('#main').replaceChildren(box);
   if (parts[0] === 'party') document.getElementById('party-card')?.scrollIntoView();
@@ -450,7 +463,8 @@ function sankeyCard(B) {
   card.append(el('h3', {}, '資金從哪裡來、往哪裡去'), el('div', {class: 'ctrl'}, sel), unitNote('千美元（節點下方數字與色帶寬度皆同）'), area,
     legend([['var(--s1)', '公約'], ['var(--s2)', '卡塔赫納議定書'], ['var(--s3)', '名古屋議定書'], ['var(--muted-fill)', '地主國捐助／準備金']]),
     el('p', {class: 'label'}, '寬度代表金額（千美元）。滑過或以 Tab 鍵選取色帶可看數字。表 1.alt 是方括號中的替代方案，支出項目分類與表 1 不同。'),
-    srcLine(B, [[B.table1.id, B.table1.page, 'CBD/COP/17/L.31/Rev.1 表 1'], ...(B.alt ? [[B.alt.id, B.alt.page, '表 1.alt']] : [])]));
+    srcLine(B, [[B.table1.id, B.table1.page, 'CBD/COP/17/L.31/Rev.1 表 1'], ...(B.alt ? [[B.alt.id, B.alt.page, '表 1.alt']] : [])]),
+    csvDl(B, [['doc:' + B.table1.id + ':' + B.table1.page, '表 1（依支出項目）'], ...(B.alt ? [['doc:' + B.alt.id + ':' + B.alt.page, '表 1.alt']] : []), ...B.funds.filter(f => f.key !== 'COP').map(f => ['doc:' + f.id + ':' + f.pages.t1, f.zh + '表 1'])]));
   draw();
   return card;
 }
@@ -564,7 +578,8 @@ function rankCard(B) {
   const unit = el('div');
   [fund, yr, view].forEach(x => x.addEventListener('change', () => unit.replaceChildren(unitNote(view.value === 'bar' ? '美元（括號內為占該基金分攤總額的 % 與新臺幣概估）' : '面積代表分攤額（美元），格內數字為占分攤總額的 %'))));
   unit.append(unitNote('美元（括號內為占該基金分攤總額的 % 與新臺幣概估）'));
-  card.append(el('h3', {}, '各締約方分攤多少'), el('div', {class: 'ctrl'}, fund, yr, view), unit, area, info, src);
+  card.append(el('h3', {}, '各締約方分攤多少'), el('div', {class: 'ctrl'}, fund, yr, view), unit, area, info, src,
+    csvDl(B, [['h:contributions_by_fund_2025-2028.csv', '三基金各締約方分攤（含上一期與增減）'], ...B.funds.map(f => ['doc:' + f.id + ':' + f.pages.ct, f.zh + '分攤表'])]));
   draw();
   return card;
 }
@@ -733,6 +748,7 @@ function mapCard(B) {
   };
   [fund, metric].forEach(x => x.addEventListener('change', draw));
   card.append(el('h3', {}, '地圖：各締約方分攤'), el('div', {class: 'ctrl'}, fund, metric), area, leg, small, explain,
+    csvDl(B, [['h:contributions_by_fund_2025-2028.csv', '三基金各締約方分攤、比例與增減']]),
     el('p', {class: 'label'}, '滾輪或雙指縮放、拖曳移動；放大後較容易點選小國，點擊國家可開啟查詢卡。分攤額與比例依分位數分 6 級（各國差距極大，分位數較能看出分布），顏色由淺到深代表由低到高（深色模式為由暗到亮）；增減以固定級距，減少偏藍、增加偏橘，±2% 以內為淺紫。國界取自 Natural Earth 1:110m，小國以 1:50m 國界的代表點畫成圓點（公有領域），僅供示意，不代表對任何領土主張的立場。'), src);
   area.append(el('p', {class: 'label', style: 'padding:12px'}, '地圖載入中…'));
   Promise.all([loadOnce('vendor/leaflet/leaflet.css', true), loadOnce('vendor/leaflet/leaflet.js'), window.WORLD ? 0 : loadOnce('data/worldmap.js')])
@@ -829,7 +845,8 @@ function trendCard(B) {
     el('h3', {style: 'margin-top:16px'}, '公約締約方應分攤淨額'), unitNote('千美元（年度金額）'), el('div', {class: 'chart'}, svg2),
     el('h3', {style: 'margin-top:16px'}, '秘書處核心預算員額'), unitNote('員額數（個）'), el('div', {class: 'dtwrap', style: 'max-height:none'}, st),
     srcLine(B, [...B.decisions.filter(d => !/^(CP|NP)/.test(d.ref)).map(d => [d.url, 0, '決議 ' + d.ref]), [B.table1.id, B.table1.page, 'CBD/COP/17/L.31/Rev.1 表 1'],
-      ...(B.comp_src ? [[B.comp_src.id, B.comp_src.page, 'CBD/COP/17/L.31/Rev.1 表 2']] : [])]));
+      ...(B.comp_src ? [[B.comp_src.id, B.comp_src.page, 'CBD/COP/17/L.31/Rev.1 表 2']] : [])]),
+    csvDl(B, [['h:budget_by_year.csv', '2019–2028 年度預算（依支出類別，含公約應分攤淨額）'], ['h:budget_by_component.csv', '依組成部分'], ['h:secretariat_staffing.csv', '秘書處員額']]));
   return card;
 }
 
@@ -902,6 +919,7 @@ function kmgbfCard(B) {
       '公約 17,622,600、卡塔赫納議定書 1,098,350、名古屋議定書 696,300 美元）的比例。'),
     el('details', {}, el('summary', {class: 'label', style: 'cursor:pointer'}, '各主題的對應與分配（資料表）'), tbl),
     noamt.length ? el('p', {class: 'label'}, '決議 15/34 另有 ' + noamt.length + ' 個主題（表中沒有金額，不列入上圖）：' + noamt.map(r => r.zh + '（' + r.t.map(lab).join('、') + '）').join('；') + '。') : null,
+    csvDl(B, [['h:kmgbf_allocation_by_target.csv', '依目標彙整'], ['h:kmgbf_voluntary_needs_mapping.csv', '各主題金額與對應目標']]),
     srcLine(B, [[K.url, 0, '決議 16/28 表 4'], ...(B.decisions.find(d => d.ref === '15/34') ? [[B.decisions.find(d => d.ref === '15/34').url, 0, '決議 15/34']] : [])]));
   draw();
   return card;
@@ -958,7 +976,8 @@ function partyCard(B, parts) {
     show(parts.map(x => byName.get(x) || byName.get(pnorm(x))).find(Boolean));
   });
   card.append(el('h3', {}, '查詢單一締約方'), el('div', {class: 'ctrl'}, inp, dl), out,
-    srcLine(B, [...B.funds.map(f => [f.id, f.pages.ct, f.sym + ' 分攤表']), ...Object.values(B.prev).map(p => [p.url, 0, '決議 ' + p.ref])]));
+    srcLine(B, [...B.funds.map(f => [f.id, f.pages.ct, f.sym + ' 分攤表']), ...Object.values(B.prev).map(p => [p.url, 0, '決議 ' + p.ref])]),
+    csvDl(B, [['h:contributions_by_fund_2025-2028.csv', '三基金各締約方分攤（含上一期）'], ['h:convention_contributions_by_party.csv', '公約各締約方 2019–2028 歷年分攤']]));
   const init = parts[0] === 'party' ? (byName.get(pnorm(parts[1] || '')) || '') : '';  // route() 已解碼，不再解碼一次
   setTimeout(() => show(init), 0);
   return card;
@@ -981,13 +1000,15 @@ function tableCard(B) {
       const f = B.funds.find(f => f.key === ds.value), p = B.prev[f.key];
       cols = [['締約方', 't'], ['Party', 't'], ['區域', 't'], ['聯合國比例（%）'], ['調整後比例（%）'], ['2027（美元）'], ['2028（美元）'], ['2027–2028（美元）'], ['2025–2026（美元）'], ['增減（%）']];
       rows = f.contrib.rows.map(r => { const pv = p?.v[r.key]; return [r.zh, r.en, r.region, r.v[0], r.v[1], r.v[2], r.v[3], r.v[4], pv ?? null, pv ? (r.v[4] / pv - 1) * 100 : null]; });
-      src.replaceChildren(srcLine(B, [[f.id, f.pages.ct, f.sym + ' 分攤表'], ...(p ? [[p.url, 0, '決議 ' + p.ref]] : [])]));
+      src.replaceChildren(srcLine(B, [[f.id, f.pages.ct, f.sym + ' 分攤表'], ...(p ? [[p.url, 0, '決議 ' + p.ref]] : [])]),
+        csvDl(B, [['doc:' + f.id + ':' + f.pages.ct, f.zh + '分攤表（原文）'], ['h:contributions_by_fund_2025-2028.csv', '含上一期與增減']]) || '');
     } else {
       const t = ds.value === 'T1' ? B.table1 : B.alt;
       cols = [['項目', 't'], ['Item', 't'], ...t.cols.map(c => [({'Proposed scenario 2027–2028 (improved zero nominal growth)': '2027–2028 提案方案（改良型零名目成長）'})[c] || c + '（千美元）'])];
       cols = cols.map(c => c[1] || /千美元/.test(c[0]) ? c : [c[0] + '（千美元）']);
       rows = t.rows.map(r => [r.zh, r.en, ...r.v]);
-      src.replaceChildren(srcLine(B, [[t.id, t.page, ds.value === 'T1' ? 'CBD/COP/17/L.31/Rev.1 表 1' : '表 1.alt']]));
+      src.replaceChildren(srcLine(B, [[t.id, t.page, ds.value === 'T1' ? 'CBD/COP/17/L.31/Rev.1 表 1' : '表 1.alt']]),
+        csvDl(B, [['doc:' + t.id + ':' + t.page, ds.value === 'T1' ? '表 1（原文）' : '表 1.alt（原文）']]) || '');
     }
     sortK = null; draw();
   };
