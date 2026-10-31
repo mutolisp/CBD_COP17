@@ -621,12 +621,35 @@ function cssColor(v) {
   p.style.color = ''; p.style.color = v;
   return getComputedStyle(p).color;
 }
+// 「調整後分攤比例」說明：規則取自分攤表欄名與決議第 7 段；四條規則與倍數由表中數字反推，逐列重算皆吻合
+function shareExplain(fs) {
+  const head = [el('b', {}, '調整後分攤比例是什麼？'), el('br'),
+    '分攤表欄名為「上限 22%，低度開發國家不超過 0.01%」。決議第 7 段規定以聯合國分攤比例（聯合國大會第 79/249 號決議）為基礎；聯合國通過 2028–2030 年新比例後，2028 年改用新比例。由表中數字可知調整方式：']
+  const one = f => {
+    const rows = f.contrib.rows, un = rows.reduce((s, r) => s + (r.v[0] || 0), 0);
+    const fixed = rows.filter(r => r.v[0] == null), top = rows.filter(r => r.v[1] === 22);
+    const T = rows.reduce((s, r) => s + (r.v[2] || 0), 0);
+    const ldc = rows.filter(r => r.v[0] && Math.abs(r.v[2] - T * 0.0001) <= 1 && r.v[0] * 100 / un > 0.01);
+    const free = rows.filter(r => r.v[0] >= 0.1 && !top.includes(r)).sort((a, b) => b.v[0] - a.v[0]);
+    const k = free.length ? free.reduce((s, r) => s + r.v[1], 0) / free.reduce((s, r) => s + r.v[0], 0) : null;
+    const ex = free.find(r => /Argentina/.test(r.en)) || free[0];
+    return el('ol', {style: 'margin:4px 0 0 18px;padding:0;line-height:1.7'},
+      el('li', {}, f.zh + '分攤表的締約方，聯合國分攤比例合計 ' + nf(un, 3) + '%' + (rows.some(r => /United States of America/.test(r.en)) ? '' : '（美國不是締約方）') + '，需換算成 100%。'),
+      fixed.length ? el('li', {}, fixed.map(r => (r.zh || r.en) + '沒有聯合國分攤比例，固定為 ' + nf(r.v[1], 1) + '%').join('；') + '。') : null,
+      top.length ? el('li', {}, top.map(r => r.zh || r.en).join('、') + '換算後會超過 22%，以 22% 為上限。') : null,
+      ldc.length ? el('li', {}, ldc.length + ' 個低度開發國家換算後會超過 0.01%，壓在 0.01%。') : null,
+      k ? el('li', {}, '其餘締約方依聯合國比例等比例放大約 ' + nf(k, 3) + ' 倍，使合計為 100%' + (ex ? '；例如' + (ex.zh || ex.en) + ' ' + nf(ex.v[0], 3) + '% → ' + nf(ex.v[1], 3) + '%' : '') + '。') : null,
+      el('li', {}, '各締約方分攤額 = 調整後比例 × 該年應分攤總額（' + nf(T, 0) + ' 美元，2027 年）。'));
+  };
+  if (fs.length > 1) return [...head, ...fs.map(f => el('div', {style: 'margin-top:6px'}, el('b', {}, f.zh), one(f)))];
+  return [...head, one(fs[0]), el('div', {class: 'label'}, '前四點的規則原文只寫在欄名中，倍數與固定比例是由表中數字反推，逐列重算皆與原表一致。')];
+}
 function mapCard(B) {
   const card = el('section', {class: 'card'}), area = el('div', {class: 'chart', style: 'aspect-ratio:16/10;max-height:560px;width:100%;border-radius:8px;background:var(--bg);isolation:isolate'}), leg = el('div', {class: 'legend'}), small = el('div', {class: 'label'});
   const fund = el('select', {'aria-label': '基金'}, ...B.funds.map(f => el('option', {value: f.key}, f.zh + '一般信託基金')), el('option', {value: 'ALL'}, '三基金合計'));
   const metric = el('select', {'aria-label': '指標'}, el('option', {value: 'amt'}, '2027–2028 分攤額（美元）'), el('option', {value: 'share'}, '調整後分攤比例（%）'),
     el('option', {value: 'chg'}, '與 2025–2026 相比的增減（%）'));
-  const src = el('div');
+  const src = el('div'), explain = el('div', {class: 'note', style: 'margin-top:8px'});
   let map = null, geo = null, dots = null, cur = null;  // cur：目前指標下各國的 {o, v, color}
   const draw = () => {
     const W = window.WORLD;
@@ -672,6 +695,7 @@ function mapCard(B) {
     const off = [...val.values()].filter(o => !o.geo && !o.pt).sort((a, b) => (get(b) ?? -1e9) - (get(a) ?? -1e9));
     small.replaceChildren(...(off.length ? ['地圖上無法標示的締約方：', off.map(o => o.zh + ' ' + fmt(get(o))).join('、'), '。'] : []));
     src.replaceChildren(srcLine(B, [...fs.map(f => [f.id, f.pages.ct, f.sym + ' 分攤表']), ...(m === 'chg' ? Object.values(B.prev).map(p => [p.url, 0, '決議 ' + p.ref]) : [])]));
+    explain.replaceChildren(...shareExplain(fs));
     evts.fmt = fmt;
   };
   // 滑過顯示數值、點擊開啟查詢卡；f() 回傳 {o, v} 或非締約方的 {name}
@@ -696,7 +720,7 @@ function mapCard(B) {
     new MutationObserver(draw).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
   };
   [fund, metric].forEach(x => x.addEventListener('change', draw));
-  card.append(el('h3', {}, '地圖：各締約方分攤'), el('div', {class: 'ctrl'}, fund, metric), area, leg, small,
+  card.append(el('h3', {}, '地圖：各締約方分攤'), el('div', {class: 'ctrl'}, fund, metric), area, leg, small, explain,
     el('p', {class: 'label'}, '滾輪或雙指縮放、拖曳移動；放大後較容易點選小國，點擊國家可開啟查詢卡。分攤額與比例依分位數分 6 級（各國差距極大，分位數較能看出分布），顏色由淺到深代表由低到高（深色模式為由暗到亮）；增減以固定級距，減少偏藍、增加偏橘。國界取自 Natural Earth 1:110m，小國以 1:50m 國界的代表點畫成圓點（公有領域），僅供示意，不代表對任何領土主張的立場。'), src);
   area.append(el('p', {class: 'label', style: 'padding:12px'}, '地圖載入中…'));
   Promise.all([loadOnce('vendor/leaflet/leaflet.css', true), loadOnce('vendor/leaflet/leaflet.js'), window.WORLD ? 0 : loadOnce('data/worldmap.js')])
