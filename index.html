@@ -884,7 +884,7 @@ const jump = (id, text) => el('a', {href: '#budget', onclick: e => { e.preventDe
 function statusCard(B) {
   const S = B.status, card = el('section', {class: 'card', id: 'status'});
   const rows = [['h', '核心分攤（三個一般信託基金）'], ...S.core.rows.filter(r => r.key !== 'ALL').map(r => ['b', r.zh, r.received, r.assessed, r.pct, FC[r.key], '千美元']),
-    ['h', '自願信託基金（估算含 13% 計畫支援費用）'], ...S.voluntary.rows.map(r => ['b', r.zh, r.received, r.estimate, r.received / r.estimate * 100, 'var(--s4)', '美元'])];
+    ['h', '自願信託基金（估算含 13% 計畫支援費用；額外核定活動另含人員需求）'], ...S.voluntary.rows.map(r => ['b', r.zh, r.received, r.estimate, r.received / r.estimate * 100, 'var(--s4)', '美元'])];
   const narrow = matchMedia('(max-width: 639px)').matches;  // 窄螢幕：標籤在上、長條在下
   const W = narrow ? 360 : 880, lw = narrow ? 0 : 330, bw = W - lw - (narrow ? 56 : 150), rh = narrow ? 44 : 30, hh = 28, by = narrow ? 16 : 0;
   let y = 4; const items = rows.map(r => { const o = [r, y]; y += r[0] === 'h' ? hh : rh; return o; });
@@ -904,14 +904,14 @@ function statusCard(B) {
   const tot = S.core.rows.find(r => r.key === 'ALL'), vol = S.voluntary.rows.find(r => r.key === 'BE'), bz = S.voluntary.rows.find(r => r.key === 'BZ');
   const pf = S.paid_full.rows, zh = {COP: '公約', CP: '卡塔赫納議定書', NP: '名古屋議定書'};
   card.append(el('h3', {}, '核定不等於到位：錢收到了多少？'),
-    el('p', {class: 'label'}, '前面各圖都是「核定或提案多少錢」。這張圖看實際收到多少：核心預算靠締約方分攤，自願信託基金靠捐助。資料為秘書處向執行附屬機構第七次會議提出的報告，截至 ' + S.as_of + '，也就是 2025–2026 兩年期的中途，2026 年的款項仍在陸續入帳。'),
+    el('p', {class: 'label'}, '前面各圖都是「核定或提案多少錢」。這張圖看實際收到多少：核心預算靠締約方分攤，自願信託基金靠捐助。資料為秘書處向執行附屬機構第七次會議提出的報告，截至 ' + S.as_of + '。分攤款在預算年度的 1 月 1 日到期（', el('a', {href: '#' + B.table1.id + '/p004'}, 'L.31/Rev.1 第 16 段'), '），所以此時 2025、2026 兩年的分攤都已到期，未收部分就是逾期未繳。'),
     unitNote('實收占分攤額或估算的 %（滑過長條看金額）'), el('div', {class: 'chart'}, svg),
     el('div', {class: 'kpis', style: 'margin-top:10px'}, ...pf.map(r => el('div', {class: 'kpi'}, el('div', {class: 'l'}, zh[r.key] + '：2025 年分攤已全額繳清'),
       el('div', {class: 'v'}, nf(r.p2025, 1) + '%'), el('div', {class: 'd'}, nf(r.y2025, 0) + '／' + nf(r.parties, 0) + ' 個締約方；2026 年為 ' + nf(r.y2026, 0) + ' 個（' + nf(r.p2026, 1) + '%）')))),
     el('div', {class: 'note', style: 'margin-top:10px'}, el('b', {}, '觀察：'),
-      '核心分攤收到 ' + nf(tot.pct, 1) + '%，尚未收到 ' + kusd(tot.unpaid) + '；截至 2026 年 5 月，仍有超過一半的締約方沒有繳清 2025 年的分攤。自願信託基金的落差更大：支持額外核定活動的基金只收到估算的 ' + nf(vol.received / vol.estimate * 100, 1) + '%，協助開發中國家代表與會的參與基金也只有 ' + nf(bz.received / bz.estimate * 100, 1) + '%。',
+      '已到期的核心分攤只收到 ' + nf(tot.pct, 1) + '%，逾期未繳 ' + kusd(tot.unpaid) + '；2026 年的分攤只有約兩成締約方繳清，連 2025 年的分攤也仍有超過一半沒有繳清。自願信託基金的落差更大：支持額外核定活動的基金只收到估算的 ' + nf(vol.received / vol.estimate * 100, 1) + '%，協助開發中國家代表與會的參與基金也只有 ' + nf(bz.received / bz.estimate * 100, 1) + '%。',
       '下方 ', jump('kmgbf-alloc', 'KMGBF 自願需求'), ' 與 ', jump('yerevan', 'Yerevan Pathway'), ' 中「視資源而定」的工作，正是要靠這類到位率約三成的基金。'),
-    el('p', {class: 'label'}, '自願信託基金的估算（如 28,690,983 美元）含 13% 計畫支援費用，與下方 KMGBF 卡的 19,417,250 美元（不含）口徑不同。原住民族與地方社區參與基金的估算較小（317,000 美元），到位率較高。'),
+    el('p', {class: 'label'}, '支持額外核定活動基金的估算 28,690,983 美元，是決議 16/28 表 4 的主題需求 21,941,493 美元加上表 5 的人員需求 6,749,490 美元，兩者都含 13% 計畫支援費用；下方 KMGBF 卡的 19,417,250 美元只計表 4 主題、不含計畫支援費用，口徑不同。原住民族與地方社區參與基金的估算較小（317,000 美元），到位率較高。'),
     csvDl(B, [['h:contributions_status_2025-2026.csv', '收款與到位率']]),
     el('div', {class: 'src'}, '資料來源：', el('a', {href: S.url + '#page=3', target: '_blank', rel: 'noopener'}, S.sym + ' 表 3、表 4（第 3 頁）↗'), '；',
       el('a', {href: S.url + '#page=7', target: '_blank', rel: 'noopener'}, '第 27–30 段（第 7–8 頁）↗')));
