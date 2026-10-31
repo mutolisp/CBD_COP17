@@ -250,7 +250,9 @@ function load(id) {
 }
 
 function route() {
-  const h = decodeURIComponent(location.hash.slice(1)), [id, sub] = h.split('/');
+  let h = location.hash.slice(1);
+  try { h = decodeURIComponent(h); } catch (_) {}  // 網址含不合法的 % 時不要整頁空白
+  const [id, sub] = h.split('/');
   $('#bnav').classList.remove('on');
   if (id === 'kmgbf') openKmgbf(sub); else if (id === 'budget') openBudget(h.split('/').slice(1)); else openDoc(id, sub);
 }
@@ -353,8 +355,8 @@ function srcLine(B, parts) {
     if (k) out.append('；');
     if (id.startsWith('http')) out.append(el('a', {href: id, target: '_blank', rel: 'noopener'}, sym + ' ↗'));
     else out.append(el('a', {href: '#' + id + '/p' + String(p).padStart(3, '0')}, sym + ' 第 ' + p + ' 頁'));
-    const c = B.csv[id + ':' + p];
-    if (c) out.append('（', el('a', {href: 'csv/' + c, download: ''}, 'CSV'), '）');
+    const cs = B.csv[id + ':' + p] || [];
+    if (cs.length) out.append('（', ...cs.flatMap((c, k) => [k ? '、' : '', el('a', {href: 'csv/' + c, download: ''}, 'CSV' + (cs.length > 1 ? ' ' + (k + 1) : ''))]), '）');
     if (extra) out.append(extra);
   });
   return out;
@@ -392,7 +394,7 @@ function renderBudget(parts) {
     el('div', {class: 'kpi'}, el('div', {class: 'l'}, '公約一般信託基金分攤國數'), el('div', {class: 'v'}, String(cop.contrib.rows.length)), el('div', {class: 'd'},
       'CP ' + F.CP.contrib.rows.length + '、NP ' + F.NP.contrib.rows.length + '（含歐盟）')),
     staffNow ? el('div', {class: 'kpi'}, el('div', {class: 'l'}, '秘書處核心預算員額'), el('div', {class: 'v'}, String(staffNow[2])), el('div', {class: 'd'}, '2025–2026 核定 ' + staffNow[1] + ' 個')) : null));
-  box.append(sankeyCard(B), rankCard(B), trendCard(B), partyCard(B, parts), tableCard(B), footer());
+  box.append(sankeyCard(B), rankCard(B), mapCard(B), trendCard(B), partyCard(B, parts), tableCard(B), footer());
   $('#main').replaceChildren(box);
   if (parts[0] === 'party') document.getElementById('party-card')?.scrollIntoView();
   else $('#main').scrollTop = 0;
@@ -503,7 +505,7 @@ function rankCard(B) {
     const k = +yr.value, fs = fund.value === 'ALL' ? B.funds : [B.funds.find(f => f.key === fund.value)];
     const m = new Map();
     for (const f of fs) for (const r of f.contrib.rows) {
-      const key = pnorm(r.en), o = m.get(key) || {zh: r.zh || r.en, en: r.en, v: 0, scale: {}};
+      const key = r.key, o = m.get(key) || {zh: r.zh || r.en, en: r.en, v: 0, scale: {}};
       o.v += r.v[k] || 0; o.scale[f.key] = [r.v[0], r.v[1]]; m.set(key, o);
     }
     const all = [...m.values()].sort((a, b) => b.v - a.v), tot = all.reduce((s, r) => s + r.v, 0);
@@ -572,6 +574,94 @@ function treemap(all, tot, color, n) {
   return svg;
 }
 
+// ---- 地圖模式：各締約方分攤額／比例／增減，依國界著色 ----
+function mapCard(B) {
+  const card = el('section', {class: 'card'}), area = el('div', {class: 'chart'}), leg = el('div', {class: 'legend'}), small = el('div', {class: 'label'});
+  const fund = el('select', {'aria-label': '基金'}, ...B.funds.map(f => el('option', {value: f.key}, f.zh + '一般信託基金')), el('option', {value: 'ALL'}, '三基金合計'));
+  const metric = el('select', {'aria-label': '指標'}, el('option', {value: 'amt'}, '2027–2028 分攤額（美元）'), el('option', {value: 'share'}, '調整後分攤比例（%）'),
+    el('option', {value: 'chg'}, '與 2025–2026 相比的增減（%）'));
+  const src = el('div');
+  const draw = () => {
+    const W = window.WORLD;
+    if (!W) { area.replaceChildren(el('p', {class: 'label'}, '地圖資料載入中…')); return; }
+    const fs = fund.value === 'ALL' ? B.funds : [B.funds.find(f => f.key === fund.value)];
+    const val = new Map();  // geo 名稱 → {zh, en, key, v}
+    for (const f of fs) for (const r of f.contrib.rows) {
+      const k = r.geo || '#' + r.key, o = val.get(k) || {zh: r.zh || r.en, en: r.en, key: r.key, geo: r.geo, amt: 0, share: 0, prev: 0, hasPrev: true};
+      o.amt += r.v[4] || 0; o.share += fund.value === 'ALL' ? 0 : (r.v[1] || 0);
+      const p = B.prev[f.key]?.v[r.key];
+      if (p == null) o.hasPrev = false; else o.prev += p;
+      val.set(k, o);
+    }
+    const m = metric.value;
+    if (m === 'share' && fund.value === 'ALL') { metric.value = 'amt'; return draw(); }
+    const get = o => m === 'amt' ? o.amt : m === 'share' ? o.share : (o.hasPrev && o.prev ? (o.amt / o.prev - 1) * 100 : null);
+    const vs = [...val.values()].map(get).filter(v => v != null).sort((a, b) => a - b);
+    let color, bins, labels;
+    if (m === 'chg') {  // 雙向：減少偏藍、增加偏橘，0 附近為中性灰
+      bins = [-25, -10, -2, 2, 10, 25];
+      const steps = ['color-mix(in oklab, var(--s1) 90%, var(--panel))', 'color-mix(in oklab, var(--s1) 60%, var(--panel))', 'color-mix(in oklab, var(--s1) 30%, var(--panel))',
+        'var(--muted-fill)', 'color-mix(in oklab, var(--s2) 30%, var(--panel))', 'color-mix(in oklab, var(--s2) 60%, var(--panel))', 'color-mix(in oklab, var(--s2) 90%, var(--panel))'];
+      color = v => steps[bins.filter(b => v > b).length];
+      labels = steps.map((c, i) => [c, i === 0 ? '< −25%' : i === steps.length - 1 ? '> +25%' : (bins[i - 1] > 0 ? '+' : '') + bins[i - 1] + ' ~ ' + (bins[i] > 0 ? '+' : '') + bins[i] + '%']);
+    } else {  // 單一色相由淺到深，依分位數分 6 級（分攤額高度偏斜）
+      const q = p => vs[Math.min(vs.length - 1, Math.floor(p * vs.length))];
+      bins = [q(1 / 6), q(2 / 6), q(3 / 6), q(4 / 6), q(5 / 6)];
+      const steps = [18, 32, 46, 62, 80, 100].map(p => `color-mix(in oklab, var(--s1) ${p}%, var(--panel))`);
+      color = v => steps[bins.filter(b => v > b).length];
+      const f = v => m === 'amt' ? nf(v, 0) : nf(v, 3);
+      labels = steps.map((c, i) => [c, i === 0 ? '≤ ' + f(bins[0]) : i === steps.length - 1 ? '> ' + f(bins[4]) : f(bins[i - 1]) + ' ~ ' + f(bins[i])]);
+    }
+    const svg = sv('svg', {viewBox: `0 0 ${W.w} ${W.h}`, role: 'img', 'aria-label': '各締約方分攤世界地圖', style: 'background:var(--bg);border-radius:8px'});
+    const fmt = (o, v) => v == null ? '無上一期資料' : m === 'amt' ? usd(v) : m === 'share' ? nf(v, 3) + '%' : (v >= 0 ? '+' : '') + nf(v) + '%';
+    for (const f of W.f) {
+      const o = val.get(f.n), v = o ? get(o) : null;
+      const p = sv('path', {d: f.d, fill: o ? (v == null ? 'var(--grid)' : color(v)) : 'var(--grid)', stroke: 'var(--panel)', 'stroke-width': .5});
+      tipOn(p, () => o ? [fmt(o, v), o.zh + '（' + o.en + '）', '點擊查看這個締約方'] : [(f.zh || f.n) + (f.n === 'Taiwan' ? '' : ''), '非締約方', f.n]);
+      if (o) { p.style.cursor = 'pointer'; p.addEventListener('click', () => { location.hash = '#budget/party/' + encodeURIComponent(o.en); }); }
+      svg.append(p);
+    }
+    area.replaceChildren(svg);
+    leg.replaceChildren(...labels.map(([c, l]) => el('span', {}, el('i', {style: 'background:' + c}), l)), el('span', {}, el('i', {style: 'background:var(--grid)'}), '非締約方或無資料'));
+    const off = [...val.values()].filter(o => !o.geo).sort((a, b) => (get(b) ?? -1e9) - (get(a) ?? -1e9));
+    small.replaceChildren('地圖比例尺（1:110m）無法顯示的締約方：', off.map(o => o.zh + ' ' + fmt(o, get(o))).join('、'), '。');
+    src.replaceChildren(srcLine(B, [...fs.map(f => [f.id, f.pages.ct, f.sym + ' 分攤表']), ...(m === 'chg' ? Object.values(B.prev).map(p => [p.url, 0, '決議 ' + p.ref]) : [])]));
+  };
+  [fund, metric].forEach(x => x.addEventListener('change', draw));
+  card.append(el('h3', {}, '地圖：各締約方分攤'), el('div', {class: 'ctrl'}, fund, metric), area, leg, small,
+    el('p', {class: 'label'}, '分攤額與比例依分位數分 6 級（各國差距極大，分位數較能看出分布）；增減以固定級距，減少偏藍、增加偏橘。點擊國家可開啟查詢卡。國界取自 Natural Earth 1:110m（公有領域），僅供示意，不代表對任何領土主張的立場。'), src);
+  if (window.WORLD) draw();
+  else { const s = el('script', {src: 'data/worldmap.js'}); s.onload = draw; s.onerror = () => area.replaceChildren(el('p', {class: 'label'}, '找不到 data/worldmap.js。')); document.head.append(s); draw(); }
+  return card;
+}
+
+// ---- 小倍數折線：每個類別一張小圖，標示首尾變化（比堆疊圖更容易看出各類趨勢） ----
+function smallMultiples(series, years, unitLabel, srcNote) {
+  const wrap = el('div', {style: 'display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px'});
+  for (const [name, color, pts] of series) {
+    const ys = years.filter(y => pts[y] != null);
+    if (ys.length < 2) continue;
+    const W = 220, H = 120, vals = ys.map(y => pts[y]), max = Math.max(...vals) * 1.1, min = 0;
+    const X = y => 14 + (W - 28) * (years.indexOf(y)) / (years.length - 1), Y = v => H - 22 - (H - 40) * (v - min) / (max - min);
+    const svg = sv('svg', {viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': name + ' 趨勢'});
+    svg.append(sv('line', {x1: 10, x2: W - 10, y1: Y(0), y2: Y(0), class: 'gl'}));
+    let d = '', prev = null;
+    for (const y of ys) { d += (prev !== null && years.indexOf(y) - years.indexOf(prev) > 1 ? 'M' : d ? 'L' : 'M') + X(y) + ',' + Y(pts[y]); prev = y; }
+    svg.append(sv('path', {d, fill: 'none', stroke: color, 'stroke-width': 2}));
+    for (const y of ys) {
+      svg.append(sv('circle', {cx: X(y), cy: Y(pts[y]), r: 3, fill: color}));
+      const hit = sv('rect', {x: X(y) - 10, y: 0, width: 20, height: H - 16, fill: 'transparent'});
+      tipOn(hit, () => [nf(pts[y], 1) + ' ' + unitLabel, y + ' ' + name, +y >= 2027 ? '本屆提案' : '']);
+      svg.append(hit);
+    }
+    svg.append(sv('text', {x: X(years[0]), y: H - 6, class: 'mut', 'font-size': 10}, years[0]), sv('text', {x: X(years[years.length - 1]), y: H - 6, 'text-anchor': 'end', class: 'mut', 'font-size': 10}, years[years.length - 1]));
+    const a = pts[ys[0]], b = pts[ys[ys.length - 1]], chg = (b / a - 1) * 100;
+    wrap.append(el('div', {class: 'kpi'}, el('div', {class: 'l'}, name),
+      el('div', {class: 'd'}, ys[0] + ' ' + nf(a, 0) + ' → ' + ys[ys.length - 1] + ' ' + nf(b, 0) + ' ', el('b', {class: chg >= 0 ? 'up' : 'down'}, (chg >= 0 ? '+' : '') + nf(chg) + '%')), svg));
+  }
+  return el('div', {}, wrap, srcNote ? el('p', {class: 'label'}, srcNote) : null);
+}
+
 // ---- 跨期趨勢：年度整合預算（依支出類別堆疊）、公約應分攤淨額、員額 ----
 function trendCard(B) {
   const card = el('section', {class: 'card'}), GZn = GZ();
@@ -624,9 +714,16 @@ function trendCard(B) {
   card.append(el('h3', {}, '2019–2028 年度預算趨勢'),
     el('div', {class: 'chart'}, svg), legend(B.groups.map(([k, z]) => [GC[k], z])),
     el('p', {class: 'label'}, '每年的整合核心預算（千美元），依支出項目歸為六類；各期用語不同，歸類方式見 tools/review_site.py 的 GROUPS。2021 年沒有年度預算決議（決議 15/1 表 1 為 2019–2020 預算結轉情形）；2022 年為暫行預算。2027、2028 為本屆提案。長條上方數字是年度總計；週轉金準備為負的年度（2027 年釋出 182.3 千美元）不畫入堆疊，所以長條會略高於總計。'),
+    el('h3', {style: 'margin-top:16px'}, '經費用在哪些工作：依組成部分'),
+    smallMultiples(Object.entries(B.comp_names).map(([k, z], i) => [z, ['var(--s3)', 'var(--s4)', 'var(--s1)', 'var(--s5)'][i], Object.fromEntries(Object.entries(B.comp).map(([y, o]) => [y, o.v[k]]))]),
+      Y, '千美元', '「C. 工作計畫」是落實昆明－蒙特婁全球生物多樣性綱要等實質工作的經費；A 為締約方大會與附屬機構會議，B 為執行秘書辦公室等行政領導，D 為會議服務與行政支援。各期組成部分的名稱略有不同（早期 D 為「行政支援」）。2021、2022 年沒有依組成部分的表。'),
+    el('h3', {style: 'margin-top:16px'}, '各支出類別的變化'),
+    smallMultiples(B.groups.filter(([k]) => !['special', 'wcr'].includes(k)).map(([k, z]) => [z, GC[k], Object.fromEntries(Object.entries(B.years).map(([y, o]) => [y, o.groups[k]]))]),
+      Y, '千美元', '每張小圖各自的縱軸從 0 開始；標示第一年與最後一年的變化。特別項目與週轉金準備每年差異大，見上方堆疊圖。'),
     el('h3', {style: 'margin-top:16px'}, '公約締約方應分攤淨額'), el('div', {class: 'chart'}, svg2),
     el('h3', {style: 'margin-top:16px'}, '秘書處核心預算員額'), el('div', {class: 'dtwrap', style: 'max-height:none'}, st),
-    srcLine(B, [...B.decisions.filter(d => !/^(CP|NP)/.test(d.ref)).map(d => [d.url, 0, '決議 ' + d.ref]), [B.table1.id, B.table1.page, 'CBD/COP/17/L.31/Rev.1 表 1']]));
+    srcLine(B, [...B.decisions.filter(d => !/^(CP|NP)/.test(d.ref)).map(d => [d.url, 0, '決議 ' + d.ref]), [B.table1.id, B.table1.page, 'CBD/COP/17/L.31/Rev.1 表 1'],
+      ...(B.comp_src ? [[B.comp_src.id, B.comp_src.page, 'CBD/COP/17/L.31/Rev.1 表 2']] : [])]));
   return card;
 }
 
@@ -634,15 +731,17 @@ function trendCard(B) {
 function partyCard(B, parts) {
   const card = el('section', {class: 'card', id: 'party-card'}), out = el('div');
   const names = new Map();
-  for (const f of B.funds) for (const r of f.contrib.rows) names.set(pnorm(r.en), {en: r.en, zh: r.zh || r.en, region: r.region});
+  const byName = new Map();  // 中文或英文名稱 → 鍵
+  for (const f of B.funds) for (const r of f.contrib.rows) { names.set(r.key, {en: r.en, zh: r.zh || r.en, region: r.region}); byName.set(pnorm(r.en), r.key); if (r.zh) byName.set(r.zh, r.key); }
   const dl = el('datalist', {id: 'party-list'}, ...[...names.values()].sort((a, b) => a.zh.localeCompare(b.zh, 'zh-Hant')).map(n => el('option', {value: n.zh + '｜' + n.en})));
   const inp = el('input', {type: 'search', list: 'party-list', placeholder: '輸入或選擇締約方（中文或英文）', 'aria-label': '締約方', style: 'min-width:280px'});
   const show = key => {
     const n = names.get(key);
     if (!n) { out.replaceChildren(el('p', {class: 'label'}, '選擇一個締約方，查看它在三個基金的分攤與歷年變化。')); return; }
     history.replaceState(null, '', '#budget/party/' + encodeURIComponent(n.en));
+    inp.value = n.zh + '｜' + n.en;
     const rows = B.funds.map(f => {
-      const r = f.contrib.rows.find(r => pnorm(r.en) === key), p = B.prev[f.key]?.v[key];
+      const r = f.contrib.rows.find(r => r.key === key), p = B.prev[f.key]?.v[key];
       return el('tr', {}, el('td', {class: 't'}, f.zh), el('td', {}, r ? nf(r.v[0], 3) : '—'), el('td', {}, r ? nf(r.v[1], 3) : '—'),
         el('td', {}, r ? nf(r.v[2], 0) : '非締約方'), el('td', {}, r ? nf(r.v[3], 0) : '—'), el('td', {}, r ? nf(r.v[4], 0) : '—'),
         el('td', {}, p !== undefined && p !== null ? nf(p, 0) : '—'),
@@ -672,10 +771,13 @@ function partyCard(B, parts) {
         el('tbody', {}, ...rows))),
       line ? el('div', {}, el('div', {class: 'label', style: 'margin-top:8px'}, '公約一般信託基金歷年分攤額（美元；2021 年沒有年度預算）'), el('div', {class: 'chart'}, line)) : null);
   };
-  inp.addEventListener('change', () => { const en = inp.value.split('｜').pop(); show(pnorm(en)); });
+  inp.addEventListener('change', () => {
+    const parts = inp.value.split('｜').map(x => x.trim()).filter(Boolean);
+    show(parts.map(x => byName.get(x) || byName.get(pnorm(x))).find(Boolean));
+  });
   card.append(el('h3', {}, '查詢單一締約方'), el('div', {class: 'ctrl'}, inp, dl), out,
     srcLine(B, [...B.funds.map(f => [f.id, f.pages.ct, f.sym + ' 分攤表']), ...Object.values(B.prev).map(p => [p.url, 0, '決議 ' + p.ref])]));
-  const init = parts[0] === 'party' ? pnorm(decodeURIComponent(parts[1] || '')) : '';
+  const init = parts[0] === 'party' ? (byName.get(pnorm(parts[1] || '')) || '') : '';  // route() 已解碼，不再解碼一次
   setTimeout(() => show(init), 0);
   return card;
 }
@@ -693,7 +795,7 @@ function tableCard(B) {
     if (B.funds.some(f => f.key === ds.value)) {
       const f = B.funds.find(f => f.key === ds.value), p = B.prev[f.key];
       cols = [['締約方', 't'], ['Party', 't'], ['區域', 't'], ['聯合國比例（%）'], ['調整後比例（%）'], ['2027（美元）'], ['2028（美元）'], ['2027–2028'], ['2025–2026'], ['增減（%）']];
-      rows = f.contrib.rows.map(r => { const pv = p?.v[pnorm(r.en)]; return [r.zh, r.en, r.region, r.v[0], r.v[1], r.v[2], r.v[3], r.v[4], pv ?? null, pv ? (r.v[4] / pv - 1) * 100 : null]; });
+      rows = f.contrib.rows.map(r => { const pv = p?.v[r.key]; return [r.zh, r.en, r.region, r.v[0], r.v[1], r.v[2], r.v[3], r.v[4], pv ?? null, pv ? (r.v[4] / pv - 1) * 100 : null]; });
       src.replaceChildren(srcLine(B, [[f.id, f.pages.ct, f.sym + ' 分攤表'], ...(p ? [[p.url, 0, '決議 ' + p.ref]] : [])]));
     } else {
       const t = ds.value === 'T1' ? B.table1 : B.alt;
@@ -703,7 +805,10 @@ function tableCard(B) {
     }
     sortK = null; draw();
   };
+  let dec = [];  // 每欄固定小數位數（取該欄原文最多的位數，最多 3 位）
+  const decOf = k => Math.min(3, Math.max(0, ...rows.map(r => typeof r[k] === 'number' ? ((String(r[k]).split('.')[1] || '').length) : 0)));
   const view = () => {
+    dec = cols.map((_, k) => decOf(k));
     const s = q.value.trim().toLowerCase();
     let r = s ? rows.filter(x => x.some(c => typeof c === 'string' && c.toLowerCase().includes(s))) : rows.slice();
     if (sortK !== null) r.sort((a, b) => { const x = a[sortK], y = b[sortK]; const c = typeof x === 'number' && typeof y === 'number' ? x - y : String(x ?? '').localeCompare(String(y ?? ''), 'zh-Hant'); return asc ? c : -c; });
@@ -715,10 +820,10 @@ function tableCard(B) {
       el('thead', {}, el('tr', {}, ...cols.map(([c, t], k) => el('th', {class: t || '', 'aria-sort': sortK === k ? (asc ? 'ascending' : 'descending') : null,
         onclick: () => { if (sortK === k) asc = !asc; else { sortK = k; asc = !!t; } draw(); }}, c)))),
       el('tbody', {}, ...r.map(x => el('tr', {}, ...x.map((c, k) => el('td', {class: cols[k][1] || (k === 9 && c !== null ? (c >= 0 ? 'up' : 'down') : '')},
-        typeof c === 'number' ? (k === 3 || k === 4) && cols.length === 10 ? nf(c, 3) : k === 9 ? (c >= 0 ? '+' : '') + nf(c) : nf(c, Number.isInteger(c) ? 0 : 1) : (c ?? '—'))))))));
+        typeof c === 'number' ? k === 9 && cols.length === 10 ? (c >= 0 ? '+' : '') + nf(c) : nf(c, dec[k]) : (c ?? '—'))))))));
   };
   exp.addEventListener('click', () => {
-    const esc = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+    const esc = v => { let t = String(v ?? ''); if (typeof v === 'string' && /^[=+\-@]/.test(t)) t = "'" + t; return '"' + t.replace(/"/g, '""') + '"'; };  // 避免試算表把文字當公式
     const text = '﻿' + [cols.map(c => c[0]), ...view()].map(r => r.map(esc).join(',')).join('\r\n');
     const a = el('a', {href: URL.createObjectURL(new Blob([text], {type: 'text/csv'})), download: 'cbd-cop17-' + ds.value.toLowerCase() + '.csv'});
     document.body.append(a); a.click(); a.remove();
@@ -886,13 +991,13 @@ function decLinks(root) {
   return root;
 }
 // 文件中提到的 KMGBF 目標（Target 3、Goal A／目標 3、長期目標 A）→ 連到 KMGBF 頁；排除愛知目標與永續發展目標
-const KG_EN = /(?<!Aichi )(?<!Aichi Biodiversity )(?<!Development )\b(?:[Tt]arget (\d{1,2})|Goal ([A-D]))(?![\d.%]|\w)/g;
-const KG_ZH = /(?<!愛知)(?<!愛知生物多樣性)(?<!發展)(?:長期目標 ?([A-D])|目標 ?(\d{1,2}))(?![\d.%％])/g;
+const KG_EN = /(?<!Aichi )(?<!Aichi Biodiversity )(?<!Development )\b(?:[Tt]arget (\d{1,2})|Goal ([A-D]))(?![\d%]|\.\d|\w)/g;
+const KG_ZH = /(?<!愛知)(?<!愛知生物多樣性)(?<!發展)(?:長期目標 ?([A-D])|目標 ?(\d{1,2}))(?![\d%％]|\.\d)/g;
 function kgLinks(root, zh) {
   if (!/target|goal|目標/i.test(root.textContent)) return root;
   wrap(root, zh ? KG_ZH : KG_EN, false, t => {
     const m = t.match(zh ? /([A-D])$|(\d+)$/ : /(\d+)$|([A-D])$/), n = m[2] && zh ? +m[2] : m[1] && !zh ? +m[1] : null;
-    const k = n ? (n >= 1 && n <= 23 ? 'T' + n : null) : 'G' + (zh ? m[1] : m[2]);
+    const L = zh ? m[1] : m[2], k = n != null ? (n >= 1 && n <= 23 ? 'T' + n : null) : L ? 'G' + L : null;
     if (!k) return null;
     const a = el('a', {class: 'kg', href: '#kmgbf/' + k}, t);
     const x = window.KMGBF && [...KMGBF.goals, ...KMGBF.targets].find(y => y.k === k);
