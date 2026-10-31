@@ -906,18 +906,21 @@ function kmgbfSunburst(agg, tot, nm, lab, onPick) {
     root.children.push(sn);
   }
   (function part(n, x0) { n.x0 = x0; n.x1 = x0 + n.value / tot; let x = x0; (n.children || []).forEach(c => { part(c, x); x = c.x1; }); })(root, 0);
-  const R = [0, 86, 158, 222, 300], S = 640;
+  const R = [0, 86, 158, 222, 300], S = 860, LEAF0 = 26, LEAF = 160;  // 最外圈（預算主題）長度＝基本 26＋依金額最多 160
   const wrap = el('div'), crumb = el('div', {class: 'label', style: 'min-height:1.6em'});
-  const svg = sv('svg', {viewBox: `${-S / 2} ${-S / 2} ${S} ${S}`, role: 'img', 'aria-label': '自願信託基金需求依 KMGBF 分類、目標與主題的旭日圖', style: 'max-width:640px;display:block;margin:0 auto'});
+  const svg = sv('svg', {viewBox: `${-S / 2} ${-S / 2} ${S} ${S}`, role: 'img', 'aria-label': '自願信託基金需求依 KMGBF 分類、目標與主題的旭日圖', style: 'max-width:760px;display:block;margin:0 auto'});
   const fills = d => d === 1 ? 1 : d === 2 ? .72 : .45;  // 越外圈越淡，同一分類同一色相
   const render = f => {
     svg.replaceChildren();
     const span = f.x1 - f.x0, ang = x => (x - f.x0) / span * 2 * Math.PI;
+    const leaves = []; (function lv(n) { if (!n.children?.length) leaves.push(n); else n.children.forEach(lv); })(f);
+    const vmax = Math.max(...leaves.map(n => n.value), 1);  // 目前畫面中最大的主題＝最長
     const walk = n => {
       const d = n.depth - f.depth;
       if (d >= 1 && d <= 3 && n.x1 > f.x0 && n.x0 < f.x1) {
-        const a0 = ang(Math.max(n.x0, f.x0)), a1 = ang(Math.min(n.x1, f.x1)), r0 = R[d], r1 = R[d + 1] - 2;
-        const path = sv('path', {d: arcPath(r0, r1, a0 + .003, a1 - .003), fill: n.color, 'fill-opacity': fills(d), stroke: 'var(--panel)', 'stroke-width': 1});
+        const leaf = !n.children?.length;
+        const a0 = ang(Math.max(n.x0, f.x0)), a1 = ang(Math.min(n.x1, f.x1)), r0 = R[d], r1 = leaf ? R[d] + LEAF0 + LEAF * n.value / vmax : R[d + 1] - 2;
+        const path = sv('path', {d: arcPath(r0, r1, a0 + .003, a1 - .003), fill: n.color, 'fill-opacity': leaf ? .5 : fills(d), stroke: 'var(--panel)', 'stroke-width': 1});
         tipOn(path, () => [usd(n.value), n.long || n.full || n.name, '占需求合計 ' + nf(n.value / tot * 100, 1) + '%' + (n.children?.length ? '；點擊放大' : '')]);
         path.style.cursor = n.children?.length ? 'zoom-in' : 'pointer';
         path.addEventListener('click', () => { hideVtip(); n.children?.length ? render(n) : onPick(n.parent.key, n.parent.o); });
@@ -925,9 +928,13 @@ function kmgbfSunburst(agg, tot, nm, lab, onPick) {
         const mid = (a0 + a1) / 2, rm = (r0 + r1) / 2, arcLen = (a1 - a0) * rm;
         const cls = {class: d === 1 ? 'sb-on' : 'sb-lb', 'font-size': d === 1 ? 12 : 11, 'pointer-events': 'none'};
         const full = n.tname || n.name;  // 目標圈弧長夠時顯示「目標 21｜資訊流通」
-        if (d < 3 && arcLen > full.length * 12 + 16) svg.append(tangentText(rm, mid, full, cls));
-        else if (d < 3 && arcLen > n.name.length * 12 + 10) svg.append(tangentText(rm, mid, n.name, cls));
-        else if (arcLen > 13) {  // 窄扇形：沿半徑方向
+        if (!leaf && arcLen > full.length * 12 + 16) svg.append(tangentText(rm, mid, full, cls));
+        else if (!leaf && arcLen > n.name.length * 12 + 10) svg.append(tangentText(rm, mid, n.name, cls));
+        else if (leaf && (a1 - a0) * (r0 + 10) > 12) {  // 主題：由內緣向外排字，長度隨扇形變長
+          const t = fitText(n.name, r1 - r0 - 10, 11);
+          if (t) svg.append(outwardText(r0 + 6, mid, t, cls));
+        }
+        else if (!leaf && arcLen > 13) {  // 窄扇形：沿半徑方向
           const t = fitText(n.name, r1 - r0 - 8, 11);
           if (t) svg.append(radialText(rm, mid, t, cls));
         }
@@ -1006,7 +1013,7 @@ function kmgbfCard(B) {
     if (view.value !== 'bar') {
       area.replaceChildren(view.value === 'sun' ? kmgbfSunburst(agg, tot, nm, lab, (t, o) => show(t, o)) : kmgbfWheel(agg, tot, K.short, (t, o) => show(t, o)));
       leg.replaceChildren(secLeg);
-      viewNote.replaceChildren(view.value === 'sun' ? '扇形角度＝金額。由內而外：KMGBF 分類、目標、預算主題（多目標主題已平均分配）。點扇形放大、點中心返回；點最外圈的主題可列出該目標的明細。'
+      viewNote.replaceChildren(view.value === 'sun' ? '扇形角度＝金額；最外圈預算主題的長度也依金額變長（以目前畫面中最大的主題為最長）。由內而外：KMGBF 分類、目標、預算主題（多目標主題已平均分配）。點扇形放大、點中心返回；點最外圈的主題可列出該目標的明細。'
         : '23 項目標等分成圈，依三大類分色；放射長條長度＝金額，虛線空位表示決議 16/28 表 4 中沒有對應主題。長期目標與跨目標／程序不屬於 23 項目標，金額見旭日圖或長條圖。');
       detail.replaceChildren(view.value === 'sun' ? '' : el('p', {class: 'label'}, '點長條可列出這個目標分到哪些主題的金額。'));
       drawTable(rows);
