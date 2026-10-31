@@ -398,7 +398,7 @@ function renderBudget(parts) {
     el('div', {class: 'kpi'}, el('div', {class: 'l'}, '公約一般信託基金分攤國數'), el('div', {class: 'v'}, String(cop.contrib.rows.length)), el('div', {class: 'd'},
       'CP ' + F.CP.contrib.rows.length + '、NP ' + F.NP.contrib.rows.length + '（含歐盟）')),
     staffNow ? el('div', {class: 'kpi'}, el('div', {class: 'l'}, '秘書處核心預算員額'), el('div', {class: 'v'}, String(staffNow[2])), el('div', {class: 'd'}, '2025–2026 核定 ' + staffNow[1] + ' 個')) : null));
-  box.append(sankeyCard(B), rankCard(B), mapCard(B), trendCard(B), partyCard(B, parts), tableCard(B), footer());
+  box.append(...[sankeyCard(B), rankCard(B), mapCard(B), trendCard(B), B.kmgbf ? kmgbfCard(B) : null, partyCard(B, parts), tableCard(B), footer()].filter(Boolean));
   $('#main').replaceChildren(box);
   if (parts[0] === 'party') document.getElementById('party-card')?.scrollIntoView();
   else $('#main').scrollTop = 0;
@@ -794,6 +794,80 @@ function trendCard(B) {
     el('h3', {style: 'margin-top:16px'}, '秘書處核心預算員額'), unitNote('員額數（個）'), el('div', {class: 'dtwrap', style: 'max-height:none'}, st),
     srcLine(B, [...B.decisions.filter(d => !/^(CP|NP)/.test(d.ref)).map(d => [d.url, 0, '決議 ' + d.ref]), [B.table1.id, B.table1.page, 'CBD/COP/17/L.31/Rev.1 表 1'],
       ...(B.comp_src ? [[B.comp_src.id, B.comp_src.page, 'CBD/COP/17/L.31/Rev.1 表 2']] : [])]));
+  return card;
+}
+
+// ---- 自願信託基金需求對應 KMGBF 目標：多目標主題平均分給所有對應目標；跨目標／程序另列 ----
+function kmgbfCard(B) {
+  const K = B.kmgbf, card = el('section', {class: 'card', id: 'kmgbf-alloc'}), area = el('div', {class: 'chart'}), detail = el('div'), tbl = el('div', {class: 'dtwrap'});
+  const FK = {'公約': 'COP', '卡塔赫納議定書': 'CP', '名古屋議定書': 'NP'};
+  const fund = el('select', {'aria-label': '基金'}, el('option', {value: ''}, '三基金合計'), ...Object.entries(FK).map(([z, k]) => el('option', {value: k}, z)));
+  const lab = t => t === '跨目標' || t === '程序' ? t : t.startsWith('G') ? '長期目標 ' + t[1] : '目標 ' + t.slice(1);
+  const nm = t => (K.short[t] ? lab(t) + '｜' + K.short[t] : lab(t));
+  const SECT = [['減少對生物多樣性的威脅（目標 1–8）', t => /^T[1-8]$/.test(t)], ['透過永續利用與利益分享滿足人類需求（目標 9–13）', t => /^T(9|1[0-3])$/.test(t)],
+    ['執行與主流化的工具與解決方案（目標 14–23）', t => /^T(1[4-9]|2[0-3])$/.test(t)], ['長期目標（只對應到長期目標的部分）', t => /^G/.test(t)], ['跨目標／程序（不分配到單一目標）', t => t === '跨目標' || t === '程序']];
+  const ORDER = [...[...Array(23)].map((_, i) => 'T' + (i + 1)), 'GA', 'GB', 'GC', 'GD', '跨目標', '程序'];
+  const draw = () => {
+    const rows = K.rows.filter(r => r.amt != null && (!fund.value || FK[r.fund] === fund.value));
+    const agg = new Map();  // 目標 → {tot, by: {COP, CP, NP}, items: [[主題, 分得金額, 主題總額, 目標數]]}
+    for (const r of rows) for (const t of r.t) {
+      const o = agg.get(t) || {tot: 0, by: {}, items: []}, v = r.amt / r.t.length;
+      o.tot += v; o.by[FK[r.fund]] = (o.by[FK[r.fund]] || 0) + v; o.items.push([r, v]); agg.set(t, o);
+    }
+    const tot = rows.reduce((s, r) => s + r.amt, 0), max = Math.max(...[...agg.values()].map(o => o.tot));
+    const narrow = innerWidth < 640;  // 窄螢幕：標籤在上、長條在下，字才不會被縮得太小
+    const W = narrow ? 360 : 880, rh = narrow ? 38 : 22, lw = narrow ? 0 : 250, hh = 26, x = v => (W - lw - (narrow ? 120 : 150)) * v / max, by = narrow ? 18 : 0;
+    let y = 4;
+    const items = [];
+    for (const [title, test] of SECT) {
+      const ts = ORDER.filter(t => test(t) && agg.has(t));
+      if (!ts.length) continue;
+      items.push(['h', title, y]); y += hh;
+      for (const t of ts) { items.push(['b', t, y]); y += rh; }
+      y += 6;
+    }
+    const svg = sv('svg', {viewBox: `0 0 ${W} ${y + 4}`, role: 'img', 'aria-label': '自願信託基金需求依 KMGBF 目標分配長條圖'});
+    for (const [k, t, yy] of items) {
+      if (k === 'h') { svg.append(sv('text', {x: 0, y: yy + 17, style: 'font-weight:600'}, t)); continue; }
+      const o = agg.get(t), muted = t === '跨目標' || t === '程序';
+      svg.append(narrow ? sv('text', {x: 0, y: yy + 14}, nm(t)) : sv('text', {x: lw - 8, y: yy + rh / 2 + 4, 'text-anchor': 'end'}, nm(t)));
+      let x0 = lw;
+      for (const f of ['COP', 'CP', 'NP']) {
+        const v = o.by[f]; if (!v) continue;
+        const w = Math.max(1, x(v) - 2);
+        const r = sv('rect', {x: x0, y: yy + by + 3, width: w, height: (narrow ? 22 : rh) - 7, rx: 3, fill: muted ? 'var(--muted-fill)' : FC[f]});
+        tipOn(r, () => [usd(v), nm(t) + '・' + ({COP: '公約', CP: '卡塔赫納議定書', NP: '名古屋議定書'})[f], o.items.filter(([r]) => FK[r.fund] === f).map(([r]) => r.zh).join('、')]);
+        r.style.cursor = 'pointer'; r.addEventListener('click', () => show(t, o));
+        svg.append(r); x0 += w + 2;
+      }
+      svg.append(sv('text', {x: x0 + 6, y: yy + by + 15, class: 'mut'}, nf(o.tot, 0) + '（' + nf(o.tot / tot * 100, 1) + '%）'));
+    }
+    area.replaceChildren(svg);
+    detail.replaceChildren(el('p', {class: 'label'}, '點長條可列出這個目標分到哪些主題的金額。'));
+    // 資料表：每個主題一列
+    tbl.replaceChildren(el('table', {class: 'dt'},
+      el('thead', {}, el('tr', {}, ...['主題', '基金', '金額（美元）', '對應目標', '每個目標分得（美元）'].map(h => el('th', {class: /主題|基金|對應/.test(h) ? 't' : ''}, h)))),
+      el('tbody', {}, ...rows.slice().sort((a, b) => b.amt - a.amt).map(r => el('tr', {},
+        el('td', {class: 't', title: r.en}, r.zh), el('td', {class: 't'}, r.fund), el('td', {}, nf(r.amt, 0)),
+        el('td', {class: 't'}, r.t.map(lab).join('、')), el('td', {}, nf(r.amt / r.t.length, 0)))))));
+  };
+  const show = (t, o) => {
+    detail.replaceChildren(el('h4', {style: 'margin:8px 0 4px'}, nm(t) + '：' + usd(o.tot)), unitNote('美元'),
+      el('ul', {style: 'margin:0 0 0 18px;padding:0;line-height:1.7'}, ...o.items.sort((a, b) => b[1] - a[1]).map(([r, v]) =>
+        el('li', {}, r.zh + '（' + r.fund + '）' + nf(v, 0) + (r.t.length > 1 ? '，為 ' + nf(r.amt, 0) + ' 平均分給 ' + r.t.length + ' 項：' + r.t.map(lab).join('、') : '')))));
+  };
+  fund.addEventListener('change', draw);
+  const noamt = K.rows.filter(r => r.amt == null);
+  card.append(el('h3', {}, '自願信託基金需求對應 KMGBF 目標'),
+    el('p', {class: 'label'}, '決議 16/28 表 4 列出「支持公約及其議定書額外核定活動特別自願信託基金」2025–2026 年各主題的經費需求。這是希望各方自願捐助的需求，不是核心預算的實際支出；本屆 L.31/Rev.1 的 2027–2028 年對應表（表 4）仍是預留位置（PLACE HOLDER，', el('a', {href: '#' + B.table1.id + '/p012'}, '第 12 頁'), '），所以此處用上一期數字。'),
+    el('div', {class: 'ctrl'}, fund), unitNote('美元（2025–2026 兩年合計，不含 13% 計畫支援費用）'), area,
+    legend([['var(--s1)', '公約'], ['var(--s2)', '卡塔赫納議定書'], ['var(--s3)', '名古屋議定書'], ['var(--muted-fill)', '跨目標／程序']]), detail,
+    el('p', {class: 'label'}, '主題與目標的對應由本團逐項判斷，不是決議原文。一個主題對應多個目標時，金額平均分給所有對應目標（主要與次要目標同權）；跨目標與程序性主題另列，不分配。百分比為占所選基金需求合計（' +
+      '公約 17,622,600、卡塔赫納議定書 1,098,350、名古屋議定書 696,300 美元）的比例。'),
+    el('details', {}, el('summary', {class: 'label', style: 'cursor:pointer'}, '各主題的對應與分配（資料表）'), tbl),
+    noamt.length ? el('p', {class: 'label'}, '決議 15/34 另有 ' + noamt.length + ' 個主題（表中沒有金額，不列入上圖）：' + noamt.map(r => r.zh + '（' + r.t.map(lab).join('、') + '）').join('；') + '。') : null,
+    srcLine(B, [[K.url, 0, '決議 16/28 表 4'], ...(B.decisions.find(d => d.ref === '15/34') ? [[B.decisions.find(d => d.ref === '15/34').url, 0, '決議 15/34']] : [])]));
+  draw();
   return card;
 }
 
