@@ -442,7 +442,7 @@ function renderBudget(parts) {
       'CP ' + F.CP.contrib.rows.length + '、NP ' + F.NP.contrib.rows.length + '（含歐盟）')),
     staffNow ? el('div', {class: 'kpi'}, el('div', {class: 'l'}, '秘書處核心預算員額'), el('div', {class: 'v'}, String(staffNow[2])), el('div', {class: 'd'}, '2025–2026 核定 ' + staffNow[1] + ' 個')) : null));
   if (kpiCsv) box.append(kpiCsv);
-  box.append(...[sankeyCard(B), rankCard(B), mapCard(B), trendCard(B), ...(B.status ? [statusCard(B), execCard(B)] : []), lorenzCard(B), B.kmgbf ? kmgbfCard(B) : null, B.kmgbf && B.years?.['2027'] ? yerevanCard(B) : null, partyCard(B, parts), tableCard(B), footer()].filter(Boolean));
+  box.append(...[sankeyCard(B), rankCard(B), mapCard(B), trendCard(B), ...(B.status ? [statusCard(B), execCard(B)] : []), lorenzCard(B), B.cf ? cfCard(B) : null, B.kmgbf ? kmgbfCard(B) : null, B.kmgbf && B.years?.['2027'] ? yerevanCard(B) : null, partyCard(B, parts), tableCard(B), footer()].filter(Boolean));
   $('#main').replaceChildren(box);
   if (parts[0] === 'party') document.getElementById('party-card')?.scrollIntoView();
   else $('#main').scrollTop = 0;
@@ -1004,6 +1004,51 @@ function lorenzCard(B) {
   return card;
 }
 
+// ---- 反事實試算：若美國依聯合國比例分攤公約一般信託基金（其他條件不變），各締約方少付多少 ----
+function cfCard(B) {
+  const C = B.cf, f = B.funds.find(f => f.key === 'COP'), card = el('section', {class: 'card', id: 'cf'});
+  const rs = f.contrib.rows.slice().sort((a, b) => b.v[4] - a.v[4]), top = rs.slice(0, 12);
+  const rest = rs.slice(12), restA = rest.reduce((s, r) => s + r.v[4], 0), restC = rest.reduce((s, r) => s + C.v[r.key][1], 0);
+  const items = [...top.map(r => ({name: r.zh || r.en, a: r.v[4], c: C.v[r.key][1]})), {name: '其他 ' + rest.length + ' 個締約方', a: restA, c: restC}, {name: '美國（反事實）', a: 0, c: C.us_amt, us: true}];
+  const narrow = matchMedia('(max-width: 639px)').matches;
+  const W = narrow ? 360 : 880, lw = narrow ? 0 : 170, rh = narrow ? 50 : 34, by = narrow ? 16 : 0, bw = W - lw - (narrow ? 70 : 170);
+  const max = Math.max(...items.map(o => Math.max(o.a, o.c)));
+  const svg = sv('svg', {viewBox: `0 0 ${W} ${items.length * rh + 8}`, role: 'group', 'aria-label': '各締約方實際分攤與若美國分攤的反事實分攤'});
+  items.forEach((o, i) => {
+    const y = i * rh + 2, x = v => bw * v / max, h = narrow ? 13 : 12;
+    svg.append(narrow ? sv('text', {x: 0, y: y + 12, style: o.us ? 'font-weight:600' : ''}, o.name) : sv('text', {x: lw - 8, y: y + rh / 2 + 4, 'text-anchor': 'end', style: o.us ? 'font-weight:600' : ''}, o.name));
+    const ra = sv('rect', {x: lw, y: y + 3 + by, width: Math.max(o.a ? 2 : 0, x(o.a)), height: h, rx: 3, fill: 'var(--s1)'});
+    const rc = sv('rect', {x: lw, y: y + 4 + h + by, width: Math.max(2, x(o.c)), height: h, rx: 3, fill: o.us ? 'var(--s2)' : 'var(--muted-fill)'});
+    if (o.a) tipOn(ra, () => [usd(o.a), o.name + '：實際分攤（美國不在）', '2027–2028 合計']);
+    tipOn(rc, () => [usd(o.c), o.name + '：若美國依聯合國比例分攤', o.us ? '美國的調整後比例 ' + nf(C.us_adj, 3) + '%' : '少付 ' + usd(o.a - o.c)]);
+    svg.append(ra, rc, sv('text', {x: lw + Math.max(x(o.a), x(o.c)) + 6, y: y + 4 + h + by + 4, class: 'mut', 'font-size': 11},
+      o.us ? '+' + nf(o.c / 1e6, 2) + ' 百萬' : '多付 ' + nf((o.a / o.c - 1) * 100, 1) + '%'));
+  });
+  const jp = rs.find(r => r.en === 'Japan'), cn = rs.find(r => r.en === 'China'), jpX = (jp.v[4] / C.v[jp.key][1] - 1) * 100, cnX = (cn.v[4] / C.v[cn.key][1] - 1) * 100;
+  card.append(el('h3', {}, '反事實試算：美國不在，大家多付多少？'),
+    el('div', {class: 'note'}, el('b', {}, '什麼是反事實？'),
+      '只改動一件已經發生的事，其他條件全部不變，算出「如果當初不是這樣」的結果，再與實際比較。這裡只改一件事：假設美國是公約締約方，依聯合國分攤比例付錢；預算總額、22% 上限、低度開發國家 0.01% 上限、歐盟固定 2.5% 都照現行。兩者的差額，就是美國缺席讓每個締約方多付的部分。這是試算，不是預測美國會加入。'),
+    el('div', {class: 'kpis', style: 'margin-top:10px'},
+      el('div', {class: 'kpi'}, el('div', {class: 'l'}, '美國若分攤（2027–2028）'), el('div', {class: 'v'}, nf(C.us_amt / 1e6, 2) + ' 百萬美元'), el('div', {class: 'd'}, '調整後比例 ' + nf(C.us_adj, 3) + '%（聯合國比例 ' + nf(C.us_un, 3) + '%）；' + twd(C.us_amt))),
+      el('div', {class: 'kpi'}, el('div', {class: 'l'}, '一般締約方因此多付'), el('div', {class: 'v'}, nf(jpX, 1) + '%'), el('div', {class: 'd'}, '放大倍數 ' + nf(C.k0, 4) + ' ÷ ' + nf(C.k1, 4) + '；例如日本多付 ' + usd(jp.v[4] - C.v[jp.key][1]))),
+      el('div', {class: 'kpi'}, el('div', {class: 'l'}, '中國多付'), el('div', {class: 'v'}, nf(cnX, 1) + '%'), el('div', {class: 'd'}, '實際被 22% 上限壓住；美國加入後降為 ' + nf(C.v[cn.key][0], 3) + '%，不再碰到上限'))),
+    unitNote('美元（2027–2028 兩年合計）；每國上條為實際、下條為反事實'), el('div', {class: 'chart'}, svg),
+    legend([['var(--s1)', '實際（美國不在）'], ['var(--muted-fill)', '若美國依聯合國比例分攤'], ['var(--s2)', '美國（反事實）']]),
+    el('details', {}, el('summary', {class: 'label', style: 'cursor:pointer'}, '怎麼算的？'),
+      el('ol', {style: 'margin:4px 0 0 18px;padding:0;line-height:1.7'},
+        el('li', {}, '分攤表的規則：各締約方的聯合國分攤比例乘上同一個倍數 k，使合計為 100%；超過 22% 者以 22% 為上限，原表中被壓在 0.01% 的 ' + C.ldc.length + ' 個低度開發國家維持 0.01% 上限，歐盟固定 ' + nf(C.fixed, 1) + '%。'),
+        el('li', {}, '先用這條規則重算原表：k ＝ ' + nf(C.k0, 4) + '，' + C.checked + ' 個有聯合國比例的締約方，調整後比例（小數 3 位）與 2027、2028 年金額（±1 美元）全部與原表一致。'),
+        el('li', {}, '加入美國（聯合國比例 ' + nf(C.us_un, 3) + '%），所有比例合計超過 100%，k 降為 ' + nf(C.k1, 4) + '；美國與中國都不再碰到 22% 上限。'),
+        el('li', {}, '各國反事實分攤額 ＝ 反事實調整後比例（與原表相同，以未四捨五入的比例計算）× 各年應分攤總額（2027 年 ' + usd(C.net[0]) + '、2028 年 ' + usd(C.net[1]) + '），兩年相加。'),
+        el('li', {}, '多付比例約等於 ' + nf(C.k0, 4) + ' ÷ ' + nf(C.k1, 4) + ' − 1。它大於「把 78% 換算為 100%」的 28%，因為美國加入後歐盟仍固定 2.5%，其他國家的比例會略低於自己的聯合國比例。例外：中國原本被 22% 上限壓住，只多付約 ' + nf(cnX, 1) + '%；原表被壓在 0.01% 的低度開發國家多付很少；歐盟固定 2.5%，沒有差別。'))),
+    el('p', {class: 'label'}, '只算公約一般信託基金：美國 1993 年簽署公約但未批准，兩項議定書都沒有簽署。假設預算總額不變；實際上美國加入可能改變預算談判本身。'),
+    csvDl(B, [['h:counterfactual_us_convention_2027-2028.csv', '各締約方實際與反事實分攤']]),
+    el('div', {class: 'src'}, '資料來源：', el('a', {href: '#' + f.id + '/p' + String(f.pages.ct).padStart(3, '0')}, f.sym + ' 分攤表 第 ' + f.pages.ct + ' 頁'), '；',
+      el('a', {href: C.src, target: '_blank', rel: 'noopener'}, '聯合國大會第 79/249 號決議（美國 22.000%）↗'), '；',
+      el('a', {href: 'https://www.cbd.int/information/parties.shtml', target: '_blank', rel: 'noopener'}, 'CBD 締約方名單 ↗')));
+  return card;
+}
+
 // ---- KMGBF 分類色（三大類＋長期目標＋跨目標／程序）：顏色依分類，不依排名 ----
 const KSECT = [
   {key: 'threat', name: '減少威脅', full: '減少對生物多樣性的威脅（目標 1–8）', color: 'var(--k1)', test: t => /^T[1-8]$/.test(t)},
@@ -1296,6 +1341,7 @@ function partyCard(B, parts) {
   for (const f of B.funds) for (const r of f.contrib.rows) { names.set(r.key, {en: r.en, zh: r.zh || r.en, region: r.region}); byName.set(pnorm(r.en), r.key); if (r.zh) byName.set(r.zh, r.key); }
   const dl = el('datalist', {id: 'party-list'}, ...[...names.values()].sort((a, b) => a.zh.localeCompare(b.zh, 'zh-Hant')).map(n => el('option', {value: n.zh + '｜' + n.en})));
   const inp = el('input', {type: 'search', list: 'party-list', placeholder: '輸入或選擇締約方（中文或英文）', 'aria-label': '締約方', style: 'min-width:280px'});
+  const f0r = key => B.funds.find(f => f.key === 'COP').contrib.rows.find(r => r.key === key);
   const show = key => {
     const n = names.get(key);
     if (!n) { out.replaceChildren(el('p', {class: 'label'}, '選擇一個締約方，查看它在三個基金的分攤與歷年變化。')); return; }
@@ -1332,6 +1378,7 @@ function partyCard(B, parts) {
       el('div', {class: 'dtwrap', style: 'max-height:none'}, el('table', {class: 'dt'},
         el('thead', {}, el('tr', {}, ...['基金', '聯合國分攤比例（%）', '調整後比例（%）', '2027（美元）', '2028（美元）', '2027–2028（美元）', '2025–2026（美元）', '增減（%）'].map(x => el('th', {}, x)))),
         el('tbody', {}, ...rows))), el('p', {class: 'label'}, '滑過金額可看新臺幣概估（' + fxNote() + '）。'),
+      B.cf && B.cf.v[key] && f0r(key) ? el('p', {class: 'label'}, '反事實試算：若美國依聯合國比例分攤，' + n.zh + '在公約一般信託基金 2027–2028 年約付 ' + usd(B.cf.v[key][1]) + '，實際多付 ' + usd(f0r(key).v[4] - B.cf.v[key][1]) + '（' + nf((f0r(key).v[4] / B.cf.v[key][1] - 1) * 100, 1) + '%）。', el('a', {href: '#budget', onclick: e => { e.preventDefault(); document.getElementById('cf')?.scrollIntoView({behavior: 'smooth'}); }}, '說明')) : '',
       line ? el('div', {}, el('div', {class: 'label', style: 'margin-top:8px'}, '公約一般信託基金歷年分攤額（美元；2021、2022 年為暫行預算）'), el('div', {class: 'chart'}, line)) : '');
   };
   inp.addEventListener('change', () => {
