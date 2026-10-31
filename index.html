@@ -82,6 +82,7 @@ body.cv-off .cv{text-decoration:none;cursor:inherit}
 .blk p{margin:.3em 0}
 .blk table{border-collapse:collapse;font-size:13px}
 .blk td,.blk th{border:1px solid var(--line);padding:2px 6px}
+.blk td:first-child,.blk th:first-child{white-space:nowrap}
 .blk.edited{background:var(--edit);outline:1px solid var(--edit-line);white-space:pre-wrap}
 .badge{position:absolute;top:2px;right:4px;font-size:11px;color:var(--warn)}
 .editor{background:var(--panel);border:1px solid var(--accent);border-radius:8px;padding:8px;margin:4px -6px;cursor:auto}
@@ -99,6 +100,26 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 .pend .old{color:var(--muted);text-decoration:line-through;white-space:pre-wrap}
 .pend .new{white-space:pre-wrap}
 .pend .hd{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.knav{display:block;margin:0 16px 0;padding:10px 12px;border:1px solid var(--accent);border-radius:8px;text-decoration:none;color:var(--ink);background:var(--soft);font-size:14px;line-height:1.4}
+.knav b{color:var(--accent)}
+.knav.on{background:var(--accent);color:var(--accent-ink)}.knav.on b{color:inherit}
+.kidx{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.kidx a{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:36px;padding:0 8px;border:1px solid var(--line);border-radius:8px;background:var(--panel);text-decoration:none;font-size:13px}
+.kgrp{font-size:16px;margin:24px 0 4px;padding-bottom:4px;border-bottom:2px solid var(--accent)}
+.kcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:12px 0;scroll-margin-top:12px}
+.kcard h3{margin:0 0 8px;font-size:16px}
+.kcard h3 small{color:var(--muted);font-weight:400;margin-left:6px}
+.kpair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.kpair p{margin:.3em 0}
+.ken{font-size:14px;line-height:1.6}
+.kexp{background:var(--soft);border-radius:8px;padding:8px 12px;margin-top:10px;font-size:14px}
+.kfn{font-size:12px;color:var(--muted);margin-top:6px}
+.kind ul,.kdocs ul{margin:4px 0;padding-left:20px;font-size:13px}
+.kind,.kdocs{margin-top:10px}
+.kdocs summary{cursor:pointer;font-size:13px;color:var(--accent);min-height:32px;display:flex;align-items:center}
+.kdocs li{margin:2px 0}
+.kdocs .pg{display:inline-block;font-size:12px;padding:0 6px;margin:0 2px;border:1px solid var(--line);border-radius:4px;text-decoration:none}
+a.kg{text-decoration:underline 1px dotted;text-underline-offset:3px}
 footer{font-size:12px;color:var(--muted);padding:16px;border-top:1px solid var(--line);margin-top:24px}
 .back{display:none}
 @media (max-width:900px){
@@ -113,6 +134,7 @@ footer{font-size:12px;color:var(--muted);padding:16px;border-top:1px solid var(-
   body.side-off aside{visibility:visible}
   .page{grid-template-columns:1fr}
   .enp{border-right:0;border-bottom:1px solid var(--line)}
+  .kpair{grid-template-columns:1fr}
   body.v-en .zh,body.v-zh .enp{display:none}
 }
 </style>
@@ -131,7 +153,8 @@ footer{font-size:12px;color:var(--muted);padding:16px;border-top:1px solid var(-
       <div class="chips" id="fm"></div>
       <div class="chips" id="ft"></div>
     </div>
-    <div class="list" id="list"></div>
+    <a class="knav" id="knav" href="#kmgbf"><b>KMGBF 目標與說明</b><br>昆明－蒙特婁全球生物多樣性綱要：願景、4 項長期目標、23 項行動目標，與提到各目標的文件</a>
+    <div class="list" id="list" style="margin-top:8px"></div>
   </aside>
   <main id="main"><div class="empty">從左側選一份文件開始檢閱。點中文段落即可修正翻譯；滑過或選取中文時，對應的英文會以螢光標示。</div></main>
 </div>
@@ -191,14 +214,21 @@ function load(id) {
   });
 }
 
-function openDoc(id) {
+function route() {
+  const h = decodeURIComponent(location.hash.slice(1)), [id, sub] = h.split('/');
+  if (id === 'kmgbf') openKmgbf(sub); else openDoc(id, sub);
+}
+const toPage = p => { const e = p && document.getElementById('pg-' + p); if (e) e.scrollIntoView(); };
+function openDoc(id, p) {
+  $('#knav').classList.remove('on');
   const meta = IDX.find(d => d.id === id);
+  if (meta && S.id === id && $('#main .page')) { toPage(p); return; }  // 同一份文件只換頁
   S.id = meta ? id : null;
   document.body.classList.toggle('reading', !!meta);
   renderList();
   if (!meta) { $('#main').replaceChildren(el('div', {class: 'empty'}, '從左側選一份文件開始檢閱。點中文段落即可修正翻譯；滑過或選取中文時，對應的英文會以螢光標示。')); return; }
   $('#main').replaceChildren(el('div', {class: 'empty'}, '載入中…'));
-  load(id).then(doc => renderDoc(meta, doc), () => $('#main').replaceChildren(el('div', {class: 'empty'}, '無法載入這份文件。')));
+  load(id).then(doc => { renderDoc(meta, doc); toPage(p); }, () => $('#main').replaceChildren(el('div', {class: 'empty'}, '無法載入這份文件。')));
 }
 
 function renderDoc(m, doc) {
@@ -218,7 +248,7 @@ function renderDoc(m, doc) {
       el('button', {class: 'btn', 'aria-pressed': String(!document.body.classList.contains('cv-off')), onclick: e => {
         const off = document.body.classList.toggle('cv-off'); e.target.setAttribute('aria-pressed', String(!off));
         try { localStorage.setItem(KEY + '-cv', off ? 'off' : 'on'); } catch (_) {}
-      }}, '控制詞彙')));
+      }}, '用語底線')));
     for (const pg of doc.pages) {
       const zh = el('div', {class: 'zh', lang: 'zh-Hant-TW'});
       const en = el('div', {class: 'enp', lang: 'en'});
@@ -229,7 +259,7 @@ function renderDoc(m, doc) {
         d.addEventListener('mouseleave', () => zs().forEach(n => n.classList.remove('hl-soft')));
       });
       pg.blocks.forEach((b, i) => zh.append(renderBlock(m, pg, b, i)));
-      box.append(el('div', {class: 'page'}, el('div', {class: 'pno'}, '第 ' + parseInt(pg.p.slice(1), 10) + ' 頁'), en, zh));
+      box.append(el('div', {class: 'page', id: 'pg-' + pg.p}, el('div', {class: 'pno'}, '第 ' + parseInt(pg.p.slice(1), 10) + ' 頁'), en, zh));
     }
   } else {
     box.append(el('div', {class: 'note'}, '會前正式文件只提供白話摘要，全文請看 CBD 原文。'));
@@ -237,6 +267,63 @@ function renderDoc(m, doc) {
   box.append(footer());
   $('#main').replaceChildren(box);
   $('#main').scrollTop = 0;
+}
+
+// KMGBF 頁：決議 15/4 附件原文、本團譯文與白話說明、主要指標、本站文件中提到各目標的頁面
+function openKmgbf(k) {
+  S.id = null; renderList();
+  document.body.classList.add('reading'); $('#knav').classList.add('on');
+  const go = () => { renderKmgbf(); const e = k && document.getElementById('kg-' + k); if (e) e.scrollIntoView(); else $('#main').scrollTop = 0; };
+  if (window.KMGBF) return go();
+  $('#main').replaceChildren(el('div', {class: 'empty'}, '載入中…'));
+  const s = el('script', {src: 'data/kmgbf.js'});
+  s.onload = go; s.onerror = () => $('#main').replaceChildren(el('div', {class: 'empty'}, '找不到 data/kmgbf.js。'));
+  document.head.append(s);
+}
+function renderKmgbf() {
+  const K = window.KMGBF, box = el('div', {class: 'doc'});
+  const lab = k => k[0] === 'G' ? '長期目標 ' + k[1] : '目標 ' + k.slice(1);
+  const jump = k => e => { e.preventDefault(); history.replaceState(null, '', '#kmgbf/' + k); document.getElementById('kg-' + k)?.scrollIntoView({behavior: 'smooth'}); };
+  const pair = (en, zh) => {
+    const a = el('div', {class: 'ken', lang: 'en'}, ...en.map(t => el('p', {}, t))), b = el('div', {class: 'kzh'}, ...zh.map(t => el('p', {}, t)));
+    cvEn(decLinks(a)); cvZh(decLinks(b));
+    return el('div', {class: 'kpair'}, a, b);
+  };
+  const card = x => {
+    const fn = K.footnotes[x.k], npg = x.docs.reduce((s, d) => s + d[1].length, 0);
+    return el('section', {class: 'kcard', id: 'kg-' + x.k},
+      el('h3', {}, lab(x.k) + '｜' + x.short, el('small', {lang: 'en'}, x.k[0] === 'G' ? 'Goal ' + x.k[1] : 'Target ' + x.k.slice(1))),
+      pair(x.en, x.zh),
+      fn ? el('div', {class: 'kfn'}, '註：', fn[1], el('span', {lang: 'en'}, '（' + fn[0] + '）')) : null,
+      el('div', {class: 'kexp'}, el('b', {}, '白話說明　'), x.explain),
+      x.ind.length ? el('div', {class: 'kind'}, el('div', {class: 'label'}, '主要指標（headline indicators）'),
+        el('ul', {}, ...x.ind.map(i => el('li', {}, i.code + '　' + (i.zh || ''), el('span', {class: 'label', lang: 'en'}, '　' + i.en))))) : null,
+      x.docs.length ? el('details', {class: 'kdocs'}, el('summary', {}, '本站文件中提到' + lab(x.k) + '：' + x.docs.length + ' 份文件、' + npg + ' 頁'),
+        el('ul', {}, ...x.docs.map(([id, ps]) => {
+          const d = IDX.find(y => y.id === id) || {};
+          return el('li', {}, el('a', {href: '#' + id}, d.sym || '（無文件代碼）'), '　' + (d.title_zh || d.title || '') + '　',
+            ...ps.map(p => el('a', {class: 'pg', href: '#' + id + '/p' + String(p).padStart(3, '0')}, 'p' + p)));
+        }))) : el('div', {class: 'label', style: 'margin-top:8px'}, '本站文件英文原文沒有直接提到' + lab(x.k) + '。'));
+  };
+  box.append(el('div', {class: 'dhead'},
+      el('div', {class: 'label'}, 'CBD/COP/DEC/15/4・COP 15 第二階段（蒙特婁）・2022 年 12 月 19 日'),
+      el('h2', {}, '昆明－蒙特婁全球生物多樣性綱要（KMGBF）'), el('p', {class: 'en', lang: 'en'}, 'Kunming-Montreal Global Biodiversity Framework')),
+    el('div', {class: 'links'}, el('a', {href: K.source, target: '_blank', rel: 'noopener'}, '決議 15/4 原文 PDF ↗')),
+    el('div', {class: 'note'}, '英文為決議 15/4 附件原文（第 F–H 節）。中文為臺灣代表團的非官方翻譯，以英文原文為準；「白話說明」只依條文本身撰寫。文件中的「Target 3」「目標 3」等字樣都可點回本頁。'),
+    el('nav', {class: 'kidx', 'aria-label': '目標索引'},
+      el('a', {href: '#kmgbf/vision', onclick: jump('vision')}, '願景與使命'),
+      ...[...K.goals, ...K.targets].map(x => el('a', {href: '#kmgbf/' + x.k, title: x.short, onclick: jump(x.k)}, x.k[0] === 'G' ? x.k[1] : x.k.slice(1)))),
+    el('section', {class: 'kcard', id: 'kg-vision'}, el('h3', {}, '2050 年願景：' + K.vision[2]), pair([K.vision[0]], [K.vision[1]]),
+      el('h3', {style: 'margin-top:12px'}, '2030 年使命'), pair([K.mission[0]], [K.mission[1]])),
+    el('h2', {class: 'kgrp'}, '2050 年長期目標'), ...K.goals.map(card),
+    el('h2', {class: 'kgrp'}, '2030 年行動目標'));
+  K.targets.forEach(x => {
+    const g = K.groups.find(g => 'T' + g[0] === x.k);
+    if (g) box.append(el('h3', {class: 'kgrp', style: 'font-size:15px'}, (K.groups.indexOf(g) + 1) + '. ' + g[2], el('small', {class: 'label', lang: 'en', style: 'margin-left:6px;font-weight:400'}, g[1])));
+    box.append(card(x));
+  });
+  box.append(el('p', {class: 'label'}, '指標清單來源：' + K.indSource + '；指標中文為本團翻譯。'), footer());
+  $('#main').replaceChildren(box);
 }
 
 // 中文段落 → 對應英文段落（產生器以長度與數字對齊）
@@ -315,13 +402,15 @@ function cvSpan(tip, kind, text) {
 }
 function cvZh(root) {
   const c = cv();
-  if (c) wrap(root, c.zre, false, (t, pre, post) => { if (pre === '/' || post === '/') return null; const v = c.zh.get(t); return v && cvSpan(v.es.join(' / '), v.k, t); });
+  // 國名夾在一般詞裡的不算：明智利用、印度洋、東加勒比、開發中國家、經濟轉型中國家、沿海地區
+  const NOT = {'智利': (p, n) => p === '明' || p === '機', '印度': (p, n) => n === '洋', '東加': (p, n) => n === '勒', '中國': (p, n) => '發展其型濟'.includes(p), '海地': (p, n) => n === '區' || p === '比' || p === '沿'};
+  if (c) wrap(root, c.zre, false, (t, pre, post) => { if (pre === '/' || post === '/' || NOT[t]?.(pre, post)) return null; const v = c.zh.get(t); return v && cvSpan(v.es.join(' / '), v.k, t); });
   return root;
 }
 function cvEn(root) {
   const c = cv();
   if (c) wrap(root, c.ere, true, (t, pre, post) => {
-    if (pre === '/' || post === '/') return null;  // 文件代碼（CBD/COP/17/…）不算
+    if (pre === '/' || post === '/' || t.includes('\n')) return null;  // 表格跨行的不標  // 文件代碼（CBD/COP/17/…）不算
     const f = norm(t), hit = (c.en.get(f) || c.en.get(f.replace(/e?s$/, '')) || []).filter(x => !acro(x.e) || t.replace(/s$/, '') === x.e);
     return hit.length ? cvSpan([...new Set(hit.map(x => x.z))].sort((a, b) => a.length - b.length).join('、'), hit[0].k, t) : null;  // 縮寫須大小寫相符（避免 us → US）
   });
@@ -335,7 +424,23 @@ function decLinks(root) {
   wrap(root, DEC_RE, false, t => D[t] ? el('a', {class: 'dec', href: D[t], target: '_blank', rel: 'noopener', title: '決議 ' + t + '（CBD 官方原文）'}, t) : null);
   return root;
 }
-function renderEp(d, t) { d.textContent = t; return cvEn(decLinks(d)); }
+// 文件中提到的 KMGBF 目標（Target 3、Goal A／目標 3、長期目標 A）→ 連到 KMGBF 頁；排除愛知目標與永續發展目標
+const KG_EN = /(?<!Aichi )(?<!Aichi Biodiversity )(?<!Development )\b(?:[Tt]arget (\d{1,2})|Goal ([A-D]))(?![\d.%]|\w)/g;
+const KG_ZH = /(?<!愛知)(?<!愛知生物多樣性)(?<!發展)(?:長期目標 ?([A-D])|目標 ?(\d{1,2}))(?![\d.%％])/g;
+function kgLinks(root, zh) {
+  if (!/target|goal|目標/i.test(root.textContent)) return root;
+  wrap(root, zh ? KG_ZH : KG_EN, false, t => {
+    const m = t.match(zh ? /([A-D])$|(\d+)$/ : /(\d+)$|([A-D])$/), n = m[2] && zh ? +m[2] : m[1] && !zh ? +m[1] : null;
+    const k = n ? (n >= 1 && n <= 23 ? 'T' + n : null) : 'G' + (zh ? m[1] : m[2]);
+    if (!k) return null;
+    const a = el('a', {class: 'kg', href: '#kmgbf/' + k}, t);
+    const x = window.KMGBF && [...KMGBF.goals, ...KMGBF.targets].find(y => y.k === k);
+    a.title = (k[0] === 'G' ? '長期目標 ' + k[1] : '目標 ' + k.slice(1)) + (x ? '：' + x.short : '') + '（KMGBF）';
+    return a;
+  });
+  return root;
+}
+function renderEp(d, t) { d.textContent = t; return cvEn(kgLinks(decLinks(d), false)); }
 function markTerms(d, t, ens) {
   renderEp(d, t);
   return ens.length ? wrap(d, new RegExp(ens.map(termRe).join('|'), 'g'), true, x => el('mark', {class: 'term'}, x)) : 0;
@@ -375,7 +480,7 @@ function renderBlock(m, pg, b, i) {
   const k = pg.zh + '#' + i;
   const ed = EDITS[k];
   const node = ed ? el('div', {class: 'blk edited', title: '已修正，點擊再修改'}, ed.new, el('span', {class: 'badge'}, '已修正'))
-                  : cvZh(decLinks(el('div', {class: 'blk', title: '點擊修正這段翻譯', html: b.html})));
+                  : cvZh(kgLinks(decLinks(el('div', {class: 'blk', title: '點擊修正這段翻譯', html: b.html})), true));
   node.dataset.i = i;
   const soft = on => (b.en || []).forEach(j => pg.eps[j]?.classList.toggle('hl-soft', on));
   node.addEventListener('mouseenter', () => soft(true));
@@ -524,7 +629,7 @@ chips($('#ft'), NAT, 't');
 $('#q').addEventListener('input', e => { S.q = e.target.value; renderList(); });
 $('#pending').addEventListener('click', showPending);
 $('#back').addEventListener('click', () => { history.replaceState(null, '', location.pathname + location.search); openDoc(null); });
-window.addEventListener('hashchange', () => openDoc(decodeURIComponent(location.hash.slice(1))));
+window.addEventListener('hashchange', route);
 saveEdits();
 try { if (localStorage.getItem(KEY + '-cv') === 'off') document.body.classList.add('cv-off'); } catch (_) {}
 // 桌機版文件清單可收合，記住狀態
@@ -540,12 +645,12 @@ $('#side').addEventListener('click', () => {
   side(off);
   try { localStorage.setItem(KEY + '-side', off ? 'off' : 'on'); } catch (_) {}
 });
-// 先載詞彙（固定控制詞彙要用），再載文件清單
+// 先載詞彙（固定用語底線要用），再載文件清單
 const s = el('script', {src: 'data/index.js'});
-s.onload = () => { renderList(); openDoc(decodeURIComponent(location.hash.slice(1))); };
+s.onload = () => { renderList(); route(); };
 s.onerror = () => $('#list').replaceChildren(el('div', {class: 'empty'}, '找不到 data/index.js，請先執行 tools/review_site.py。'));
 const tv = el('script', {src: 'data/terms.js'});
-tv.onload = tv.onerror = () => document.head.append(s);
+tv.onload = tv.onerror = () => document.head.append(el('script', {src: 'data/kmgbf.js', onload: () => document.head.append(s), onerror: () => document.head.append(s)}));
 document.head.append(tv);
 const tip = $('#tip');
 document.addEventListener('mouseover', e => {
