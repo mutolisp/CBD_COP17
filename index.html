@@ -510,11 +510,14 @@ function rankCard(B) {
     const color = fund.value === 'ALL' ? 'var(--s1)' : FC[fund.value];
     area.replaceChildren(view.value === 'bar' ? hbars(all, tot, color, 15) : treemap(all, tot, color, 30));
     const f0 = fs[0], un = f0.contrib.rows.reduce((s, r) => s + (r.v[0] || 0), 0);
-    const capped = f0.contrib.rows.filter(r => r.v[1] === 22).map(r => r.zh || r.en), ldc = f0.contrib.rows.filter(r => Math.abs(r.v[1] - 0.01) < 1e-9 && r.v[0] * 100 / un > 0.01001).length;
+    // 被 0.01% 上限壓低者：分攤額正好是總額的 0.01%，且換算前比例高於 0.01%（只看調整後比例 0.010 會把 0.008→0.0103 四捨五入者誤算進來）
+    const T2027 = f0.contrib.rows.reduce((s, r) => s + (r.v[2] || 0), 0);
+    const capped = f0.contrib.rows.filter(r => r.v[1] === 22).map(r => r.zh || r.en),
+      ldc = f0.contrib.rows.filter(r => r.v[0] && Math.abs(r.v[2] - T2027 * 0.0001) <= 1 && r.v[0] * 100 / un > 0.01).length;
     const us = f0.contrib.rows.some(r => /United States of America/.test(r.en));
     info.replaceChildren(fund.value === 'ALL' ? '三基金合計是把同一締約方在三個基金的分攤額相加。' :
       `${f0.zh}分攤表的締約方，其聯合國分攤比例合計 ${nf(un, 3)}%${us ? '' : '（表中沒有美國）'}，依比例換算為 100%；` +
-      (capped.length ? `${capped.join('、')}以 22% 為上限；` : '') + `另有 ${ldc} 個低度開發國家以 0.01% 為上限。`);
+      (capped.length ? `${capped.join('、')}以 22% 為上限；` : '') + `另有 ${ldc} 個締約方的分攤比例被壓在 0.01%（低度開發國家上限）。`);
     src.replaceChildren(srcLine(B, fs.map(f => [f.id, f.pages.ct, f.sym + ' 分攤表'])));
   };
   [fund, yr, view].forEach(x => x.addEventListener('change', draw));
@@ -620,7 +623,7 @@ function trendCard(B) {
       ...per.map(p => el('td', {}, p.get(g) === null ? '—' : String(p.get(g))))))));
   card.append(el('h3', {}, '2019–2028 年度預算趨勢'),
     el('div', {class: 'chart'}, svg), legend(B.groups.map(([k, z]) => [GC[k], z])),
-    el('p', {class: 'label'}, '每年的整合核心預算（千美元），依支出項目歸為六類；各期用語不同，歸類方式見 tools/review_site.py 的 GROUPS。2021 年沒有年度預算決議（決議 15/1 表 1 為 2019–2020 預算結轉情形）；2022 年為暫行預算。2027、2028 為本屆提案。'),
+    el('p', {class: 'label'}, '每年的整合核心預算（千美元），依支出項目歸為六類；各期用語不同，歸類方式見 tools/review_site.py 的 GROUPS。2021 年沒有年度預算決議（決議 15/1 表 1 為 2019–2020 預算結轉情形）；2022 年為暫行預算。2027、2028 為本屆提案。長條上方數字是年度總計；週轉金準備為負的年度（2027 年釋出 182.3 千美元）不畫入堆疊，所以長條會略高於總計。'),
     el('h3', {style: 'margin-top:16px'}, '公約締約方應分攤淨額'), el('div', {class: 'chart'}, svg2),
     el('h3', {style: 'margin-top:16px'}, '秘書處核心預算員額'), el('div', {class: 'dtwrap', style: 'max-height:none'}, st),
     srcLine(B, [...B.decisions.filter(d => !/^(CP|NP)/.test(d.ref)).map(d => [d.url, 0, '決議 ' + d.ref]), [B.table1.id, B.table1.page, 'CBD/COP/17/L.31/Rev.1 表 1']]));
