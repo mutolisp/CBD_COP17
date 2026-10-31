@@ -218,7 +218,7 @@ function renderDoc(m, doc) {
       el('button', {class: 'btn', 'aria-pressed': String(!document.body.classList.contains('cv-off')), onclick: e => {
         const off = document.body.classList.toggle('cv-off'); e.target.setAttribute('aria-pressed', String(!off));
         try { localStorage.setItem(KEY + '-cv', off ? 'off' : 'on'); } catch (_) {}
-      }}, '用語底線')));
+      }}, '控制詞彙')));
     for (const pg of doc.pages) {
       const zh = el('div', {class: 'zh', lang: 'zh-Hant-TW'});
       const en = el('div', {class: 'enp', lang: 'en'});
@@ -540,7 +540,7 @@ $('#side').addEventListener('click', () => {
   side(off);
   try { localStorage.setItem(KEY + '-side', off ? 'off' : 'on'); } catch (_) {}
 });
-// 先載詞彙（固定用語底線要用），再載文件清單
+// 先載詞彙（固定控制詞彙要用），再載文件清單
 const s = el('script', {src: 'data/index.js'});
 s.onload = () => { renderList(); openDoc(decodeURIComponent(location.hash.slice(1))); };
 s.onerror = () => $('#list').replaceChildren(el('div', {class: 'empty'}, '找不到 data/index.js，請先執行 tools/review_site.py。'));
