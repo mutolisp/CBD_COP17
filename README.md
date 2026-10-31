@@ -42,7 +42,7 @@ python tools/review_site.py --out ../CBD_COP17
 
 ## 版權與聲明
 
-- **地圖**：國界取自 Natural Earth 1:110m（公有領域），經 world-atlas 2.0.2（ISC）封裝，僅供示意。
+- **地圖**：以 Leaflet 1.9.4（BSD-2-Clause，`vendor/leaflet/`）繪製，不載入底圖圖磚。國界取自 Natural Earth 1:110m，小國以 1:50m 國界的代表點標示（公有領域），經 world-atlas 2.0.2（ISC）封裝，僅供示意。
 
 - **英文原文**：CBD 秘書處正式文件。依 [CBD 版權說明](https://www.cbd.int/copyright/)，正式文件、資料與文本屬公有領域，在不改動內容並註明出處的前提下，可以自由下載、複製與列印。
   - 本網站照原始 PDF 抽出文字（只調整版面），未改動內容。
