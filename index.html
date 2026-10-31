@@ -622,7 +622,7 @@ function cssColor(v) {
   return getComputedStyle(p).color;
 }
 function mapCard(B) {
-  const card = el('section', {class: 'card'}), area = el('div', {class: 'chart', style: 'aspect-ratio:16/10;max-height:560px;width:100%;border-radius:8px;background:var(--bg)'}), leg = el('div', {class: 'legend'}), small = el('div', {class: 'label'});
+  const card = el('section', {class: 'card'}), area = el('div', {class: 'chart', style: 'aspect-ratio:16/10;max-height:560px;width:100%;border-radius:8px;background:var(--bg);isolation:isolate'}), leg = el('div', {class: 'legend'}), small = el('div', {class: 'label'});
   const fund = el('select', {'aria-label': '基金'}, ...B.funds.map(f => el('option', {value: f.key}, f.zh + '一般信託基金')), el('option', {value: 'ALL'}, '三基金合計'));
   const metric = el('select', {'aria-label': '指標'}, el('option', {value: 'amt'}, '2027–2028 分攤額（美元）'), el('option', {value: 'share'}, '調整後分攤比例（%）'),
     el('option', {value: 'chg'}, '與 2025–2026 相比的增減（%）'));
