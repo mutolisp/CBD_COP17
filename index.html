@@ -327,7 +327,7 @@ const GZ = () => Object.fromEntries(window.BUDGET.groups);
 // 提示框：數值在前、標籤在後；以 textContent 放入（資料來自外部文件）
 function showVtip(x, y, value, label, note) {
   const t = $('#vtip');
-  t.replaceChildren(el('b', {}, value), label, note ? el('div', {class: 'label'}, note) : null);
+  t.replaceChildren(...[el('b', {}, value), label, note ? el('div', {class: 'label'}, note) : null].filter(x => x != null && x !== ''));  // replaceChildren 會把 null 印成文字
   t.style.display = 'block';
   const w = t.offsetWidth, h = t.offsetHeight;
   t.style.left = Math.max(8, Math.min(x + 12, innerWidth - w - 8)) + 'px';
