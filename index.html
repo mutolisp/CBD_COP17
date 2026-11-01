@@ -2220,8 +2220,12 @@ const tv = el('script', {src: 'data/terms.js'});
 tv.onload = tv.onerror = () => document.head.append(el('script', {src: 'data/kmgbf.js', onload: () => document.head.append(s), onerror: () => document.head.append(s)}));
 document.head.append(tv);
 const tip = $('#tip');
+let muted = null;  // 滑到用語時暫時拿掉段落的 title（「點擊修正這段翻譯」），免得瀏覽器提示蓋住用語提示
 document.addEventListener('mouseover', e => {
   const c = e.target.closest?.('.cv');
+  const host = c?.closest('[title],[data-title]');
+  if (muted && muted !== host) { muted.title = muted.dataset.title; delete muted.dataset.title; muted = null; }
+  if (host && !muted) { host.dataset.title = host.title; host.removeAttribute('title'); muted = host; }
   if (!c || document.body.classList.contains('cv-off')) { tip.classList.remove('on'); return; }
   tip.replaceChildren(c.dataset.tip, el('small', {}, c.dataset.kind));
   tip.classList.add('on');
