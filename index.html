@@ -481,7 +481,7 @@ function renderBudget(parts) {
       'CP ' + F.CP.contrib.rows.length + '、NP ' + F.NP.contrib.rows.length + '（含歐盟）')),
     staffNow ? el('div', {class: 'kpi'}, el('div', {class: 'l'}, '秘書處核心預算員額'), el('div', {class: 'v'}, String(staffNow[2])), el('div', {class: 'd'}, '2025–2026 核定 ' + staffNow[1] + ' 個')) : null));
   if (kpiCsv) box.append(kpiCsv);
-  box.append(...[sankeyCard(B), rankCard(B), mapCard(B), trendCard(B), ...(B.status ? [statusCard(B)] : []), B.arrears ? arrearsCard(B) : null, ...(B.status ? [execCard(B)] : []), B.fin ? finCard(B) : null, B.fin ? auditCard() : null, lorenzCard(B), B.cf ? cfCard(B) : null, B.kmgbf ? kmgbfCard(B) : null, B.kmgbf && B.years?.['2027'] ? yerevanCard(B) : null, partyCard(B, parts), tableCard(B), footer()].filter(Boolean));
+  box.append(...[sankeyCard(B), rankCard(B), mapCard(B), trendCard(B), ...(B.status ? [statusCard(B)] : []), B.arrears ? arrearsCard(B) : null, ...(B.status ? [execCard(B)] : []), B.fin ? finCard(B) : null, B.fin ? auditCard() : null, lorenzCard(B), B.cf ? cfCard(B) : null, B.kmgbf ? kmgbfCard(B) : null, B.kmgbf && B.years?.['2027'] ? yerevanCard(B) : null, groupsCard(B), partyCard(B, parts), tableCard(B), footer()].filter(Boolean));
   $('#main').replaceChildren(box);
   if (parts[0] === 'party') document.getElementById('party-card')?.scrollIntoView();
   else $('#main').scrollTop = 0;
@@ -1074,7 +1074,7 @@ function cfCard(B) {
     legend([['var(--s1)', '實際（美國不在）'], ['var(--muted-fill)', '若美國依聯合國比例分攤'], ['var(--s2)', '美國（反事實）']]),
     el('details', {}, el('summary', {class: 'label', style: 'cursor:pointer'}, '怎麼算的？'),
       el('ol', {style: 'margin:4px 0 0 18px;padding:0;line-height:1.7'},
-        el('li', {}, '分攤表的規則：各締約方的聯合國分攤比例乘上同一個倍數 k，使合計為 100%；超過 22% 者以 22% 為上限，原表中被壓在 0.01% 的 ' + C.ldc.length + ' 個低度開發國家維持 0.01% 上限，歐盟固定 ' + nf(C.fixed, 1) + '%。'),
+        el('li', {}, '分攤表的規則：各締約方的聯合國分攤比例乘上同一個倍數 k，使合計為 100%；超過 22% 者以 22% 為上限，原表中被壓在 0.01% 的 ' + C.ldc.length + ' 個低度開發國家維持 0.01% 上限，歐盟固定 ' + nf(C.fixed, 1) + '%。22% 與 0.01% 兩個上限載於 L.31/Rev.1 附件分攤表的欄名，和聯合國分攤比例方法的兩個上限相同（', el('a', {href: C.src, target: '_blank', rel: 'noopener'}, 'A/RES/79/249 第 7 段 (g)(h) ↗'), '）；決議條文本身只寫依聯合國分攤比例，沒有明文說明比照。'),
         el('li', {}, '先用這條規則重算原表：k ＝ ' + nf(C.k0, 4) + '，' + C.checked + ' 個有聯合國比例的締約方，調整後比例（小數 3 位）與 2027、2028 年金額（±1 美元）全部與原表一致。'),
         el('li', {}, '加入美國（聯合國比例 ' + nf(C.us_un, 3) + '%），所有比例合計超過 100%，k 降為 ' + nf(C.k1, 4) + '；美國與中國都不再碰到 22% 上限。'),
         el('li', {}, '各國反事實分攤額 ＝ 反事實調整後比例（與原表相同，以未四捨五入的比例計算）× 各年應分攤總額（2027 年 ' + usd(C.net[0]) + '、2028 年 ' + usd(C.net[1]) + '），兩年相加。'),
@@ -1244,6 +1244,38 @@ function auditCard() {
       li('建議秘書處與主席團檢討締約方參與基金的結構與規則，並在 BE 基金提供完整成本估算與預期捐款金額，以提高透明度；UNEP 與秘書處都已接受。', '61–62')),
     el('div', {class: 'note', style: 'margin-top:10px'}, el('b', {}, '觀察：'), '外部查核與本頁其他圖指向同一個問題：核定的工作很多，支撐它們的自願經費不足（審計委員會算的是資源不足工作的缺口占需求 85%；秘書處報告的自願基金到位率約三成，兩者口徑不同）。長期未核銷的預付款顯示資金追蹤需要加強（第 36 段）；BE 自願基金帳上的餘額（見「財務報表」）是否都已有指定用途與期限，審計報告沒有評論，需逐筆查核。'),
     el('div', {class: 'src'}, '資料來源：', el('a', {href: U, target: '_blank', rel: 'noopener'}, '聯合國審計委員會，UNEP 2025 年財務報告及審計報告（A/81/5/Add.7）↗'), '（CBD 秘書處行政與財務頁）'));
+  return card;
+}
+
+// ---- 其他群體：婦女、青年、地方政府有沒有經費（與會基金只有締約方與 IPLC 兩個） ----
+function groupsCard(B) {
+  const card = el('section', {class: 'card', id: 'groups'});
+  const a2 = IDX.find(d => d.id === '6abd7597c96e530e2edd8d94'), u = (p) => (a2 ? a2.url : '') + '#page=' + p;
+  const s4 = IDX.find(d => d.id === '6a5a9c19571af244dd5bb462');
+  const rows = [
+    ['婦女（性別行動計畫）', '專項 1 筆：第 6(b) 段能力建構工作坊，包括促進與婦女組織和網絡的合作', 258318, 11],
+    ['次國家級政府、城市與地方政府', '專項 1 筆：議程 14(b) 第 12 段，指引、資金可及性彙整與檢討', 119328, 10],
+    ['青年', '沒有專項；只出現在其他工作的對象名單中', 0, null]];
+  const max = Math.max(...rows.map(r => r[2])), W = 880, lw = 300, bw = W - lw - 170, rh = 40;
+  const svg = sv('svg', {viewBox: `0 0 ${W} ${rows.length * rh + 6}`, role: 'group', 'aria-label': '2027–2028 年自願經費中專門給特定群體的估算'});
+  rows.forEach(([g, , v], i) => {
+    const y = i * rh + 4;
+    svg.append(sv('text', {x: lw - 8, y: y + 22, 'text-anchor': 'end'}, g));
+    const b = sv('rect', {x: lw, y: y + 6, width: v ? Math.max(2, bw * v / max) : 0, height: rh - 14, rx: 3, fill: 'var(--s2)'});
+    if (v) tipOn(b, () => [usd(v), g, '2027–2028 估算，含 13% 計畫支援費用']);
+    svg.append(b, sv('text', {x: lw + (v ? bw * v / max : 0) + 8, y: y + 22, class: 'mut', 'font-size': 12}, v ? nf(v, 0) + ' 美元' : '0（沒有專項）'));
+  });
+  card.append(el('h3', {}, '除了原住民族與地方社區，婦女、青年有經費嗎？'),
+    el('p', {class: 'label'}, '支援與會的信託基金只有兩個：締約方參與基金（BZ）與原住民族與地方社區參與基金（VB）（', ...docRef('6ac02bade811bc9bfc681810', 8, 'CBD/COP/17/4/Add.5 第 19 段', '19'), '）。婦女、青年、地方政府等團體沒有對應的與會補助。下圖是秘書處估算 2027–2028 年決議草案交辦工作所需的自願經費中，專門針對這些群體的項目。'),
+    unitNote('美元（2027–2028 年合計，含 13% 計畫支援費用）'), el('div', {class: 'chart'}, svg),
+    el('div', {class: 'dtwrap', style: 'max-height:none;margin-top:8px'}, el('table', {class: 'dt'},
+      el('thead', {}, el('tr', {}, ...['群體', '2027–2028 專項經費', '內容', '出處'].map((h, i) => el('th', {class: i !== 1 ? 't' : ''}, h)))),
+      el('tbody', {}, ...rows.map(([g, t, v, p]) => el('tr', {}, el('td', {class: 't'}, g), el('td', {}, v ? nf(v, 0) : '0'), el('td', {class: 't'}, t),
+        el('td', {class: 't'}, p ? el('a', {href: u(p), target: '_blank', rel: 'noopener'}, 'Add.2 第 ' + p + ' 頁 ↗') : '—')))))),
+    el('div', {class: 'note', style: 'margin-top:10px'}, el('b', {}, '觀察：'),
+      '性別行動計畫的 258,318 美元，約占 Add.2 全部交辦工作估算 12,973,078 美元的 2.0%，是唯一專門針對性別的經費；青年沒有任何專項。婦女與青年在 Add.2 中出現十幾次，但都和原住民族與地方社區、其他利害關係人列在同一串名單中，經費併在其他工作裡，例如合成生物學的能力建構工作坊（316,626 美元）、會前線上簡報（53,110 美元），金額無法拆出。上一期決議 16/28 表 4 的自願基金需求中，沒有任何婦女或青年項目。'),
+    el('p', {class: 'label'}, '人力：合作與參與單位有 3 名 P-2，分別負責合作、性別與傳統知識（', el('a', {href: (s4 ? s4.url : '') + '#page=19', target: '_blank', rel: 'noopener'}, 'CBD/COP/17/4 第 80 段 ↗'), '），沒有負責青年的職位。2026 年額外核定活動基金的各筆認捐，用途說明沒有提到婦女、青年或性別。以上都是「視資源而定」的自願經費，部分條文仍在方括號內，以正式決議為準。'),
+    el('div', {class: 'src'}, '資料來源：', el('a', {href: a2 ? a2.url : '#', target: '_blank', rel: 'noopener'}, 'CBD/COP/17/4/Add.2（2026-09-29）↗'), '；', ...docRef('6ac02bade811bc9bfc681810', 8, 'CBD/COP/17/4/Add.5 第 19 段', '19'), '；', el('a', {href: (s4 ? s4.url : '') + '#page=19', target: '_blank', rel: 'noopener'}, 'CBD/COP/17/4 第 80 段 ↗')));
   return card;
 }
 
