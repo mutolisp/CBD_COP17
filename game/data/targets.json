@@ -1,0 +1,143 @@
+{
+ "note": "KMGBF（決議 15/4 附件）23 個行動目標；中文為臺灣代表團非官方翻譯，以英文原文為準。",
+ "targets": {
+  "T1": {
+   "short": "空間規劃",
+   "zh": "確保所有區域都納入參與式、整合且納入生物多樣性考量的空間規劃和／或有效管理程序，以處理陸域與海域利用的變遷，使高生物多樣性重要性區域（包括高生態完整性的生態系）的流失在 2030 年前趨近於零，同時尊重原住民族與地方社區的權利。",
+   "explain": "所有陸地與海洋都要有考量生物多樣性的空間規劃或有效管理，讓生物多樣性重要地區的流失在 2030 年前接近零。規劃要讓各方參與，並尊重原住民族與地方社區的權利。",
+   "en": "Ensure that all areas are under participatory, integrated and biodiversity inclusive spatial planning and/or effective management processes addressing land- and sea-use change, to bring the loss of areas of high biodiversity importance, including ecosystems of high ecological integrity, close to zero by 2030, while respecting the rights of indigenous peoples and local communities."
+  },
+  "T2": {
+   "short": "30% 復育",
+   "zh": "確保到 2030 年，至少 30% 已劣化的陸域、內陸水域及海洋與沿岸生態系面積處於有效復育之中，以提升生物多樣性與生態系功能與服務、生態完整性及連結性。",
+   "explain": "已經劣化的陸域、淡水、海洋與沿岸生態系，到 2030 年至少要有 30% 正在進行「有效」的復育，目的是恢復生物多樣性、生態系服務與生態連結。",
+   "en": "Ensure that by 2030 at least 30 per cent of areas of degraded terrestrial, inland water, and marine and coastal ecosystems are under effective restoration, in order to enhance biodiversity and ecosystem functions and services, ecological integrity and connectivity."
+  },
+  "T3": {
+   "short": "30×30 保育",
+   "zh": "確保並促成到 2030 年，至少 30% 的陸域與內陸水域，以及 30% 的海洋與沿岸區域，特別是對生物多樣性與生態系功能與服務特別重要的區域，透過具生態代表性、連結良好且治理公平的保護區與保育共生地體系獲得有效保育與管理；在適用時承認原住民族與傳統領域，並整合到更廣泛的地景、海景與海洋之中；同時確保在這些區域中的任何永續利用（在適當情況下）完全符合保育成果，並承認與尊重原住民族與地方社區的權利，包括對其傳統領域的權利。",
+   "explain": "也就是常說的「30x30」：到 2030 年，陸域（含內陸水域）與海洋（含沿岸）各至少 30% 要透過保護區或保育共生地（OECMs）有效保育。重點不只是面積，還要有代表性、彼此相連、治理公平，並尊重原住民族的權利與傳統領域；區內若有利用，必須與保育成果相容。",
+   "en": "Ensure and enable that by 2030 at least 30 per cent of terrestrial and inland water areas, and of marine and coastal areas, especially areas of particular importance for biodiversity and ecosystem functions and services, are effectively conserved and managed through ecologically representative, well-connected and equitably governed systems of protected areas and other effective area-based conservation measures, recognizing indigenous and traditional territories, where applicable, and integrated into wider landscapes, seascapes and the ocean, while ensuring that any sustainable use, where appropriate in such areas, is fully consistent with conservation outcomes, recognizing and respecting the rights of indigenous peoples and local communities, including over their traditional territories."
+  },
+  "T4": {
+   "short": "物種救援",
+   "zh": "確保採取緊急管理行動，以遏止已知受威脅物種因人為造成的滅絕，並復原與保育物種，特別是受威脅物種，以大幅降低滅絕風險；同時維持並復原原生、野生與馴化物種族群內與族群間的遺傳多樣性，以維持其適應潛力，包括透過就地與移地保育及永續管理作法；並有效管理人與野生動物的互動，將人與野生動物衝突降至最低，以達成共存。",
+   "explain": "針對受威脅物種採取緊急行動，停止人為造成的滅絕、降低滅絕風險；同時保住野生與馴化物種的遺傳多樣性（可透過就地與移地保育）；也要妥善處理人與野生動物的衝突，追求共存。",
+   "en": "Ensure urgent management actions to halt human induced extinction of known threatened species and for the recovery and conservation of species, in particular threatened species, to significantly reduce extinction risk, as well as to maintain and restore the genetic diversity within and between populations of native, wild and domesticated species to maintain their adaptive potential, including through in situ and ex situ conservation and sustainable management practices, and effectively manage human-wildlife interactions to minimize human-wildlife conflict for coexistence."
+  },
+  "T5": {
+   "short": "合法永續利用",
+   "zh": "確保野生物種的利用、採集與貿易是永續、安全且合法的，防止過度利用，將對非目標物種與生態系的衝擊降至最低，並降低病原體外溢的風險；採用生態系方法，同時尊重並保護原住民族與地方社區的習慣性永續利用。",
+   "explain": "野生物種的採集、利用與貿易要永續、安全、合法：不過度利用、減少對其他物種與生態系的連帶衝擊，並降低病原體從野生動物外溢到人類的風險。原住民族與地方社區的傳統永續利用要受到尊重。",
+   "en": "Ensure that the use, harvesting and trade of wild species is sustainable, safe and legal, preventing overexploitation, minimizing impacts on non-target species and ecosystems, and reducing the risk of pathogen spillover, applying the ecosystem approach, while respecting and protecting customary sustainable use by indigenous peoples and local communities."
+  },
+  "T6": {
+   "short": "入侵種減半",
+   "zh": "消除、減少和／或減緩外來入侵種對生物多樣性與生態系服務的衝擊，作法包括：辨識並管理外來種的引入途徑；防止優先外來入侵種的引入與立足；到 2030 年將其他已知或潛在外來入侵種的引入與立足速率降低至少 50%；以及根除或控制外來入侵種，特別是在島嶼等優先地點。",
+   "explain": "減少外來入侵種的危害：管好入侵途徑、擋住優先處理的入侵種，其他入侵種的引入與立足速率到 2030 年至少減半，並在島嶼等重點地區根除或控制入侵種。",
+   "en": "Eliminate, minimize, reduce and or mitigate the impacts of invasive alien species on biodiversity and ecosystem services by identifying and managing pathways of the introduction of alien species, preventing the introduction and establishment of priority invasive alien species, reducing the rates of introduction and establishment of other known or potential invasive alien species by at least 50 per cent by 2030, and eradicating or controlling invasive alien species, especially in priority sites, such as islands."
+  },
+  "T7": {
+   "short": "污染減量",
+   "zh": "到 2030 年，將所有來源的污染風險與負面衝擊降低到不危害生物多樣性與生態系功能與服務的程度，並考量累積效應，包括：(a) 將流失到環境中的過量養分至少減半，包括透過更有效率的養分循環與利用；(b) 將農藥與高度危害化學品的整體風險至少減半，包括透過以科學為基礎的整合性有害生物管理，並考量糧食安全與生計；以及 (c) 防止、減少並致力於消除塑膠污染。",
+   "explain": "到 2030 年把各種污染降到不傷害生物多樣性的程度，三個具體數字：流失到環境的過量養分（例如肥料）至少減半、農藥與高度危害化學品的整體風險至少減半，並朝消除塑膠污染努力。",
+   "en": "Reduce pollution risks and the negative impact of pollution from all sources by 2030, to levels that are not harmful to biodiversity and ecosystem functions and services, considering cumulative effects, including: (a) by reducing excess nutrients lost to the environment by at least half, including through more efficient nutrient cycling and use; (b) by reducing the overall risk from pesticides and highly hazardous chemicals by at least half, including through integrated pest management, based on science, taking into account food security and livelihoods; and (c) by preventing, reducing, and working towards eliminating plastic pollution."
+  },
+  "T8": {
+   "short": "氣候與海洋酸化",
+   "zh": "透過減緩、調適與減災行動，包括自然解方和／或以生態系為基礎的方法，將氣候變遷與海洋酸化對生物多樣性的衝擊降至最低並提升其韌性，同時將氣候行動對生物多樣性的負面衝擊降至最低、促進正面衝擊。",
+   "explain": "降低氣候變遷與海洋酸化對生物多樣性的衝擊，並運用自然解方等方式提升韌性；同時，氣候行動本身（例如能源或造林計畫）也不能反過來傷害生物多樣性。",
+   "en": "Minimize the impact of climate change and ocean acidification on biodiversity and increase its resilience through mitigation, adaptation, and disaster risk reduction actions, including through nature-based solutions and/or ecosystem-based approaches, while minimizing negative and fostering positive impacts of climate action on biodiversity."
+  },
+  "T9": {
+   "short": "野生物種永續管理",
+   "zh": "確保野生物種的管理與利用是永續的，從而為人們，特別是處境脆弱者與最依賴生物多樣性者，帶來社會、經濟與環境利益，包括透過能增進生物多樣性的永續生物多樣性相關活動、產品與服務，並保護與鼓勵原住民族與地方社區的習慣性永續利用。",
+   "explain": "野生物種的管理與利用要永續，並讓人們（特別是弱勢、最依賴自然維生的人）從中得到社會、經濟與環境利益；也要保護並鼓勵原住民族與地方社區的傳統永續利用。",
+   "en": "Ensure that the management and use of wild species are sustainable, thereby providing social, economic and environmental benefits for people, especially those in vulnerable situations and those most dependent on biodiversity, including through sustainable biodiversity-based activities, products and services that enhance biodiversity, and protecting and encouraging customary sustainable use by indigenous peoples and local communities."
+  },
+  "T10": {
+   "short": "永續農林漁",
+   "zh": "確保農業、水產養殖、漁業與林業區域獲得永續管理，特別是透過生物多樣性的永續利用，包括大幅增加對生物多樣性友善作法的應用，例如永續集約化、農業生態及其他創新方法，以增進這些生產系統的韌性與長期效率與生產力，並促進糧食安全、保育與復育生物多樣性，以及維持自然對人類的貢獻，包括生態系功能與服務。",
+   "explain": "農、林、漁、牧與水產養殖的生產地區要永續管理，大幅擴大生物多樣性友善的作法（例如農業生態），讓生產系統更有韌性、更有效率，同時兼顧糧食安全與生物多樣性。",
+   "en": "Ensure that areas under agriculture, aquaculture, fisheries and forestry are managed sustainably, in particular through the sustainable use of biodiversity, including through a substantial increase of the application of biodiversity friendly practices, such as sustainable intensification, agroecological and other innovative approaches, contributing to the resilience and long-term efficiency and productivity of these production systems, and to food security, conserving and restoring biodiversity and maintaining nature’s contributions to people, including ecosystem functions and services."
+  },
+  "T11": {
+   "short": "自然的貢獻",
+   "zh": "透過自然解方和／或以生態系為基礎的方法，復原、維持並提升自然對人類的貢獻，包括生態系功能與服務，例如空氣、水與氣候的調節、土壤健康、授粉與降低疾病風險，以及對自然危害與災害的防護，以造福所有人與自然。",
+   "explain": "復原並提升自然提供給人類的服務，例如調節空氣、水與氣候、維持土壤健康、授粉、降低疾病風險與防災，作法以自然解方或以生態系為基礎的方法為主。",
+   "en": "Restore, maintain and enhance nature’s contributions to people, including ecosystem functions and services, such as the regulation of air, water and climate, soil health, pollination and reduction of disease risk, as well as protection from natural hazards and disasters, through nature-based solutions and/or ecosystem-based approaches for the benefit of all people and nature."
+  },
+  "T12": {
+   "short": "城市綠藍空間",
+   "zh": "以永續方式大幅增加都市與人口稠密地區綠色與藍色空間的面積與品質、連結性、可及性與效益，作法是將生物多樣性的保育與永續利用主流化，並確保納入生物多樣性考量的都市規劃，以增進原生生物多樣性、生態連結與完整性，改善人類健康與福祉及與自然的連結，並促進包容與永續的都市化及生態系功能與服務的提供。",
+   "explain": "城市與人口密集地區的綠地與水域（藍綠空間）要更多、更好、更相連、更容易親近；都市規劃要納入生物多樣性，增加原生物種，也改善居民健康與和自然的連結。",
+   "en": "Significantly increase the area and quality, and connectivity of, access to, and benefits from green and blue spaces in urban and densely populated areas sustainably, by mainstreaming the conservation and sustainable use of biodiversity, and ensure biodiversity-inclusive urban planning, enhancing native biodiversity, ecological connectivity and integrity, and improving human health and well-being and connection to nature, and contributing to inclusive and sustainable urbanization and to the provision of ecosystem functions and services."
+  },
+  "T13": {
+   "short": "利益分享",
+   "zh": "在各層級酌情採取有效的法律、政策、行政與能力建構措施，以確保公平公正分享利用遺傳資源、遺傳資源數位序列資訊及遺傳資源相關傳統知識所產生的利益，並促進對遺傳資源的適當取得；到 2030 年，依適用的國際取得與利益分享文書，促成分享的利益大幅增加。",
+   "explain": "各國要以法律、政策、行政與能力建構措施，確保遺傳資源、數位序列資訊（DSI）與相關傳統知識所產生的利益被公平公正分享，也讓遺傳資源能被適當取得；到 2030 年分享的利益要大幅增加。",
+   "en": "Take effective legal, policy, administrative and capacity-building measures at all levels, as appropriate, to ensure the fair and equitable sharing of benefits that arise from the utilization of genetic resources and from digital sequence information on genetic resources, as well as traditional knowledge associated with genetic resources, and facilitating appropriate access to genetic resources, and by 2030, facilitating a significant increase of the benefits shared, in accordance with applicable international access and benefit-sharing instruments."
+  },
+  "T14": {
+   "short": "生物多樣性主流化",
+   "zh": "確保將生物多樣性及其多元價值充分整合到政策、法規、規劃與發展程序、消除貧窮策略、策略環境評估、環境影響評估，以及（酌情）國家會計帳之中，涵蓋各級政府內部與之間及所有部門，特別是對生物多樣性有重大衝擊的部門，並逐步使所有相關公私部門活動及財政與金融流向與本綱要的目標與標的一致。",
+   "explain": "也就是「主流化」：生物多樣性要納入各級政府與各部門的政策、法規、規劃、環境評估與國家會計，特別是對自然影響大的部門；公私部門的活動與資金流向也要逐步與綱要一致。",
+   "en": "Ensure the full integration of biodiversity and its multiple values into policies, regulations, planning and development processes, poverty eradication strategies, strategic environmental assessments, environmental impact assessments and, as appropriate, national accounting, within and across all levels of government and across all sectors, in particular those with significant impacts on biodiversity, progressively aligning all relevant public and private activities, and fiscal and financial flows with the goals and targets of this framework."
+  },
+  "T15": {
+   "short": "企業揭露",
+   "zh": "採取法律、行政或政策措施，鼓勵並促使企業，特別是確保大型與跨國企業及金融機構： (a) 定期監測、評估並透明揭露其對生物多樣性的風險、依賴與衝擊，包括要求所有大型與跨國企業及金融機構揭露其營運、供應鏈與價值鏈及投資組合的相關資訊； (b) 向消費者提供所需資訊，以促進永續消費模式； (c) 酌情報告其遵守取得與利益分享法規與措施的情形； 以逐步減少對生物多樣性的負面衝擊、增加正面衝擊，降低企業與金融機構的生物多樣性相關風險，並促進確保永續生產模式的行動。",
+   "explain": "政府要用法律、行政或政策工具，讓企業（特別是大型、跨國企業與金融機構）定期評估並公開揭露自己對生物多樣性的風險、依賴與衝擊（含供應鏈與投資組合），提供消費者所需資訊，並報告利益分享規定的遵循情形。",
+   "en": "Take legal, administrative or policy measures to encourage and enable business, and in particular to ensure that large and transnational companies and financial institutions: (a) Regularly monitor, assess, and transparently disclose their risks, dependencies and impacts on biodiversity, including with requirements for all large as well as transnational companies and financial institutions along their operations, supply and value chains, and portfolios; (b) Provide information needed to consumers to promote sustainable consumption patterns; (c) Report on compliance with access and benefit-sharing regulations and measures, as applicable; in order to progressively reduce negative impacts on biodiversity, increase positive impacts, reduce biodiversity-related risks to business and financial institutions, and promote actions to ensure sustainable patterns of production."
+  },
+  "T16": {
+   "short": "永續消費",
+   "zh": "確保鼓勵並促使人們做出永續消費選擇，包括建立支持性的政策、立法或法規架構，改善教育並提高取得相關且正確資訊與替代方案的機會；到 2030 年，以公平的方式減少全球消費足跡，包括將全球糧食浪費減半、大幅減少過度消費，並大幅減少廢棄物產生，使所有人都能與地球母親和諧共存、過上好生活。",
+   "explain": "讓人們更容易做出永續的消費選擇（靠政策、教育與正確資訊）；到 2030 年公平地減少全球消費足跡，包括全球糧食浪費減半、大幅減少過度消費與廢棄物。",
+   "en": "Ensure that people are encouraged and enabled to make sustainable consumption choices, including by establishing supportive policy, legislative or regulatory frameworks, improving education and access to relevant and accurate information and alternatives, and by 2030, reduce the global footprint of consumption in an equitable manner, including through halving global food waste, significantly reducing overconsumption and substantially reducing waste generation, in order for all people to live well in harmony with Mother Earth."
+  },
+  "T17": {
+   "short": "生物安全",
+   "zh": "在所有國家建立、強化能力並實施《生物多樣性公約》第 8(g) 條所列的生物安全措施，以及第 19 條所列的生物技術處理及其利益分配措施。",
+   "explain": "各國要建立並落實生物安全措施（公約第 8(g) 條，例如基因改造生物的風險管理），以及生物技術的處理與利益分配措施（公約第 19 條），並強化相關能力。",
+   "en": "Establish, strengthen capacity for, and implement in all countries, biosafety measures as set out in Article 8(g) of the Convention on Biological Diversity and measures for the handling of biotechnology and distribution of its benefits as set out in Article 19 of the Convention."
+  },
+  "T18": {
+   "short": "有害補貼改革",
+   "zh": "在 2025 年前辨識出有害生物多樣性的誘因（包括補貼），並以相稱、公正、公平、有效且衡平的方式加以消除、逐步淘汰或改革，同時從最有害的誘因開始，到 2030 年每年大幅且逐步減少至少 5,000 億美元，並擴大對生物多樣性保育與永續利用的正向誘因。",
+   "explain": "2025 年前找出對生物多樣性有害的補貼與誘因，再以公平的方式取消或改革；到 2030 年每年至少減少 5,000 億美元，從最有害的開始；同時增加有利於保育的正向誘因。",
+   "en": "Identify by 2025, and eliminate, phase out or reform incentives, including subsidies, harmful for biodiversity, in a proportionate, just, fair, effective and equitable way, while substantially and progressively reducing them by at least $500 billion per year by 2030, starting with the most harmful incentives, and scale up positive incentives for the conservation and sustainable use of biodiversity."
+  },
+  "T19": {
+   "short": "資金動員",
+   "zh": "依公約第 20 條，以有效、及時且容易取得的方式，大幅且逐步提高來自所有來源的財務資源水準，包括國內、國際、公共與私部門資源，以落實國家生物多樣性策略與行動計畫，到 2030 年每年至少動員 2,000 億美元，作法包括： (a) 增加已開發國家，以及自願承擔已開發國家締約方義務的國家，提供給開發中國家（特別是低度開發國家與小島嶼開發中國家，以及經濟轉型國家）的生物多樣性相關國際財務資源總額，包括官方發展援助，到 2025 年至少每年 200 億美元，到 2030 年至少每年 300 億美元； (b) 大幅增加國內資源動員，並依國家需求、優先事項與情況，透過擬定與實施國家生物多樣性財務計畫或類似工具加以促進； (c) 槓桿私人資金、推廣混合融資、實施籌措新的與額外資源的策略，並鼓勵私部門投資生物多樣性，包括透過影響力基金及其他工具； (d) 激勵創新機制，例如生態系服務給付、綠色債券、生物多樣性抵換與信用，以及利益分享機制，並設有環境與社會保障措施； (e) 使針對生物多樣性危機與氣候危機的資金發揮最大的共同效益與綜效； (f) 強化集體行動的角色，包括原住民族與地方社區的集體行動、以地球母親為中心的行動，以及非市場導向的方法，包括以社區為基礎的自然資源管理，以及以生物多樣性保育為目的的公民社會合作與團結； (g) 提升資源提供與使用的有效性、效率與透明度。",
+   "explain": "到 2030 年每年從各種來源動員至少 2,000 億美元落實國家生物多樣性策略與行動計畫。其中已開發國家提供給開發中國家的國際資金，2025 年前每年至少 200 億美元、2030 年前每年至少 300 億美元；其餘靠擴大國內資源、引進私部門資金與創新財務機制等。",
+   "en": "Substantially and progressively increase the level of financial resources from all sources, in an effective, timely and easily accessible manner, including domestic, international, public and private resources, in accordance with Article 20 of the Convention, to implement national biodiversity strategies and action plans, mobilizing at least $200 billion per year by 2030, including by: (a) Increasing total biodiversity related international financial resources from developed countries, including official development assistance, and from countries that voluntarily assume obligations of developed country Parties, to developing countries, in particular the least developed countries and small island developing States, as well as countries with economies in transition, to at least $20 billion per year by 2025, and to at least $30 billion per year by 2030; (b) Significantly increasing domestic resource mobilization, facilitated by the preparation and implementation of national biodiversity finance plans or similar instruments according to national needs, priorities and circumstances; (c) Leveraging private finance, promoting blended finance, implementing strategies for raising new and additional resources, and encouraging the private sector to invest in biodiversity, including through impact funds and other instruments; (d) Stimulating innovative schemes such as payment for ecosystem services, green bonds, biodiversity offsets and credits, and benefit-sharing mechanisms, with environmental and social safeguards; (e) Optimizing co-benefits and synergies of finance targeting the biodiversity and climate crises; (f) Enhancing the role of collective actions, including by indigenous peoples and local communities, Mother Earth centric actions and non-market-based approaches including community based natural resource management and civil society cooperation and solidarity aimed at the conservation of biodiversity; (g) Enhancing the effectiveness, efficiency and transparency of resource provision and use."
+  },
+  "T20": {
+   "short": "能力建構",
+   "zh": "強化能力建構與發展、技術的取得與移轉，並促進創新的發展與取得以及技術與科學合作，包括透過南南、南北及三角合作，以滿足有效執行的需求，特別是在開發中國家；促進聯合技術開發與聯合科學研究計畫，以保育與永續利用生物多樣性，並強化科學研究與監測能力，使其與綱要目標與標的的企圖心相稱。",
+   "explain": "加強能力建構、技術移轉與科學合作（包括南南、南北與三角合作），特別協助開發中國家；推動聯合研發與研究計畫，並提升科學研究與監測能力。",
+   "en": "Strengthen capacity-building and development, access to and transfer of technology, and promote development of and access to innovation and technical and scientific cooperation, including through South-South, North-South and triangular cooperation, to meet the needs for effective implementation, particularly in developing countries, fostering joint technology development and joint scientific research programmes for the conservation and sustainable use of biodiversity and strengthening scientific research and monitoring capacities, commensurate with the ambition of the goals and targets of the Framework."
+  },
+  "T21": {
+   "short": "知識取得",
+   "zh": "確保決策者、實務工作者與公眾能取得最佳可得的資料、資訊與知識，以引導有效且公平的治理、生物多樣性的整合與參與式管理，並強化溝通、意識提升、教育、監測、研究與知識管理；在此脈絡下，原住民族與地方社區的傳統知識、創新、作法與技術，也應僅在取得其自由、事先及知情同意後才能取用，並依國家法律為之。",
+   "explain": "讓決策者、實務工作者與一般大眾都能取得最好的資料、資訊與知識，用來改善治理、管理、教育與研究；取用原住民族與地方社區的傳統知識，必須先取得他們自由、事先及知情的同意。",
+   "en": "Ensure that the best available data, information and knowledge are accessible to decision makers, practitioners and the public to guide effective and equitable governance, integrated and participatory management of biodiversity, and to strengthen communication, awareness-raising, education, monitoring, research and knowledge management and, also in this context, traditional knowledge, innovations, practices and technologies of indigenous peoples and local communities should only be accessed with their free, prior and informed consent, in accordance with national legislation."
+  },
+  "T22": {
+   "short": "參與與權利",
+   "zh": "確保原住民族與地方社區，以及婦女與女孩、兒童與青年及身心障礙者，在生物多樣性相關決策中享有充分、公平、包容、有效且具性別回應的代表與參與，以及司法與資訊的取得，並尊重原住民族與地方社區的文化及其對土地、領域、資源與傳統知識的權利；同時確保環境人權捍衛者獲得充分保護。",
+   "explain": "原住民族與地方社區、婦女與女孩、兒童與青年及身心障礙者，都要能充分參與生物多樣性決策，並能取得資訊與司法救濟；原住民族對土地、領域、資源與傳統知識的權利要受到尊重，環境人權捍衛者要受到保護。",
+   "en": "Ensure the full, equitable, inclusive, effective and gender-responsive representation and participation in decision-making, and access to justice and information related to biodiversity by indigenous peoples and local communities, respecting their cultures and their rights over lands, territories, resources, and traditional knowledge, as well as by women and girls, children and youth, and persons with disabilities and ensure the full protection of environmental human rights defenders."
+  },
+  "T23": {
+   "short": "性別平等",
+   "zh": "透過具性別回應的方法，確保綱要執行中的性別平等，使所有婦女與女孩都有平等的機會與能力為公約三大目標做出貢獻，包括承認其平等權利及取得土地與自然資源的權利，以及在生物多樣性相關的各層級行動、參與、政策與決策中充分、公平、有意義且知情的參與及領導。",
+   "explain": "落實綱要時要做到性別平等：婦女與女孩要有平等的機會與能力參與，土地與自然資源的權利要平等，並能在各層級的行動、政策與決策中參與及擔任領導。",
+   "en": "Ensure gender equality in the implementation of the Framework through a gender-responsive approach, where all women and girls have equal opportunity and capacity to contribute to the three objectives of the Convention, including by recognizing their equal rights and access to land and natural resources and their full, equitable, meaningful and informed participation and leadership at all levels of action, engagement, policy and decision-making related to biodiversity."
+  }
+ }
+}

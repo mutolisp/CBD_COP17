@@ -1,0 +1,93 @@
+{
+ "north": {
+  "name": "北方工業國", "group": "party", "groupName": "締約方", "icon": "🏭", "color": "#3b6fd8",
+  "tagline": "口袋最深，但國會每年都在問：這筆錢為什麼要給國外？",
+  "start": {"m": 9, "i": 3, "k": 2}, "income": {"m": 4, "i": 1},
+  "power": "資金大戶：投資「資金動員與能力建構」「污染減量」時少付 1 💰。",
+  "discount": {"squares": ["T19T20", "T7"], "r": "m"},
+  "dilemma": "國內選舉與預算刪減會打亂承諾；國際資金承諾要兌現，否則全體都會受影響。",
+  "missions": [
+   {"text": "兌現承諾：把 8 單位以上的資源交給其他角色", "kind": "given", "n": 8, "pts": 4},
+   {"text": "「資金動員與能力建構」與「有害補貼改革」都達成", "kind": "achieve", "squares": ["T19T20", "T18"], "n": 2, "pts": 4},
+   {"text": "國庫守門人：結束時保有 6 💰 以上", "kind": "res", "r": "m", "n": 6, "pts": 2}
+  ]
+ },
+ "south": {
+  "name": "雨林大國", "group": "party", "groupName": "締約方", "icon": "🌳", "color": "#1f9d6b",
+  "tagline": "全球一成的物種住在你的國土上，但道路、礦場和選票也都在這裡。",
+  "start": {"m": 3, "i": 3, "k": 5}, "income": {"m": 2, "i": 1, "k": 1},
+  "power": "生物多樣性熱點：投資「空間規劃與復育」「30×30」「物種救援」時少付 1 📚。",
+  "discount": {"squares": ["T1T2", "T3", "T4T5"], "r": "k"},
+  "dilemma": "發展與保育的取捨；國際資金到位慢，地方等不及。",
+  "missions": [
+   {"text": "「30×30」與「空間規劃與復育」都達成", "kind": "achieve", "squares": ["T3", "T1T2"], "n": 2, "pts": 4},
+   {"text": "從基金機制累計取得 6 💰 以上", "kind": "funds", "n": 6, "pts": 3},
+   {"text": "在 4 個關卡擔任關鍵角色", "kind": "key", "n": 4, "pts": 3}
+  ]
+ },
+ "ngo": {
+  "name": "保育 NGO", "group": "ngo", "groupName": "非政府組織", "icon": "📣", "color": "#d9822b",
+  "tagline": "你有志工、有監測資料，也有一份永遠寫不完的募款企劃書。",
+  "start": {"m": 3, "i": 4, "k": 4}, "income": {"m": 1, "i": 2, "k": 1},
+  "power": "監督與倡議：投資「企業揭露」「有害補貼改革」時少付 1 🤝。",
+  "discount": {"squares": ["T14T15", "T18"], "r": "i"},
+  "dilemma": "靠募款維生，公信力是唯一的資本；太溫和沒人理，太激進進不了會場。",
+  "missions": [
+   {"text": "參與 4 次危機應變", "kind": "crisis", "n": 4, "pts": 4},
+   {"text": "「企業揭露」與「物種救援」都達成", "kind": "achieve", "squares": ["T14T15", "T4T5"], "n": 2, "pts": 4},
+   {"text": "取得 3 枚目標徽章", "kind": "badges", "n": 3, "pts": 2}
+  ]
+ },
+ "igo": {
+  "name": "國際組織", "group": "igo", "groupName": "政府間組織", "icon": "🏛️", "color": "#7a5cc7",
+  "tagline": "你是 GEF 的執行機構之一，手續嚴謹，大家既需要你又嫌你慢。",
+  "start": {"m": 4, "i": 3, "k": 4}, "income": {"m": 2, "i": 1, "k": 1},
+  "power": "執行機構：別人從 GEF 或 GBFF 拿到撥款時，你收 1 💰 執行機構費。投資「資金動員與能力建構」「知識、參與與性別」時少付 1 📚。",
+  "discount": {"squares": ["T19T20", "T21T22T23"], "r": "k"},
+  "dilemma": "執行機構費讓你活下去，但各方都覺得錢卡在你這裡。",
+  "missions": [
+   {"text": "協助其他角色：交出 6 單位以上資源", "kind": "given", "n": 6, "pts": 3},
+   {"text": "全場達成 6 個以上關卡", "kind": "achieveAny", "n": 6, "pts": 4},
+   {"text": "在 3 個關卡擔任關鍵角色", "kind": "key", "n": 3, "pts": 3}
+  ]
+ },
+ "iplc": {
+  "name": "原住民族與地方社區", "group": "iplc", "groupName": "原住民族與地方社區", "icon": "🪶", "color": "#b5452f",
+  "tagline": "這片森林是你的祖先留下來的。保護區地圖畫到你家門口時，有人問過你嗎？",
+  "start": {"m": 1, "i": 3, "k": 6}, "income": {"m": 1, "i": 1, "k": 2},
+  "power": "傳統知識與自由、事先及知情同意（FPIC）：標有 🪶 的關卡若沒有你參與投資，自然指數 −2，你得到 1 🤝。投資「永續利用」「利益分享」時少付 1 📚。",
+  "discount": {"squares": ["T9T10", "T13"], "r": "k"},
+  "dilemma": "傳統知識最豐富、管理效率最高，資金卻最難直接到手。",
+  "missions": [
+   {"text": "全場沒有任何違反 FPIC 的投資", "kind": "noFpicBreak", "n": 0, "pts": 4},
+   {"text": "「利益分享」與「知識、參與與性別」都達成", "kind": "achieve", "squares": ["T13", "T21T22T23"], "n": 2, "pts": 4},
+   {"text": "在 4 個關卡擔任關鍵角色", "kind": "key", "n": 4, "pts": 2}
+  ]
+ },
+ "youth": {
+  "name": "青年", "group": "youth", "groupName": "青年", "icon": "✊", "color": "#c2369a",
+  "tagline": "2050 年的世界是你們的，但現在連去開會的機票錢都要自己想辦法。",
+  "start": {"m": 0, "i": 5, "k": 3}, "income": {"m": 1, "i": 2, "k": 1},
+  "power": "社群動員：投資「氣候」「城市綠藍空間」「永續消費」時少付 1 🤝。",
+  "discount": {"squares": ["T8", "T11T12", "T16T17"], "r": "i"},
+  "dilemma": "時間和熱情最多，錢最少；聲音常被當成點綴。",
+  "missions": [
+   {"text": "結束時自然指數達 70 以上", "kind": "nature", "n": 70, "pts": 4},
+   {"text": "把伙伴從方括號裡救出來 1 次", "kind": "rescues", "n": 1, "pts": 2},
+   {"text": "參與 3 次危機應變", "kind": "crisis", "n": 3, "pts": 4}
+  ]
+ },
+ "women": {
+  "name": "婦女團體", "group": "women", "groupName": "婦女", "icon": "♀️", "color": "#0f8fa8",
+  "tagline": "管理水源、種子與家計的是你們，坐在談判桌主位的卻很少是你們。",
+  "start": {"m": 2, "i": 4, "k": 4}, "income": {"m": 1, "i": 1, "k": 2},
+  "power": "性別主流化：有你參與的跨角色投資，自然指數再 +1。投資「知識、參與與性別」「永續利用」時少付 1 🤝。",
+  "discount": {"squares": ["T21T22T23", "T9T10"], "r": "i"},
+  "dilemma": "性別行動計畫的經費很少，要靠和別人合作才能放大影響。",
+  "missions": [
+   {"text": "「知識、參與與性別」達成", "kind": "achieve", "squares": ["T21T22T23"], "n": 1, "pts": 3},
+   {"text": "取得 4 枚目標徽章", "kind": "badges", "n": 4, "pts": 4},
+   {"text": "交出 5 單位以上資源支援他人", "kind": "given", "n": 5, "pts": 3}
+  ]
+ }
+}
