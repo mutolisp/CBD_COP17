@@ -66,6 +66,7 @@ section.card h3{font-size:15px;margin:0 0 6px}
 .ep.hl-soft,.blk.hl-soft{background:var(--hl-soft)}
 .ep.hl,.blk.hl,.blk.hl:hover{background:var(--hl)}
 .editor.hl{box-shadow:0 0 0 3px var(--hl)}
+.ep.hl-anchor,.blk.hl-anchor{background:var(--hl);box-shadow:-4px 0 0 var(--accent)}
 mark.term{background:none;color:var(--term);font-weight:700;text-decoration:underline 2px;text-underline-offset:3px}
 a.dec{text-decoration:underline 1px dashed;text-underline-offset:3px;white-space:nowrap}
 a.dec::after{content:"↗";font-size:.75em;margin-left:1px}
@@ -263,19 +264,49 @@ function route() {
   const [id, sub] = h.split('/');
   $('#bnav').classList.remove('on');
   if (id !== 'budget') teardown();
-  if (id === 'kmgbf') openKmgbf(sub); else if (id === 'budget') openBudget(h.split('/').slice(1)); else openDoc(id, sub);
+  // 文件連結 #<id>/p004/<錨點>：錨點可能含「/」，所以先切再解碼
+  const anc = (() => { const r = location.hash.slice(1).split('/')[2]; try { return r ? decodeURIComponent(r) : ''; } catch (_) { return ''; } })();
+  if (id === 'kmgbf') openKmgbf(sub); else if (id === 'budget') openBudget(h.split('/').slice(1)); else openDoc(id, sub, anc);
 }
 const toPage = p => { const e = p && document.getElementById('pg-' + p); if (e) e.scrollIntoView(); };
-function openDoc(id, p) {
+// 錨點：「16」＝第 16 段（含其下 (a)(b) 子項）；「fn12」＝註 12；其他文字＝以此開頭的段落（如「Table 3」）及其後的表格內容
+let ANCHOR = [];
+function markAnchor(id, p, a) {
+  ANCHOR.forEach(n => n.classList.remove('hl-anchor')); ANCHOR = [];
+  const pg = window.DOCS[id]?.pages.find(x => x.p === p);
+  if (!a || !pg?.eps) return false;
+  const T = pg.en.map(e => pnorm(e.t).replace(/^\[/, '')), esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const isPara = t => /^\d{1,3}\.\s/.test(t), isFn = t => /^\d{1,3}\s+\S/.test(t) && !/^\d[\d\s.,()–-]*$/.test(t);
+  let js = [];
+  if (/^\d{1,3}$/.test(a)) {
+    const i = T.findIndex(t => t.startsWith(a + '. ') || t === a + '.');
+    if (i >= 0) { js = [i]; for (let k = i + 1; k < T.length && /^\([a-z]{1,4}\)/.test(T[k]); k++) js.push(k); }
+  } else if (/^fn\d{1,3}$/.test(a)) {
+    const n = a.slice(2), i = T.findLastIndex(t => t.startsWith(n + ' ') && isFn(t));
+    if (i >= 0) js = [i];
+  } else {
+    const re = new RegExp('^' + esc(pnorm(a)) + '(?![\\d.])'), i = T.findIndex(t => re.test(t));
+    const head = !/^table \d/.test(T[i] || ''), stop = t => /^\d+\/\d+$/.test(t) || isFn(t) || /^table \d/.test(t) || /^([a-h]|[ivx]{1,4})\.\s/.test(t);  // 「C. 」「II. 」等章節標題
+    if (i < 0) { const re2 = new RegExp('(^|\\s)' + esc(pnorm(a)) + '(?![\\d.])'), i2 = T.findIndex(t => re2.test(t)); if (i2 >= 0) js = [i2]; }  // 段落切分把標題併進別段時：只標示含這段文字的段落
+    if (i >= 0) { js = [i]; for (let k = i + 1; k < T.length && js.length < 12 && !stop(T[k]) && (head ? !(T[k].length < 90 && !isPara(T[k]) && !/^\(/.test(T[k])) : !isPara(T[k])); k++) js.push(k); }
+  }
+  if (!js.length) return false;
+  const zh = pg.eps[0].parentNode.parentNode.querySelector('.zh');
+  ANCHOR = [...js.map(j => pg.eps[j]), ...[...zh.children].filter(n => pg.blocks[n.dataset.i]?.en?.some(j => js.includes(j)))];
+  ANCHOR.forEach(n => n.classList.add('hl-anchor'));
+  ANCHOR[0].scrollIntoView({block: 'center'});
+  return true;
+}
+function openDoc(id, p, a) {
   $('#knav').classList.remove('on');
   const meta = IDX.find(d => d.id === id);
-  if (meta && S.id === id && $('#main .page')) { toPage(p); return; }  // 同一份文件只換頁
+  if (meta && S.id === id && $('#main .page')) { toPage(p); markAnchor(id, p, a); return; }  // 同一份文件只換頁
   S.id = meta ? id : null;
   document.body.classList.toggle('reading', !!meta);
   renderList();
   if (!meta) { $('#main').replaceChildren(el('div', {class: 'empty'}, '從左側選一份文件開始檢閱。點中文段落即可修正翻譯；滑過或選取中文時，對應的英文會以螢光標示。')); return; }
   $('#main').replaceChildren(el('div', {class: 'empty'}, '載入中…'));
-  load(id).then(doc => { renderDoc(meta, doc); toPage(p); }, () => $('#main').replaceChildren(el('div', {class: 'empty'}, '無法載入這份文件。')));
+  load(id).then(doc => { renderDoc(meta, doc); toPage(p); markAnchor(id, p, a); },() => $('#main').replaceChildren(el('div', {class: 'empty'}, '無法載入這份文件。')));
 }
 
 function renderDoc(m, doc) {
@@ -284,7 +315,7 @@ function renderDoc(m, doc) {
     el('div', {class: 'label'}, [m.sym || '（無文件代碼）', MEET.find(x => x[0] === m.meeting)?.[1], NATL[m.nature], m.group, '發布 ' + ymd(m.pub)].filter(Boolean).join('・')),
     el('h2', {}, m.title_zh || m.title), el('p', {class: 'en', lang: 'en'}, m.title)),
     el('div', {class: 'links'}, el('a', {href: m.url, target: '_blank', rel: 'noopener'}, 'CBD 原文 PDF ↗')),
-    el('div', {class: 'note'}, '中文為非官方翻譯（AI 翻譯' + (m.reviewed ? '，經 Claude Haiku 逐頁對照原文審查' : '') + '），未經 CBD 秘書處審定，以英文原文為準。發現錯誤請點該段修正。'));
+    el('div', {class: 'note'}, '中文為非官方翻譯（' + (m.tr ? m.tr + ' 翻譯' + (m.rv ? '，經 ' + m.rv + ' 逐頁對照原文審查' : '，尚未審查') : 'AI 翻譯' + (m.reviewed ? '，經 Claude Haiku 逐頁對照原文審查' : '')) + '），未經 CBD 秘書處審定，以英文原文為準。發現錯誤請點該段修正。'));
   if (doc.summary) box.append(renderSummary(m, doc));
   if (doc.pages.length) {
     box.append(el('div', {class: 'toolbar'}, el('div', {class: 'seg', role: 'group', 'aria-label': '顯示方式'},
@@ -390,13 +421,21 @@ function csvDl(B, items) {
   links.forEach(([href, label], k) => out.append(k ? '、' : '', el('a', {href, download: ''}, label)));
   return links.length ? out : '';
 }
+// 本站文件頁連結；a 為錨點（段號「16」、註「fn12」或段首文字「Table 3」），點開後螢光標示
+const docHref = (id, p, a) => '#' + id + '/p' + String(p).padStart(3, '0') + (a ? '/' + encodeURIComponent(a) : '');
+// 一筆 COP17 文件出處：原文 PDF（該頁）＋本站中英對照（標示段落）
+function docRef(id, p, sym, a) {
+  const m = IDX.find(d => d.id === id);
+  return [sym + '（', ...(m?.url ? [el('a', {href: m.url + '#page=' + p, target: '_blank', rel: 'noopener'}, '原文第 ' + p + ' 頁 ↗'), '、'] : []),
+    el('a', {href: docHref(id, p, a), title: '本站英文原文與中文翻譯並排，並標示相關段落'}, m?.full ? '本站中英對照' : '本站摘要'), '）'];
+}
 function srcLine(B, parts) {
-  // parts: [[docId, page, sym], …]；有 CSV 的頁面加下載連結
+  // parts: [[docId, page, sym, extra, anchor], …]；有 CSV 的頁面加下載連結
   const out = el('div', {class: 'src'}, '資料來源：');
-  parts.forEach(([id, p, sym, extra], k) => {
+  parts.forEach(([id, p, sym, extra, a], k) => {
     if (k) out.append('；');
     if (id.startsWith('http')) out.append(el('a', {href: id, target: '_blank', rel: 'noopener'}, sym + ' ↗'));
-    else out.append(el('a', {href: '#' + id + '/p' + String(p).padStart(3, '0')}, sym + ' 第 ' + p + ' 頁'));
+    else out.append(...docRef(id, p, sym, a));
     const cs = B.csv[id + ':' + p] || [];
     if (cs.length) out.append('（', ...cs.flatMap((c, k) => [k ? '、' : '', el('a', {href: 'csv/' + c, download: ''}, 'CSV' + (cs.length > 1 ? ' ' + (k + 1) : ''))]), '）');
     if (extra) out.append(extra);
@@ -486,7 +525,7 @@ function sankeyCard(B) {
   card.append(el('h3', {}, '資金從哪裡來、往哪裡去'), el('div', {class: 'ctrl'}, sel), unitNote('千美元（節點下方數字與色帶寬度皆同）'), area,
     legend([['var(--s1)', '公約'], ['var(--s2)', '卡塔赫納議定書'], ['var(--s3)', '名古屋議定書'], ['var(--muted-fill)', '地主國捐助／準備金']]),
     el('p', {class: 'label'}, '寬度代表金額（千美元）。滑過或以 Tab 鍵選取色帶可看數字。表 1.alt 是方括號中的替代方案，支出項目分類與表 1 不同。'),
-    srcLine(B, [[B.table1.id, B.table1.page, 'CBD/COP/17/L.31/Rev.1 表 1'], ...(B.alt ? [[B.alt.id, B.alt.page, '表 1.alt']] : [])]),
+    srcLine(B, [[B.table1.id, B.table1.page, 'CBD/COP/17/L.31/Rev.1 表 1', null, 'Table 1'], ...(B.alt ? [[B.alt.id, B.alt.page, '表 1.alt']] : [])]),
     csvDl(B, [['doc:' + B.table1.id + ':' + B.table1.page, '表 1（依支出項目）'], ...(B.alt ? [['doc:' + B.alt.id + ':' + B.alt.page, '表 1.alt']] : []), ...B.funds.filter(f => f.key !== 'COP').map(f => ['doc:' + f.id + ':' + f.pages.t1, f.zh + '表 1'])]));
   draw();
   return card;
@@ -743,7 +782,7 @@ function mapCard(B) {
       el('span', {}, el('i', {style: 'background:var(--panel);border:1px solid var(--ink);border-radius:50%'}), '圓點：地圖上太小的國家'));
     const off = [...val.values()].filter(o => !o.geo && !o.pt).sort((a, b) => (get(b) ?? -1e9) - (get(a) ?? -1e9));
     small.replaceChildren(...(off.length ? ['地圖上無法標示的締約方：', off.map(o => o.zh + ' ' + fmt(get(o))).join('、'), '。'] : []));
-    src.replaceChildren(srcLine(B, [...fs.map(f => [f.id, f.pages.ct, f.sym + ' 分攤表']), ...(m === 'chg' ? Object.values(B.prev).map(p => [p.url, 0, '決議 ' + p.ref]) : [])]));
+    src.replaceChildren(srcLine(B, [...fs.map(f => [f.id, f.pages.ct, f.sym + ' 分攤表', null, 'Contribution table']), ...(m === 'chg' ? Object.values(B.prev).map(p => [p.url, 0, '決議 ' + p.ref]) : [])]));
     explain.replaceChildren(...shareExplain(fs));
     evts.fmt = fmt;
   };
@@ -871,7 +910,7 @@ function trendCard(B) {
       Y, '千美元', '每張小圖各自的縱軸從 0 開始；變化率比較第一個與最後一個兩年期的合計。特別項目與週轉金準備每年差異大，見上方堆疊圖。'),
     el('h3', {style: 'margin-top:16px'}, '公約締約方應分攤淨額'), unitNote('千美元（年度金額）'), el('div', {class: 'chart'}, svg2),
     el('h3', {style: 'margin-top:16px'}, '秘書處核心預算員額'), unitNote('員額數（個）'), el('div', {class: 'dtwrap', style: 'max-height:none'}, st),
-    srcLine(B, [...B.decisions.filter(d => !/^(CP|NP)/.test(d.ref)).map(d => [d.url, 0, '決議 ' + d.ref]), [B.table1.id, B.table1.page, 'CBD/COP/17/L.31/Rev.1 表 1'], [B.table1.id, 11, 'CBD/COP/17/L.31/Rev.1 表 3（員額）'],
+    srcLine(B, [...B.decisions.filter(d => !/^(CP|NP)/.test(d.ref)).map(d => [d.url, 0, '決議 ' + d.ref]), [B.table1.id, B.table1.page, 'CBD/COP/17/L.31/Rev.1 表 1', null, 'Table 1'], [B.table1.id, 11, 'CBD/COP/17/L.31/Rev.1 表 3（員額）', null, 'Table 3'],
       ...(B.comp_src ? [[B.comp_src.id, B.comp_src.page, 'CBD/COP/17/L.31/Rev.1 表 2']] : [])]),
     csvDl(B, [['h:budget_by_year.csv', '2019–2028 年度預算（依支出類別，含公約應分攤淨額）'], ['h:budget_by_component.csv', '依組成部分'], ['h:secretariat_staffing.csv', '秘書處員額']]));
   return card;
@@ -904,7 +943,7 @@ function statusCard(B) {
   const tot = S.core.rows.find(r => r.key === 'ALL'), vol = S.voluntary.rows.find(r => r.key === 'BE'), bz = S.voluntary.rows.find(r => r.key === 'BZ');
   const pf = S.paid_full.rows, zh = {COP: '公約', CP: '卡塔赫納議定書', NP: '名古屋議定書'};
   card.append(el('h3', {}, '核定不等於到位：錢收到了多少？'),
-    el('p', {class: 'label'}, '前面各圖都是「核定或提案多少錢」。這張圖看實際收到多少：核心預算靠締約方分攤，自願信託基金靠捐助。資料為秘書處向執行附屬機構第七次會議提出的報告，截至 ' + S.as_of + '。分攤款在預算年度的 1 月 1 日到期（', el('a', {href: '#' + B.table1.id + '/p004'}, 'L.31/Rev.1 第 16 段'), '），所以此時 2025、2026 兩年的分攤都已到期，未收部分就是逾期未繳。'),
+    el('p', {class: 'label'}, '前面各圖都是「核定或提案多少錢」。這張圖看實際收到多少：核心預算靠締約方分攤，自願信託基金靠捐助。資料為秘書處向執行附屬機構第七次會議提出的報告，截至 ' + S.as_of + '。分攤款在預算年度的 1 月 1 日到期（', el('a', {href: docHref(B.table1.id, 4, '16')}, 'L.31/Rev.1 第 16 段'), '），所以此時 2025、2026 兩年的分攤都已到期，未收部分就是逾期未繳。'),
     unitNote('實收占分攤額或估算的 %（滑過長條看金額）'), el('div', {class: 'chart'}, svg),
     el('div', {class: 'kpis', style: 'margin-top:10px'}, ...pf.map(r => el('div', {class: 'kpi'}, el('div', {class: 'l'}, zh[r.key] + '：2025 年分攤已全額繳清'),
       el('div', {class: 'v'}, nf(r.p2025, 1) + '%'), el('div', {class: 'd'}, nf(r.y2025, 0) + '／' + nf(r.parties, 0) + ' 個締約方；2026 年為 ' + nf(r.y2026, 0) + ' 個（' + nf(r.p2026, 1) + '%）')))),
@@ -913,8 +952,7 @@ function statusCard(B) {
       '下方 ', jump('kmgbf-alloc', 'KMGBF 自願需求'), ' 與 ', jump('yerevan', 'Yerevan Pathway'), ' 中「視資源而定」的工作，正是要靠這類到位率約三成的基金。'),
     el('p', {class: 'label'}, '支持額外核定活動基金的估算 28,690,983 美元，是決議 16/28 表 4 的主題需求 21,941,493 美元加上表 5 的人員需求 6,749,490 美元，兩者都含 13% 計畫支援費用；下方 KMGBF 卡的 19,417,250 美元只計表 4 主題、不含計畫支援費用，口徑不同。原住民族與地方社區參與基金的估算較小（317,000 美元），到位率較高。'),
     csvDl(B, [['h:contributions_status_2025-2026.csv', '收款與到位率']]),
-    el('div', {class: 'src'}, '資料來源：', el('a', {href: S.url + '#page=3', target: '_blank', rel: 'noopener'}, S.sym + ' 表 3、表 4（第 3 頁）↗'), '；',
-      el('a', {href: S.url + '#page=7', target: '_blank', rel: 'noopener'}, '第 27–30 段（第 7–8 頁）↗')));
+    srcLine(B, [[S.doc, 3, S.sym + ' 表 3', null, 'Table 3'], [S.doc, 3, '表 4', null, 'Table 4'], [S.doc, 7, '第 27 段', null, '27'], [S.doc, 7, '第 28 段', null, '28'], [S.doc, 8, '第 30 段', null, '30'], [B.table1.id, 4, 'CBD/COP/17/L.31/Rev.1 第 16 段', null, '16']]));
   return card;
 }
 
@@ -948,7 +986,7 @@ function execCard(B) {
       '秘書處說明超支的原因是兩場未編入預算的會議：第十六屆大會在羅馬的續會，以及加開一次執行附屬機構會議，合計約 110 萬美元（CBD/COP/17/4/Add.5 第 21 段）；人事費結餘則來自職位懸缺（同文件第 23 段），截至 5 月 31 日核定的 87 個員額中有 14 個懸缺（CBD/COP/17/3 第 32 段）。也就是說，加開會議的費用是靠職位懸缺省下的錢支應。2027–2028 年提案每個附屬機構只編一次會議（Add.5 第 30 段），若再加開會議，仍得靠結餘或懸缺吸收。'),
     el('p', {class: 'label'}, '原文不一致照原文呈現：表 5「實際＋預估」欄各項加總為 ' + nf(all.reduce((s, r) => s + r.spent, 0)) + '，表列合計為 ' + nf(T.spent) + '；表列差額合計 ' + nf(T.var) + '，以兩欄合計相減為 ' + nf(T.approved - T.spent) + '；第 8 段另寫實際＋預估總計 39,023,699 美元。'),
     csvDl(B, [['h:budget_execution_2025-2026.csv', '2025–2026 預算執行（表 5）']]),
-    el('div', {class: 'src'}, '資料來源：', el('a', {href: S.url + '#page=3', target: '_blank', rel: 'noopener'}, S.sym + ' 表 5（第 3–4 頁）↗')));
+    srcLine(B, [[S.doc, 3, S.sym + ' 表 5', null, 'Table 5'], [S.doc, 3, '第 8 段', null, '8'], [S.doc, 8, '第 32 段', null, '32'], ['6ac02bade811bc9bfc681810', 8, 'CBD/COP/17/4/Add.5 第 21 段', null, '21'], ['6ac02bade811bc9bfc681810', 8, '第 23 段', null, '23'], ['6ac02bade811bc9bfc681810', 8, '第 24 段', null, '24'], ['6ac02bade811bc9bfc681810', 10, '第 30 段', null, '30']]));
   return card;
 }
 
@@ -1000,7 +1038,7 @@ function lorenzCard(B) {
       '吉尼係數 ' + nf(gini, 3) + '（0 為完全平均、1 為完全集中）。最大分攤國一國就占 ' + nf(top(1) * 100, 1) + '%，前 3 國合計 ' + nf(top(3) * 100, 1) + '%，分攤最少的 100 國合計只有 ' + nf(bot(100) * 100, 2) + '%。',
       '只要前 3 國延遲繳費，公約基金就只剩約 ' + nf((1 - top(3)) * 100, 0) + '% 的分攤可收；2025–2026 年截至 5 月的實際收款率是 ' + (recv ? nf(recv.pct, 1) + '%' : '—') + '（見 ', jump('status', '上方收款圖'), '）。結構上，少數大國延遲繳費就會明顯影響現金流；但依 ' + (B.arrears ? B.arrears.date : '最新') + ' 的繳款狀況，前 10 大分攤國 2026 年都已繳清、也沒有前期欠款，實際欠款集中在其他國家（見 ', jump('arrears', '「誰還沒繳」'), '）。'),
     el('p', {class: 'label'}, '右側為結構試算，只表示「若這些國家延遲」的影響，不代表哪一國實際未繳；實際逐國繳款狀況見「誰還沒繳」。'),
-    srcLine(B, [[f.id, f.pages.ct, f.sym + ' 分攤表']]), csvDl(B, [['h:contributions_by_fund_2025-2028.csv', '三基金各締約方分攤']]));
+    srcLine(B, [[f.id, f.pages.ct, f.sym + ' 分攤表', null, 'Contribution table']]), csvDl(B, [['h:contributions_by_fund_2025-2028.csv', '三基金各締約方分攤']]));
   return card;
 }
 
@@ -1043,9 +1081,7 @@ function cfCard(B) {
         el('li', {}, '多付比例約等於 ' + nf(C.k0, 4) + ' ÷ ' + nf(C.k1, 4) + ' − 1。它大於「把 78% 換算為 100%」的 28%，主因是實際分攤表中中國被 22% 上限壓住（聯合國比例 20.004% 換算後會超過 22%），超出的部分由其他締約方分擔；美國加入後中國不再碰到上限，所以中國只多付約 ' + nf(cnX, 1) + '%。歐盟固定 2.5% 則使差距略為縮小（約 1 個百分點）；原表被壓在 0.01% 的低度開發國家多付很少；歐盟本身沒有差別。'))),
     el('p', {class: 'label'}, '只算公約一般信託基金：美國 1993 年簽署公約但未批准，兩項議定書都沒有簽署。假設預算總額不變；實際上美國加入可能改變預算談判本身。2028 年的分攤目前也依第 79/249 號決議計算，聯合國通過 2028–2030 年新分攤比例後會重算（L.31/Rev.1 註 12）。'),
     csvDl(B, [['h:counterfactual_us_convention_2027-2028.csv', '各締約方實際與反事實分攤']]),
-    el('div', {class: 'src'}, '資料來源：', el('a', {href: '#' + f.id + '/p' + String(f.pages.ct).padStart(3, '0')}, f.sym + ' 分攤表 第 ' + f.pages.ct + ' 頁'), '；',
-      el('a', {href: C.src, target: '_blank', rel: 'noopener'}, '聯合國大會第 79/249 號決議（美國 22.000%）↗'), '；',
-      el('a', {href: 'https://www.cbd.int/information/parties.shtml', target: '_blank', rel: 'noopener'}, 'CBD 締約方名單 ↗')));
+    srcLine(B, [[f.id, f.pages.ct, f.sym + ' 分攤表', null, 'Contribution table'], [f.id, 3, 'L.31/Rev.1 第 7 段與註 12', null, '7'], [C.src, 0, '聯合國大會第 79/249 號決議（美國 22.000%）'], ['https://www.cbd.int/information/parties.shtml', 0, 'CBD 締約方名單']]));
   return card;
 }
 
@@ -1054,6 +1090,26 @@ function arrearsCard(B) {
   const A = B.arrears, card = el('section', {class: 'card', id: 'arrears'}), area = el('div', {class: 'chart'}), kp = el('div', {class: 'kpis'}), obs = el('div', {class: 'note', style: 'margin-top:10px'});
   const ZH = {COP: '公約一般信託基金', CP: '卡塔赫納議定書', NP: '名古屋議定書'};
   const fund = el('select', {'aria-label': '基金'}, ...Object.keys(A.core).map(k => el('option', {value: k}, ZH[k])));
+  // 逐國篩選：狀態＋名稱搜尋（中文、英文皆可）
+  const ST = [['owe', '有未繳（任一年）'], ['prior', '欠 2025 年以前'], ['y26', '2026 年未繳清'], ['paid', '已全部繳清'], ['all', '全部締約方']];
+  const stSel = el('select', {'aria-label': '繳款狀態'}, ...ST.map(([v, l]) => el('option', {value: v}, l)));
+  const q = el('input', {type: 'search', placeholder: '搜尋國名（中文或英文）', 'aria-label': '搜尋國名', style: 'min-width:12em'});
+  const tbox = el('div'), tsum = el('div', {class: 'label', style: 'margin:6px 0 4px'});
+  const drawTable = () => {
+    const k = fund.value, f = A.core[k], fr = B.funds.find(x => x.key === k);
+    const nm = Object.fromEntries(fr.contrib.rows.map(r => [r.key, [r.zh || r.en, r.en]])), s = stSel.value, t = pnorm(q.value);
+    const test = {owe: v => v[8] > 0, prior: v => v[6] > 0, y26: v => v[7] > 0, paid: v => v[8] <= 0, all: () => true}[s];
+    const R = Object.entries(f.rows).filter(([p, v]) => test(v) && (!t || pnorm((nm[p] || [p]).join(' ') + ' ' + p).includes(t))).sort((a, b) => b[1][8] - a[1][8] || (nm[a[0]]?.[0] || a[0]).localeCompare(nm[b[0]]?.[0] || b[0], 'zh-Hant'));
+    tsum.textContent = '符合 ' + R.length + ' 個締約方；未繳合計 ' + nf(R.reduce((x, [, v]) => x + Math.max(0, v[8]), 0), 0) + ' 美元（2025 年以前 ' + nf(R.reduce((x, [, v]) => x + v[6], 0), 0) + '、2026 年 ' + nf(R.reduce((x, [, v]) => x + Math.max(0, v[7]), 0), 0) + '）';
+    const stat = v => v[8] <= 0 ? (v[9] > 0 ? '已繳清（另預繳 ' + nf(v[9], 0) + '）' : '已繳清') : v[6] > 0 && v[7] > 0 ? '兩者皆欠' : v[6] > 0 ? '欠前期' : '欠 2026 年';
+    const H = ['締約方', '2026 年分攤', '2026 年未繳', '2025 年以前未繳', '未繳合計', '狀態'];
+    tbox.replaceChildren(el('div', {class: 'dtwrap'}, el('table', {class: 'dt'},
+      el('thead', {}, el('tr', {}, ...H.map((h, i) => el('th', {class: i === 0 || i === 5 ? 't' : ''}, h)))),
+      el('tbody', {}, ...R.map(([p, v]) => el('tr', {},
+        el('td', {class: 't'}, el('a', {href: '#budget/party/' + encodeURIComponent(nm[p]?.[1] || p), title: '查看這個締約方的分攤'}, nm[p]?.[0] || p)),
+        el('td', {}, nf(v[1], 0)), el('td', {}, nf(Math.max(0, v[7]), 0)), el('td', {}, nf(v[6], 0)), el('td', {}, nf(Math.max(0, v[8]), 0)), el('td', {class: 't'}, stat(v))))))));
+  };
+  stSel.addEventListener('change', drawTable); q.addEventListener('input', drawTable);
   const draw = () => {
     const k = fund.value, f = A.core[k], fr = B.funds.find(x => x.key === k), nm = Object.fromEntries(fr.contrib.rows.map(r => [r.key, r.zh || r.en]));
     const R = Object.entries(f.rows), n = R.length, ex = f.extra.reduce((s, e) => [s[0] + e[1], s[1] + e[2]], [0, 0]);
@@ -1078,6 +1134,7 @@ function arrearsCard(B) {
     area.replaceChildren(svg);
     obs.replaceChildren(el('b', {}, '觀察：'), '欠繳高度集中：前期欠款最多的 5 國（' + t5.map(([p]) => nm[p] || p).join('、') + '）就占 2025 年以前未繳總額的 ' + nf(t5s / sp * 100, 1) + '%。',
       '另有 ' + two + ' 國的前期未繳超過自己 2026 年分攤的兩倍；決議草案確認既有規定：欠繳兩年以上者不得擔任主席團成員（L.31/Rev.1 第 20 段，低度開發國家與小島嶼開發中國家除外），但這個倍數只是估算，不等於正式的欠繳年數。');
+    drawTable();
   };
   fund.addEventListener('change', draw);
   // 自願基金：依捐款者彙總 2026 年認捐
@@ -1092,6 +1149,8 @@ function arrearsCard(B) {
     el('p', {class: 'label'}, '秘書處公布的各信託基金繳款狀況，截至 ' + A.date + '（大會開幕前三天）；締約方數依此表（名古屋議定書 143 國，5 月的秘書處報告為 142 國）。分攤款在預算年度的 1 月 1 日到期，所以表中「2026 年未繳」與「2025 年以前未繳」都是逾期款。'),
     el('div', {class: 'ctrl'}, fund), kp, unitNote('美元；橘色為 2025 年以前未繳、藍色為 2026 年未繳'), area,
     legend([['var(--s2)', '2025 年以前未繳'], ['var(--s1)', '2026 年未繳']]), obs,
+    el('h4', {style: 'margin:16px 0 6px'}, '逐國查詢：哪些國家還沒繳'), el('div', {class: 'ctrl'}, stSel, q), tsum, tbox,
+    el('p', {class: 'label'}, '基金以上方選單切換；金額為美元。2026 年未繳為負值者表示已預繳，以 0 計。點國名可看該國的分攤。'),
     el('p', {class: 'label'}, '「前期約幾年分攤」以 2026 年分攤額估算；分攤比例逐期調整（例如委內瑞拉的分攤比例大幅下降），所以只是相對規模，不是實際欠繳年數。'),
     el('h4', {style: 'margin:16px 0 6px'}, '自願基金靠誰（2026 年認捐）'), el('div', {class: 'kpis'}, ...vol),
     el('details', {}, el('summary', {class: 'label', style: 'cursor:pointer'}, '額外核定活動基金（BE）2026 年各筆認捐與用途（原文）'),
@@ -1099,7 +1158,7 @@ function arrearsCard(B) {
         el('tbody', {}, ...be.sort((a, b) => b.v[1] - a.v[1]).map(r => el('tr', {}, el('td', {class: 't'}, r.donor), el('td', {}, nf(r.v[1], 0)), el('td', {class: 't', lang: 'en'}, r.purpose)))))),
       el('p', {class: 'label'}, '認捐幾乎都指定用途（特定會議、對話或倡議）；地主國亞美尼亞為主辦 COP 17 認捐的 2,166,855 美元也列在此基金。')),
     csvDl(B, [['h:arrears_by_party_' + A.date + '.csv', '逐國欠繳'], ['h:voluntary_pledges_' + A.date + '.csv', '自願基金各筆認捐']]),
-    el('div', {class: 'src'}, '資料來源：', el('a', {href: A.url, target: '_blank', rel: 'noopener'}, 'CBD 秘書處行政與財務頁「Status of Contributions」（' + A.date + '）↗'), '；', el('a', {href: '#' + B.table1.id + '/p004'}, 'CBD/COP/17/L.31/Rev.1 第 16 段'), '、', el('a', {href: '#' + B.table1.id + '/p005'}, '第 20 段')));
+    el('div', {class: 'src'}, '資料來源：', el('a', {href: A.url, target: '_blank', rel: 'noopener'}, 'CBD 秘書處行政與財務頁「Status of Contributions」（' + A.date + '）↗'), '；', ...docRef(B.table1.id, 4, 'CBD/COP/17/L.31/Rev.1 第 16 段', '16'), '；', ...docRef(B.table1.id, 5, '第 20 段', '20')));
   draw();
   return card;
 }
@@ -1166,7 +1225,7 @@ function finCard(B) {
     el('h4', {style: 'margin:12px 0 4px'}, '收入與支出'), area2, legend([['var(--s3)', '收入'], ['var(--s2)', '支出']]), obs,
     el('details', {}, el('summary', {class: 'label', style: 'cursor:pointer'}, '原表不一致與轉錄說明'), el('ul', {style: 'margin:4px 0 0 18px;padding:0;line-height:1.7'}, ...F.source_issues.map(t => el('li', {}, t)))),
     csvDl(B, [['h:fin_statements_2017-2025.csv', '各基金 2017–2025 財務報表主要項目']]),
-    el('div', {class: 'src'}, '資料來源：', el('a', {href: F.url, target: '_blank', rel: 'noopener'}, 'CBD 秘書處行政與財務頁「Financial Statements」↗'), '；', el('a', {href: 'https://www.cbd.int/doc/c/a398/e70d/efd2a290fb117738dfebd140/sbi-07-14-en.pdf#page=7', target: '_blank', rel: 'noopener'}, 'CBD/COP/17/3 表 6、表 7 ↗')));
+    el('div', {class: 'src'}, '資料來源：', el('a', {href: F.url, target: '_blank', rel: 'noopener'}, 'CBD 秘書處行政與財務頁「Financial Statements」↗'), '；', ...docRef('6a56a3345157386777b42d42', 7, 'CBD/COP/17/3 表 6', 'Working capital reserve, as at'), '；', ...docRef('6a56a3345157386777b42d42', 7, '表 7', 'Cumulative surplus (excluding'), '；', ...docRef(B.table1.id, 4, 'L.31/Rev.1 第 17 段', '17'), '；', ...docRef('6ac02bade811bc9bfc681810', 2, 'CBD/COP/17/4/Add.5 第 4 段', '4')));
   draw();
   return card;
 }
@@ -1429,7 +1488,7 @@ function kmgbfCard(B) {
 
 // ---- Yerevan Pathway 與預算：全球檢視決議（L.15 第 14–49 段）對照預算草案 ----
 function yerevanCard(B) {
-  const L15 = '6ae38db57de9589330b2f72d', pg = n => '#' + L15 + '/p' + String(n).padStart(3, '0');
+  const L15 = '6ae38db57de9589330b2f72d', pg = (n, a) => docHref(L15, n, a);
   const K = B.kmgbf, tot = K.rows.filter(r => r.amt).reduce((s, r) => s + r.amt, 0);
   const PW = ['Mechanisms for planning, monitoring, reporting and review', 'Monitoring framework', 'Clearing-house mechanism and knowledge management',
     'Capacity-building and development, technical and scientific cooperation', 'Scientific and technical needs', 'Financial mechanism', 'Resource mobilization', 'Mainstreaming of biodiversity'];
@@ -1442,6 +1501,7 @@ function yerevanCard(B) {
     ['全社會參與', 9, '原住民族與地方社區、女性、青年、地方政府、企業與金融界的參與'],
     ['強化監測與知識', 9, '補強國家監測與知識管理系統，讓生態系類主要指標可以運作'],
     ['交辦秘書處', 10, '8 項工作，其中 3 項「視資源而定」（下表）']];
+  const AREA_A = {'加速行動與執行': 'Yerevan pathway for accelerating', '擴大範圍與涵蓋': 'Enhancing scope and coverage', '全社會參與': 'Engaging the whole of society', '強化監測與知識': 'Enhancing monitoring and knowledge'};
   const TASKS = [['(a) 檢討工作計畫時納入全球檢視的發現', false], ['(b) 透過資訊交換機制促進經驗分享', false], ['(c) 在下次 COP 前的執行附屬機構會議提出經驗彙整', true],
     ['(d) 協調同儕學習與能力建構', true], ['(e) 舉辦全球檢視與 Yerevan Pathway 的區域對話', true], ['(f) 讓國家計畫與報告更易取得', false],
     ['(g) 建置全球報告資訊儀表板', false], ['(h) 協助改善國家監測與知識管理系統', false]];
@@ -1452,7 +1512,7 @@ function yerevanCard(B) {
     el('div', {class: 'note'}, '正式決議文本尚未公布；以下段落依決議草案 L.15（2026-10-29），方括號段落的最終寫法待確認：第 26 段（有害誘因）、第 45 段（區域對話）與第 49(e) 段在 L.15 中整段都在方括號內。依 Carbon Brief 報導，有害補貼一段由「敦促」軟化為「鼓勵」並加上「依國情」，驅動因素一段大幅刪減。'),
     el('div', {class: 'dtwrap', style: 'max-height:none'}, el('table', {class: 'dt'},
       el('thead', {}, el('tr', {}, el('th', {class: 't'}, '面向'), el('th', {class: 't'}, '主要內容'))),
-      el('tbody', {}, ...AREAS.map(([a, p, t]) => el('tr', {}, el('td', {class: 't'}, el('a', {href: pg(p)}, a)), el('td', {class: 't'}, t)))))),
+      el('tbody', {}, ...AREAS.map(([a, p, t]) => el('tr', {}, el('td', {class: 't'}, el('a', {href: pg(p, AREA_A[a])}, a)), el('td', {class: 't'}, t)))))),
     el('h3', {style: 'margin-top:16px'}, '交辦秘書處的工作'),
     el('div', {class: 'dtwrap', style: 'max-height:none'}, el('table', {class: 'dt'},
       el('thead', {}, el('tr', {}, el('th', {class: 't'}, 'L.15 第 49 段'), el('th', {class: 't'}, '是否「視資源而定」'))),
@@ -1466,7 +1526,7 @@ function yerevanCard(B) {
     el('div', {class: 'note', style: 'margin-top:10px'}, el('b', {}, '判斷：'), '核心預算撐得住秘書處的基本運作與下一輪檢視程序，但撐不起 Pathway 期待的「加速」——區域對話、同儕學習、監測系統支援與能力建構目前都沒有可靠財源，成敗取決於自願捐助、GEF 撥款與各國自己的預算。'),
     el('p', {class: 'label'}, '值得追蹤：2027–2028 年自願信託基金表 4 的內容與捐助到位情形；GEF-9 生物多樣性撥款的實際分配；有害誘因改革在各國預算上的變化；正式決議文本。'),
     csvDl(B, [['h:kmgbf_voluntary_needs_mapping.csv', '自願信託基金各主題需求']]),
-    el('div', {class: 'src'}, '資料來源：', el('a', {href: pg(6)}, 'CBD/COP/17/L.15 第 6–11 頁'), '；', el('a', {href: '#' + B.table1.id + '/p008'}, 'CBD/COP/17/L.31/Rev.1 表 1'), '；',
+    el('div', {class: 'src'}, '資料來源：', ...docRef(L15, 6, 'CBD/COP/17/L.15 第 6–11 頁', 'Yerevan pathway for accelerating'), '；', ...docRef(B.table1.id, 8, 'CBD/COP/17/L.31/Rev.1 表 1', 'Table 1'), '；',
       el('a', {href: K.url, target: '_blank', rel: 'noopener'}, '決議 16/28 表 4 ↗'), '；', el('a', {href: 'https://www.cbd.int/doc/press/2026/pr-2026-10-31-cop17-en.pdf', target: '_blank', rel: 'noopener'}, 'CBD 新聞稿 2026-10-31 ↗'),
       '；Carbon Brief, COP17: Key outcomes（第二手）'));
   return card;
@@ -1529,7 +1589,7 @@ function partyCard(B, parts) {
     show(parts.map(x => byName.get(x) || byName.get(pnorm(x))).find(Boolean));
   });
   card.append(el('h3', {}, '查詢單一締約方'), el('div', {class: 'ctrl'}, inp, dl), out,
-    srcLine(B, [...B.funds.map(f => [f.id, f.pages.ct, f.sym + ' 分攤表']), ...Object.values(B.prev).map(p => [p.url, 0, '決議 ' + p.ref])]),
+    srcLine(B, [...B.funds.map(f => [f.id, f.pages.ct, f.sym + ' 分攤表', null, 'Contribution table']), ...Object.values(B.prev).map(p => [p.url, 0, '決議 ' + p.ref])]),
     csvDl(B, [['h:contributions_by_fund_2025-2028.csv', '三基金各締約方分攤（含上一期）'], ['h:convention_contributions_by_party.csv', '公約各締約方 2019–2028 歷年分攤']]));
   partyShow = name => show(byName.get(pnorm(name)) || byName.get(name) || '');
   TEARDOWN.push(() => { partyShow = null; });
@@ -1555,14 +1615,14 @@ function tableCard(B) {
       const f = B.funds.find(f => f.key === ds.value), p = B.prev[f.key];
       cols = [['締約方', 't'], ['Party', 't'], ['區域', 't'], ['聯合國比例（%）'], ['調整後比例（%）'], ['2027（美元）'], ['2028（美元）'], ['2027–2028（美元）'], ['2025–2026（美元）'], ['增減（%）']];
       rows = f.contrib.rows.map(r => { const pv = p?.v[r.key]; return [r.zh, r.en, r.region, r.v[0], r.v[1], r.v[2], r.v[3], r.v[4], pv ?? null, pv ? (r.v[4] / pv - 1) * 100 : null]; });
-      src.replaceChildren(srcLine(B, [[f.id, f.pages.ct, f.sym + ' 分攤表'], ...(p ? [[p.url, 0, '決議 ' + p.ref]] : [])]),
+      src.replaceChildren(srcLine(B, [[f.id, f.pages.ct, f.sym + ' 分攤表', null, 'Contribution table'], ...(p ? [[p.url, 0, '決議 ' + p.ref]] : [])]),
         csvDl(B, [['doc:' + f.id + ':' + f.pages.ct, f.zh + '分攤表（原文）'], ['h:contributions_by_fund_2025-2028.csv', '含上一期與增減']]) || '');
     } else {
       const t = ds.value === 'T1' ? B.table1 : B.alt;
       cols = [['項目', 't'], ['Item', 't'], ...t.cols.map(c => [({'Proposed scenario 2027–2028 (improved zero nominal growth)': '2027–2028 提案方案（改良型零名目成長）'})[c] || c + '（千美元）'])];
       cols = cols.map(c => c[1] || /千美元/.test(c[0]) ? c : [c[0] + '（千美元）']);
       rows = t.rows.map(r => [r.zh, r.en, ...r.v]);
-      src.replaceChildren(srcLine(B, [[t.id, t.page, ds.value === 'T1' ? 'CBD/COP/17/L.31/Rev.1 表 1' : '表 1.alt']]),
+      src.replaceChildren(srcLine(B, [[t.id, t.page, ds.value === 'T1' ? 'CBD/COP/17/L.31/Rev.1 表 1' : '表 1.alt', null, ds.value === 'T1' ? 'Table 1' : '']]),
         csvDl(B, [['doc:' + t.id + ':' + t.page, ds.value === 'T1' ? '表 1（原文）' : '表 1.alt（原文）']]) || '');
     }
     sortK = null; draw();
