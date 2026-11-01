@@ -442,7 +442,7 @@ function renderBudget(parts) {
       'CP ' + F.CP.contrib.rows.length + '、NP ' + F.NP.contrib.rows.length + '（含歐盟）')),
     staffNow ? el('div', {class: 'kpi'}, el('div', {class: 'l'}, '秘書處核心預算員額'), el('div', {class: 'v'}, String(staffNow[2])), el('div', {class: 'd'}, '2025–2026 核定 ' + staffNow[1] + ' 個')) : null));
   if (kpiCsv) box.append(kpiCsv);
-  box.append(...[sankeyCard(B), rankCard(B), mapCard(B), trendCard(B), ...(B.status ? [statusCard(B), execCard(B)] : []), lorenzCard(B), B.cf ? cfCard(B) : null, B.kmgbf ? kmgbfCard(B) : null, B.kmgbf && B.years?.['2027'] ? yerevanCard(B) : null, partyCard(B, parts), tableCard(B), footer()].filter(Boolean));
+  box.append(...[sankeyCard(B), rankCard(B), mapCard(B), trendCard(B), ...(B.status ? [statusCard(B)] : []), B.arrears ? arrearsCard(B) : null, ...(B.status ? [execCard(B)] : []), B.fin ? finCard(B) : null, B.fin ? auditCard() : null, lorenzCard(B), B.cf ? cfCard(B) : null, B.kmgbf ? kmgbfCard(B) : null, B.kmgbf && B.years?.['2027'] ? yerevanCard(B) : null, partyCard(B, parts), tableCard(B), footer()].filter(Boolean));
   $('#main').replaceChildren(box);
   if (parts[0] === 'party') document.getElementById('party-card')?.scrollIntoView();
   else $('#main').scrollTop = 0;
@@ -467,7 +467,7 @@ function introCard(B, F) {
     el('h3', {style: 'margin-top:16px'}, '本屆相關決議草案'),
     el('p', {class: 'label'}, 'COP 17、CP-MOP 12、NP-MOP 6 於 2026 年 10 月 19–30 日在葉里溫合併舉行。以下三份是預算議題的會中決議草案（L 文件）：公約那份的預算金額與表 1–3 在方括號內；兩項議定書的金額沒有加方括號，但註腳說明待表 1 預算表通過後依最終表修正。'),
     el('ul', {style: 'margin:4px 0 0 18px;padding:0;line-height:1.7'},
-      el('li', {}, el('a', {href: '#' + F.COP.id}, F.COP.sym), '（公約行政管理、信託基金預算及秘書處功能審查）：採用 2027–2028 整合工作計畫與預算；核心信託基金 2027、2028 年金額待定；擬動用未支出餘額抵減分攤（金額在方括號內）；請執行秘書持續落實秘書處外部深度功能審查中與核心功能相關的建議；欠繳分攤兩年以上的締約方（低度開發國家與小島嶼開發中國家除外）不得擔任締約方大會、議定書締約方會議或科學、技術和工藝諮詢附屬機構的主席團成員，也不得提名遵約委員會成員；動用 20 萬美元（' + twd(200000) + '）支應數位序列資訊（DSI）閉會期間工作的段落整段仍在方括號內。'),
+      el('li', {}, el('a', {href: '#' + F.COP.id}, F.COP.sym), '（公約行政管理、信託基金預算及秘書處功能審查）：採用 2027–2028 整合工作計畫與預算；核心信託基金 2027、2028 年金額待定；擬動用未支出餘額抵減分攤（金額在方括號內）；請執行秘書持續落實秘書處外部深度功能審查中與核心功能相關的建議；欠繳分攤兩年以上的締約方（低度開發國家與小島嶼開發中國家除外）不得擔任締約方大會、議定書締約方會議或科學、技術及工藝諮詢附屬機構的主席團成員，也不得提名遵約委員會成員；動用 20 萬美元（' + twd(200000) + '）支應數位序列資訊（DSI）閉會期間工作的段落整段仍在方括號內。'),
       el('li', {}, el('a', {href: '#' + F.CP.id}, F.CP.sym), '（卡塔赫納議定書行政管理、信託基金預算及秘書處功能審查）：採用同一份整合預算與 72：15：13 分攤；核定議定書核心信託基金 2027 年 ' + usd(3181871) + '、2028 年 ' + usd(3691006) + '，即整合預算的 15%（金額待預算表通過後依最終表修正）；附件分攤表待公約與議定書統一的分攤比例表通過後才納入決定。'),
       el('li', {}, el('a', {href: '#' + F.NP.id}, F.NP.sym), '（名古屋議定書行政管理與信託基金預算）：同上，核定名古屋議定書一般信託基金 2027 年 ' + usd(2757622) + '、2028 年 ' + usd(3198872) + '，即整合預算的 13%（金額待預算表通過後依最終表修正）；附件分攤表同樣待統一分攤比例表通過後納入。')),
     el('p', {class: 'label'}, '決議草案的白話摘要與逐段中英對照，請點文件代碼。'));
@@ -909,7 +909,7 @@ function statusCard(B) {
     el('div', {class: 'kpis', style: 'margin-top:10px'}, ...pf.map(r => el('div', {class: 'kpi'}, el('div', {class: 'l'}, zh[r.key] + '：2025 年分攤已全額繳清'),
       el('div', {class: 'v'}, nf(r.p2025, 1) + '%'), el('div', {class: 'd'}, nf(r.y2025, 0) + '／' + nf(r.parties, 0) + ' 個締約方；2026 年為 ' + nf(r.y2026, 0) + ' 個（' + nf(r.p2026, 1) + '%）')))),
     el('div', {class: 'note', style: 'margin-top:10px'}, el('b', {}, '觀察：'),
-      '已到期的核心分攤只收到 ' + nf(tot.pct, 1) + '%，逾期未繳 ' + kusd(tot.unpaid) + '；2026 年的分攤只有約兩成締約方繳清，連 2025 年的分攤也仍有超過一半沒有繳清。自願信託基金的落差更大：支持額外核定活動的基金只收到估算的 ' + nf(vol.received / vol.estimate * 100, 1) + '%，協助開發中國家代表與會的參與基金也只有 ' + nf(bz.received / bz.estimate * 100, 1) + '%。',
+      '已到期的核心分攤只收到 ' + nf(tot.pct, 1) + '%，逾期未繳 ' + kusd(tot.unpaid) + '；2026 年的分攤只有約兩成締約方繳清，連 2025 年的分攤也仍有超過一半的締約方沒有繳清。自願信託基金的落差更大：支持額外核定活動的基金只收到估算的 ' + nf(vol.received / vol.estimate * 100, 1) + '%，協助開發中國家代表與會的參與基金也只有 ' + nf(bz.received / bz.estimate * 100, 1) + '%。',
       '下方 ', jump('kmgbf-alloc', 'KMGBF 自願需求'), ' 與 ', jump('yerevan', 'Yerevan Pathway'), ' 中「視資源而定」的工作，正是要靠這類到位率約三成的基金。'),
     el('p', {class: 'label'}, '支持額外核定活動基金的估算 28,690,983 美元，是決議 16/28 表 4 的主題需求 21,941,493 美元加上表 5 的人員需求 6,749,490 美元，兩者都含 13% 計畫支援費用；下方 KMGBF 卡的 19,417,250 美元只計表 4 主題、不含計畫支援費用，口徑不同。原住民族與地方社區參與基金的估算較小（317,000 美元），到位率較高。'),
     csvDl(B, [['h:contributions_status_2025-2026.csv', '收款與到位率']]),
@@ -946,7 +946,7 @@ function execCard(B) {
     el('div', {class: 'note', style: 'margin-top:10px'}, el('b', {}, '觀察：'),
       '政府間機構會議預估超支 ' + kusd(-meet.var) + '，比核定多 ' + nf(-meet.var / meet.approved * 100) + '%，幾乎全由人事費結餘 ' + kusd(staff.var) + ' 抵銷，整體才勉強打平（表列差額合計 ' + nf(T.var) + ' 千美元）。',
       '會議成本是結構性壓力（見上方「依組成部分」的 A），而本屆提案員額由 87 增為 91、人事費隨之增加，下一期能用來吸收會議超支的空間會更小。'),
-    el('p', {class: 'label'}, '原文不一致照原文呈現：表 5「實際＋預估」欄各項加總為 ' + nf(all.reduce((s, r) => s + r.spent, 0)) + '，表列合計為 ' + nf(T.spent) + '；表列差額合計 ' + nf(T.var) + '，以兩欄合計相減為 ' + nf(T.approved - T.spent) + '。'),
+    el('p', {class: 'label'}, '原文不一致照原文呈現：表 5「實際＋預估」欄各項加總為 ' + nf(all.reduce((s, r) => s + r.spent, 0)) + '，表列合計為 ' + nf(T.spent) + '；表列差額合計 ' + nf(T.var) + '，以兩欄合計相減為 ' + nf(T.approved - T.spent) + '；第 8 段另寫實際＋預估總計 39,023,699 美元。'),
     csvDl(B, [['h:budget_execution_2025-2026.csv', '2025–2026 預算執行（表 5）']]),
     el('div', {class: 'src'}, '資料來源：', el('a', {href: S.url + '#page=3', target: '_blank', rel: 'noopener'}, S.sym + ' 表 5（第 3–4 頁）↗')));
   return card;
@@ -998,8 +998,8 @@ function lorenzCard(B) {
     unitNote('累積比例（%）；右側試算為占公約分攤總額的 %'), el('div', {class: 'chart'}, svg),
     el('div', {class: 'note', style: 'margin-top:10px'}, el('b', {}, '觀察：'),
       '吉尼係數 ' + nf(gini, 3) + '（0 為完全平均、1 為完全集中）。最大分攤國一國就占 ' + nf(top(1) * 100, 1) + '%，前 3 國合計 ' + nf(top(3) * 100, 1) + '%，分攤最少的 100 國合計只有 ' + nf(bot(100) * 100, 2) + '%。',
-      '只要前 3 國延遲繳費，公約基金就只剩約 ' + nf((1 - top(3)) * 100, 0) + '% 的分攤可收；2025–2026 年截至 5 月的實際收款率是 ' + (recv ? nf(recv.pct, 1) + '%' : '—') + '（見 ', jump('status', '上方收款圖'), '）。財源能否到位，主要取決於少數大國的繳費時間；分攤國數再多，對現金流的影響也很小。'),
-    el('p', {class: 'label'}, '右側為結構試算，只表示「若這些國家延遲」的影響；本站沒有逐國繳費資料，不代表哪一國實際未繳。'),
+      '只要前 3 國延遲繳費，公約基金就只剩約 ' + nf((1 - top(3)) * 100, 0) + '% 的分攤可收；2025–2026 年截至 5 月的實際收款率是 ' + (recv ? nf(recv.pct, 1) + '%' : '—') + '（見 ', jump('status', '上方收款圖'), '）。結構上，少數大國延遲繳費就會明顯影響現金流；但依 ' + (B.arrears ? B.arrears.date : '最新') + ' 的繳款狀況，前 10 大分攤國 2026 年都已繳清、也沒有前期欠款，實際欠款集中在其他國家（見 ', jump('arrears', '「誰還沒繳」'), '）。'),
+    el('p', {class: 'label'}, '右側為結構試算，只表示「若這些國家延遲」的影響，不代表哪一國實際未繳；實際逐國繳款狀況見「誰還沒繳」。'),
     srcLine(B, [[f.id, f.pages.ct, f.sym + ' 分攤表']]), csvDl(B, [['h:contributions_by_fund_2025-2028.csv', '三基金各締約方分攤']]));
   return card;
 }
@@ -1040,12 +1040,151 @@ function cfCard(B) {
         el('li', {}, '先用這條規則重算原表：k ＝ ' + nf(C.k0, 4) + '，' + C.checked + ' 個有聯合國比例的締約方，調整後比例（小數 3 位）與 2027、2028 年金額（±1 美元）全部與原表一致。'),
         el('li', {}, '加入美國（聯合國比例 ' + nf(C.us_un, 3) + '%），所有比例合計超過 100%，k 降為 ' + nf(C.k1, 4) + '；美國與中國都不再碰到 22% 上限。'),
         el('li', {}, '各國反事實分攤額 ＝ 反事實調整後比例（與原表相同，以未四捨五入的比例計算）× 各年應分攤總額（2027 年 ' + usd(C.net[0]) + '、2028 年 ' + usd(C.net[1]) + '），兩年相加。'),
-        el('li', {}, '多付比例約等於 ' + nf(C.k0, 4) + ' ÷ ' + nf(C.k1, 4) + ' − 1。它大於「把 78% 換算為 100%」的 28%，因為美國加入後歐盟仍固定 2.5%，其他國家的比例會略低於自己的聯合國比例。例外：中國原本被 22% 上限壓住，只多付約 ' + nf(cnX, 1) + '%；原表被壓在 0.01% 的低度開發國家多付很少；歐盟固定 2.5%，沒有差別。'))),
+        el('li', {}, '多付比例約等於 ' + nf(C.k0, 4) + ' ÷ ' + nf(C.k1, 4) + ' − 1。它大於「把 78% 換算為 100%」的 28%，主因是實際分攤表中中國被 22% 上限壓住（聯合國比例 20.004% 換算後會超過 22%），超出的部分由其他締約方分擔；美國加入後中國不再碰到上限，所以中國只多付約 ' + nf(cnX, 1) + '%。歐盟固定 2.5% 在兩種情境中大致相消，反而略為縮小差距；原表被壓在 0.01% 的低度開發國家多付很少；歐盟本身沒有差別。'))),
     el('p', {class: 'label'}, '只算公約一般信託基金：美國 1993 年簽署公約但未批准，兩項議定書都沒有簽署。假設預算總額不變；實際上美國加入可能改變預算談判本身。'),
     csvDl(B, [['h:counterfactual_us_convention_2027-2028.csv', '各締約方實際與反事實分攤']]),
     el('div', {class: 'src'}, '資料來源：', el('a', {href: '#' + f.id + '/p' + String(f.pages.ct).padStart(3, '0')}, f.sym + ' 分攤表 第 ' + f.pages.ct + ' 頁'), '；',
       el('a', {href: C.src, target: '_blank', rel: 'noopener'}, '聯合國大會第 79/249 號決議（美國 22.000%）↗'), '；',
       el('a', {href: 'https://www.cbd.int/information/parties.shtml', target: '_blank', rel: 'noopener'}, 'CBD 締約方名單 ↗')));
+  return card;
+}
+
+// ---- 誰還沒繳：核心基金逐國欠繳與自願基金捐款者（秘書處繳款狀況表） ----
+function arrearsCard(B) {
+  const A = B.arrears, card = el('section', {class: 'card', id: 'arrears'}), area = el('div', {class: 'chart'}), kp = el('div', {class: 'kpis'}), obs = el('div', {class: 'note', style: 'margin-top:10px'});
+  const ZH = {COP: '公約一般信託基金', CP: '卡塔赫納議定書', NP: '名古屋議定書'};
+  const fund = el('select', {'aria-label': '基金'}, ...Object.keys(A.core).map(k => el('option', {value: k}, ZH[k])));
+  const draw = () => {
+    const k = fund.value, f = A.core[k], fr = B.funds.find(x => x.key === k), nm = Object.fromEntries(fr.contrib.rows.map(r => [r.key, r.zh || r.en]));
+    const R = Object.entries(f.rows), n = R.length, ex = f.extra.reduce((s, e) => [s[0] + e[1], s[1] + e[2]], [0, 0]);
+    const ass = f.total[1] - ex[0], got = f.total[4] - ex[1], paid = R.filter(([, v]) => v[7] <= 0).length, pri = R.filter(([, v]) => v[6] > 0);
+    const sp = pri.reduce((s, [, v]) => s + v[6], 0), su = R.reduce((s, [, v]) => s + v[8], 0), two = R.filter(([, v]) => v[1] && v[6] >= 2 * v[1]).length;
+    const top = R.slice().sort((a, b) => b[1][8] - a[1][8]).slice(0, 15), t5 = R.slice().sort((a, b) => b[1][6] - a[1][6]).slice(0, 5), t5s = t5.reduce((s, [, v]) => s + v[6], 0);
+    kp.replaceChildren(
+      el('div', {class: 'kpi'}, el('div', {class: 'l'}, '2026 年分攤已收到'), el('div', {class: 'v'}, nf(got / ass * 100, 1) + '%'), el('div', {class: 'd'}, usd(got) + '／' + usd(ass) + '：2026 年內收到、用於 2026 年的款項，不含地主國額外捐助與 2025 年底已預繳的部分；計入預繳則已清償 ' + nf((ass - R.reduce((s, [, v]) => s + v[7], 0)) / ass * 100, 1) + '%')),
+      el('div', {class: 'kpi'}, el('div', {class: 'l'}, '2026 年分攤已繳清'), el('div', {class: 'v'}, paid + '／' + n), el('div', {class: 'd'}, nf(paid / n * 100, 1) + '% 的締約方')),
+      el('div', {class: 'kpi'}, el('div', {class: 'l'}, '仍欠 2025 年以前的分攤'), el('div', {class: 'v'}, pri.length + ' 國'), el('div', {class: 'd'}, '合計 ' + usd(sp) + '；未繳總額 ' + usd(su))));
+    const W = 880, lw = 210, bw = W - lw - 200, rh = 26, max = Math.max(...top.map(([, v]) => v[8]));
+    const svg = sv('svg', {viewBox: `0 0 ${W} ${top.length * rh + 6}`, role: 'group', 'aria-label': ZH[k] + '未繳分攤最多的締約方'});
+    top.forEach(([p, v], i) => {
+      const y = i * rh + 2, x = t => bw * t / max;
+      svg.append(sv('text', {x: lw - 8, y: y + rh / 2 + 4, 'text-anchor': 'end'}, fitText(nm[p] || p, lw - 12, 12)));
+      const a = sv('rect', {x: lw, y: y + 5, width: Math.max(v[6] ? 2 : 0, x(v[6])), height: rh - 10, rx: 3, fill: 'var(--s2)'});
+      const b = sv('rect', {x: lw + x(v[6]) + (v[6] ? 2 : 0), y: y + 5, width: Math.max(v[7] ? 2 : 0, x(v[7])), height: rh - 10, rx: 3, fill: 'var(--s1)'});
+      tipOn(a, () => [usd(v[6]), (nm[p] || p) + '：2025 年以前未繳', v[1] ? '約為 2026 年分攤的 ' + nf(v[6] / v[1], 1) + ' 倍' : '']);
+      tipOn(b, () => [usd(v[7]), (nm[p] || p) + '：2026 年未繳', '2026 年分攤 ' + usd(v[1])]);
+      svg.append(a, b, sv('text', {x: lw + x(v[8]) + 8, y: y + rh / 2 + 4, class: 'mut', 'font-size': 11}, nf(v[8], 0) + (v[1] && v[6] ? '（前期約 ' + nf(v[6] / v[1], 1) + ' 年分攤）' : '')));
+    });
+    area.replaceChildren(svg);
+    obs.replaceChildren(el('b', {}, '觀察：'), '欠繳高度集中：前期欠款最多的 5 國（' + t5.map(([p]) => nm[p] || p).join('、') + '）就占 2025 年以前未繳總額的 ' + nf(t5s / sp * 100, 1) + '%。',
+      '另有 ' + two + ' 國的前期未繳超過自己 2026 年分攤的兩倍；依決議草案，欠繳兩年以上者不得擔任主席團成員（L.31/Rev.1 第 20 段，低度開發國家與小島嶼開發中國家除外），但這個倍數只是估算，不等於正式的欠繳年數。');
+  };
+  fund.addEventListener('change', draw);
+  // 自願基金：依捐款者彙總 2026 年認捐
+  const vol = Object.entries(A.vol).map(([c, f]) => {
+    const by = {}; f.rows.forEach(r => { by[r.donor] = (by[r.donor] || 0) + r.v[1]; });
+    const list = Object.entries(by).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]), tot = f.total[1];
+    return el('div', {class: 'kpi'}, el('div', {class: 'l'}, {BE: '額外核定活動（BE）', BZ: '締約方參與（BZ）', VB: '原住民族與地方社區參與（VB）'}[c] + '：2026 年認捐'),
+      el('div', {class: 'v'}, usd(tot).replace(/（.*）/, '')), el('div', {class: 'd'}, list.length + ' 個捐款者；前三：' + list.slice(0, 3).map(([d, v]) => d + ' ' + nf(v / tot * 100, 0) + '%').join('、')));
+  });
+  const be = A.vol.BE.rows.filter(r => r.v[1] > 0);
+  card.append(el('h3', {}, '誰還沒繳：逐國欠繳與自願基金捐款者'),
+    el('p', {class: 'label'}, '秘書處公布的各信託基金繳款狀況，截至 ' + A.date + '（大會開幕前三天）；締約方數依此表（名古屋議定書 143 國，5 月的秘書處報告為 142 國）。分攤款在預算年度的 1 月 1 日到期，所以表中「2026 年未繳」與「2025 年以前未繳」都是逾期款。'),
+    el('div', {class: 'ctrl'}, fund), kp, unitNote('美元；橘色為 2025 年以前未繳、藍色為 2026 年未繳'), area,
+    legend([['var(--s2)', '2025 年以前未繳'], ['var(--s1)', '2026 年未繳']]), obs,
+    el('p', {class: 'label'}, '「前期約幾年分攤」以 2026 年分攤額估算；分攤比例逐期調整（例如委內瑞拉的分攤比例大幅下降），所以只是相對規模，不是實際欠繳年數。'),
+    el('h4', {style: 'margin:16px 0 6px'}, '自願基金靠誰（2026 年認捐）'), el('div', {class: 'kpis'}, ...vol),
+    el('details', {}, el('summary', {class: 'label', style: 'cursor:pointer'}, '額外核定活動基金（BE）2026 年各筆認捐與用途（原文）'),
+      el('div', {class: 'dtwrap', style: 'max-height:none'}, el('table', {class: 'dt'}, el('thead', {}, el('tr', {}, ...['捐款者', '2026 年認捐（美元）', '用途（原文）'].map((h, i) => el('th', {class: i !== 1 ? 't' : ''}, h)))),
+        el('tbody', {}, ...be.sort((a, b) => b.v[1] - a.v[1]).map(r => el('tr', {}, el('td', {class: 't'}, r.donor), el('td', {}, nf(r.v[1], 0)), el('td', {class: 't', lang: 'en'}, r.purpose)))))),
+      el('p', {class: 'label'}, '認捐幾乎都指定用途（特定會議、對話或倡議）；地主國亞美尼亞為主辦 COP 17 認捐的 2,166,855 美元也列在此基金。')),
+    csvDl(B, [['h:arrears_by_party_' + A.date + '.csv', '逐國欠繳'], ['h:voluntary_pledges_' + A.date + '.csv', '自願基金各筆認捐']]),
+    el('div', {class: 'src'}, '資料來源：', el('a', {href: A.url, target: '_blank', rel: 'noopener'}, 'CBD 秘書處行政與財務頁「Status of Contributions」（' + A.date + '）↗'), '；', el('a', {href: '#' + B.table1.id + '/p004'}, 'CBD/COP/17/L.31/Rev.1 第 16 段'), '、', el('a', {href: '#' + B.table1.id + '/p005'}, '第 20 段')));
+  draw();
+  return card;
+}
+
+// ---- 財務報表：各信託基金 2017–2025 年的資產組成、淨資產與收支（年度財務報表，掃描檔轉錄） ----
+function finCard(B) {
+  const F = B.fin, card = el('section', {class: 'card', id: 'fin'}), area = el('div', {class: 'chart'}), area2 = el('div', {class: 'chart'}), kp = el('div', {class: 'kpis'}), obs = el('div', {class: 'note', style: 'margin-top:10px'});
+  const NAME = {BY: '公約一般信託基金（BY）', BG: '卡塔赫納議定書核心基金（BG）', BB: '名古屋議定書核心基金（BB）', BE: '額外核定活動自願基金（BE）', BZ: '締約方參與自願基金（BZ）', VB: '原住民族與地方社區參與自願基金（VB）'};
+  const fund = el('select', {'aria-label': '基金'}, ...Object.entries(NAME).map(([k, z]) => el('option', {value: k}, z)));
+  const PARTS = [['cashinv', '現金及投資', 'var(--s1)'], ['recv', '應收款', 'var(--s4)'], ['advances', '預付款', 'var(--s5)'], ['ppe', '不動產、廠房及設備', 'var(--s2)'], ['other', '其他資產', 'var(--muted-fill)']];
+  const draw = () => {
+    const k = fund.value, ys = [...Array(9)].map((_, i) => 2017 + i), R = ys.map(y => F.rows[k + '-' + y] || null);
+    const parts = r => { const ci = (r.cash || 0) + (r.investments || 0), rv = (r.recv_assessed || 0) + (r.recv_voluntary || 0), a = r.advances || 0, p = r.ppe || 0;
+      return {cashinv: ci, recv: rv, advances: a, ppe: p, other: Math.max(0, (r.total_assets || 0) - ci - rv - a - p)}; };
+    const W = 880, H = 300, ml = 70, mb = 40, mt = 16, max = Math.max(...R.filter(Boolean).map(r => r.total_assets)) * 1.08;
+    const step = Math.pow(10, Math.floor(Math.log10(max / 4))), tk = Math.ceil(max / 5 / step) * step, yv = v => H - mb - (H - mb - mt) * v / max, bw = 52, cx = i => ml + 30 + i * ((W - ml - 50) / ys.length);
+    const svg = sv('svg', {viewBox: `0 0 ${W} ${H}`, role: 'group', 'aria-label': NAME[k] + '各年底資產組成與淨資產'});
+    for (let v = 0; v <= max; v += tk) svg.append(sv('line', {x1: ml, x2: W - 10, y1: yv(v), y2: yv(v), class: 'gl'}), sv('text', {x: ml - 6, y: yv(v) + 4, 'text-anchor': 'end', class: 'mut', 'font-size': 11}, nf(v / 1e6, v < 1e6 && v ? 2 : 1) + ' 百萬'));
+    R.forEach((r, i) => {
+      const x = cx(i);
+      svg.append(sv('text', {x: x + bw / 2, y: H - mb + 16, 'text-anchor': 'middle', 'font-size': 11}, String(ys[i])));
+      if (!r) { svg.append(sv('text', {x: x + bw / 2, y: yv(0) - 6, 'text-anchor': 'middle', class: 'mut', 'font-size': 10}, '未公布')); return; }
+      let base = 0; const pv = parts(r);
+      for (const [pk, z, c] of PARTS) {
+        const v = pv[pk]; if (v <= 0) continue;
+        const rect = sv('rect', {x, y: yv(base + v), width: bw, height: Math.max(1, yv(base) - yv(base + v)), fill: c, stroke: 'var(--panel)', 'stroke-width': 1});
+        tipOn(rect, () => [usd(v), ys[i] + ' 年底：' + z, NAME[k]]); svg.append(rect); base += v;
+      }
+      const na = sv('line', {x1: x - 6, x2: x + bw + 6, y1: yv(r.net_assets), y2: yv(r.net_assets), stroke: 'var(--ink)', 'stroke-width': 3});
+      tipOn(na, () => [usd(r.net_assets), ys[i] + ' 年底淨資產', '負債 ' + usd(r.liabilities)]); svg.append(na);
+    });
+    area.replaceChildren(svg);
+    // 收入與支出
+    const H2 = 200, max2 = Math.max(...R.filter(Boolean).flatMap(r => [r.revenue, r.expenses])) * 1.1, y2 = v => H2 - 30 - (H2 - 46) * v / max2, X = i => cx(i) + bw / 2;
+    const s2 = sv('svg', {viewBox: `0 0 ${W} ${H2}`, role: 'group', 'aria-label': NAME[k] + '各年收入與支出'});
+    const st2 = Math.pow(10, Math.floor(Math.log10(max2 / 3))), tk2 = Math.ceil(max2 / 4 / st2) * st2;
+    for (let v = 0; v <= max2; v += tk2) s2.append(sv('line', {x1: ml, x2: W - 10, y1: y2(v), y2: y2(v), class: 'gl'}), sv('text', {x: ml - 6, y: y2(v) + 4, 'text-anchor': 'end', class: 'mut', 'font-size': 11}, nf(v / 1e6, v < 1e6 && v ? 2 : 1) + ' 百萬'));
+    [['revenue', '收入', 'var(--s3)'], ['expenses', '支出', 'var(--s2)']].forEach(([key, z, c]) => {
+      let d = '', prev = null;
+      R.forEach((r, i) => { if (!r) { prev = null; return; } d += (prev === null ? 'M' : 'L') + X(i) + ',' + y2(r[key]); prev = i; });
+      s2.append(sv('path', {d, fill: 'none', stroke: c, 'stroke-width': 2}));
+      R.forEach((r, i) => { if (!r) return; const dot = sv('circle', {cx: X(i), cy: y2(r[key]), r: 4, fill: c}); tipOn(dot, () => [usd(r[key]), ys[i] + ' 年' + z, '本期盈餘 ' + usd(r.surplus)]); s2.append(dot); });
+    });
+    R.forEach((r, i) => s2.append(sv('text', {x: X(i), y: H2 - 10, 'text-anchor': 'middle', 'font-size': 11, class: 'mut'}, String(ys[i]))));
+    area2.replaceChildren(s2);
+    const last = R[8], prev = R[7], months = last.expenses ? last.net_assets / (last.expenses / 12) : null;
+    kp.replaceChildren(
+      el('div', {class: 'kpi'}, el('div', {class: 'l'}, '2025 年底淨資產'), el('div', {class: 'v'}, nf(last.net_assets / 1e6, 2) + ' 百萬美元'), el('div', {class: 'd'}, months ? '相當於 ' + nf(months, 1) + ' 個月的 2025 年支出' : '')),
+      el('div', {class: 'kpi'}, el('div', {class: 'l'}, '2025 年底現金及投資'), el('div', {class: 'v'}, nf(((last.cash || 0) + (last.investments || 0)) / 1e6, 2) + ' 百萬美元'), el('div', {class: 'd'}, '負債 ' + usd(last.liabilities))),
+      el('div', {class: 'kpi'}, el('div', {class: 'l'}, '2025 年收入／支出'), el('div', {class: 'v'}, nf(last.revenue / 1e6, 2) + '／' + nf(last.expenses / 1e6, 2)), el('div', {class: 'd'}, '百萬美元；本期盈餘 ' + usd(last.surplus))));
+    const T7 = {BY: [11.0, 2441.9], BG: [4.9, 508.7], BB: [2.3, 440.9]}, t = T7[k];
+    const msg = {
+      BY: '2025 年不動產、廠房及設備由 ' + usd(prev.ppe) + ' 增為 ' + usd(last.ppe) + '，負債同時由 ' + usd(prev.liabilities) + ' 增為 ' + usd(last.liabilities) + '（含非流動「其他負債」3,899,063 美元），全年折舊 ' + usd(last.depreciation) + '；報表未附說明，原因需向秘書處確認。年底淨資產 ' + usd(last.net_assets) + '，其中現金 ' + usd(last.cash) + '，其餘是應收款與設備扣除負債後的淨額。',
+      BE: '這是自願基金，但年底現金有 ' + usd(last.cash) + '，約為當年支出的 ' + nf(last.cash / last.expenses, 1) + ' 倍。這筆餘額包括多年期、指定用途的認捐（例如韓國 2026–2028 年的計畫，見「誰還沒繳」的 BE 明細），報表另列附條件安排負債 1,468,344 美元。依規則，自願基金的結餘須依捐款者同意的用途使用，或退還捐款者（CBD/COP/17/4/Add.5 第 4 段），所以不能自由調度；各筆餘額的用途與期限需逐一查核。',
+      BZ: '參與基金的收支隨大會年份大幅起伏（例如 2022 年支出 ' + usd(R[5].expenses) + '）；年底餘額主要是下一場會議的與會補助。',
+      VB: '規模很小；2021 年支出只有 ' + usd(R[4].expenses) + '。2023 年財務報表未公布。'}[k];
+    obs.replaceChildren(el('b', {}, '觀察：'), (t ? '2025 年底淨資產扣除週轉金準備 ' + nf(t[1]) + ' 千美元後為 ' + nf((last.net_assets / 1000 - t[1]) / 1000, 2) + ' 百萬美元，與秘書處報告 CBD/COP/17/3 表 7 的累積盈餘 ' + nf(t[0], 1) + ' 百萬美元一致。' : '') + (msg || ''));
+  };
+  fund.addEventListener('change', draw);
+  card.append(el('h3', {}, '財務報表：錢放在哪裡（2017–2025）'),
+    el('p', {class: 'label'}, '各信託基金的年度財務報表（由聯合國奈洛比辦事處預算與財務管理處簽署；聯合國採國際公共部門會計準則 IPSAS，見 L.31/Rev.1 第 17 段）。原檔是掃描影像，本站以兩種方法轉錄（逐列判讀與 OCR），逐段合計檢查並交叉比對，不一致處已對照原圖。'),
+    el('div', {class: 'ctrl'}, fund), kp, unitNote('美元；長條為年底資產組成，橫線為淨資產'), area,
+    legend([...PARTS.map(([, z, c]) => [c, z]), ['var(--ink)', '淨資產']]),
+    el('h4', {style: 'margin:12px 0 4px'}, '收入與支出'), area2, legend([['var(--s3)', '收入'], ['var(--s2)', '支出']]), obs,
+    el('details', {}, el('summary', {class: 'label', style: 'cursor:pointer'}, '原表不一致與轉錄說明'), el('ul', {style: 'margin:4px 0 0 18px;padding:0;line-height:1.7'}, ...F.source_issues.map(t => el('li', {}, t)))),
+    csvDl(B, [['h:fin_statements_2017-2025.csv', '各基金 2017–2025 財務報表主要項目']]),
+    el('div', {class: 'src'}, '資料來源：', el('a', {href: F.url, target: '_blank', rel: 'noopener'}, 'CBD 秘書處行政與財務頁「Financial Statements」↗'), '；', el('a', {href: 'https://www.cbd.int/doc/c/a398/e70d/efd2a290fb117738dfebd140/sbi-07-14-en.pdf#page=7', target: '_blank', rel: 'noopener'}, 'CBD/COP/17/3 表 6、表 7 ↗')));
+  draw();
+  return card;
+}
+
+// ---- 外部查核：聯合國審計委員會 2025 年對 UNEP 的報告中，有關 CBD 秘書處的發現 ----
+function auditCard() {
+  const U = 'https://www.cbd.int/admin-fin/audit/2025-audit-report-scbd-en.pdf', card = el('section', {class: 'card', id: 'audit'});
+  const li = (t, p) => el('li', {}, t, ' ', el('a', {href: U, target: '_blank', rel: 'noopener'}, '（第 ' + p + ' 段）'));
+  card.append(el('h3', {}, '外部查核：聯合國審計委員會怎麼說'),
+    el('p', {class: 'label'}, 'CBD 秘書處的帳由 UNEP 代管，納入 UNEP 的財務報表，由聯合國審計委員會查核。2025 年度的報告（A/81/5/Add.7，2026 年 7 月）中，審計委員會於 2025 年 10–11 月到蒙特婁查核秘書處，發現如下：'),
+    el('ul', {style: 'margin:4px 0 0 18px;padding:0;line-height:1.8'},
+      li('預付款長期未核銷：2025 年底，秘書處有 23 份協議的預付款尚未核銷，共 617,314.86 美元；抽查其中 6 份（290,000 美元），都已超過 6 年，原因是執行夥伴沒有繳交活動、財務或進度報告。', 36),
+      li('大會決議的工作缺錢：40 項決議下的 219 項工作中，106 項（48%）資源不足，資金缺口 1,436 萬美元，占總需求的 85%；應由自願捐助支應的 22 個職位有 20 個懸缺，秘書處以臨時人員或顧問替代。', 57),
+      li('與會補助不足：2025 年 10 月在巴拿馬舉行的兩場附屬機構會議，只能補助 92 個締約方各 1 名代表。', 58),
+      li('成果導向預算尚未落實：工作計畫的預期成果沒有基準值與目標值等可衡量指標。審計委員會建議在執行附屬機構第八次會議前訂出指標。', '29–31'),
+      li('建議秘書處與主席團檢討締約方參與基金的結構與規則，並在 BE 基金提供完整成本估算與預期捐款金額，以提高透明度；UNEP 與秘書處都已接受。', '61–62')),
+    el('div', {class: 'note', style: 'margin-top:10px'}, el('b', {}, '觀察：'), '外部查核的結論與本頁其他圖一致：核定的工作很多，但支撐它們的自願經費只到位約三成。長期未核銷的預付款顯示資金追蹤需要加強（第 36 段）；BE 自願基金帳上的餘額（見「財務報表」）是否都已有指定用途與期限，審計報告沒有評論，需逐筆查核。'),
+    el('div', {class: 'src'}, '資料來源：', el('a', {href: U, target: '_blank', rel: 'noopener'}, '聯合國審計委員會，UNEP 2025 年財務報告及審計報告（A/81/5/Add.7）↗'), '（CBD 秘書處行政與財務頁）'));
   return card;
 }
 
@@ -1378,6 +1517,10 @@ function partyCard(B, parts) {
       el('div', {class: 'dtwrap', style: 'max-height:none'}, el('table', {class: 'dt'},
         el('thead', {}, el('tr', {}, ...['基金', '聯合國分攤比例（%）', '調整後比例（%）', '2027（美元）', '2028（美元）', '2027–2028（美元）', '2025–2026（美元）', '增減（%）'].map(x => el('th', {}, x)))),
         el('tbody', {}, ...rows))), el('p', {class: 'label'}, '滑過金額可看新臺幣概估（' + fxNote() + '）。'),
+      B.arrears ? el('p', {class: 'label'}, '繳款狀況（截至 ' + B.arrears.date + '）：' + Object.entries(B.arrears.core).filter(([k, f]) => f.rows[key]).map(([k, f]) => {
+        const v = f.rows[key], z = {COP: '公約', CP: '卡塔赫納', NP: '名古屋'}[k];
+        return z + (v[8] > 0 ? '未繳 ' + nf(v[8], 0) + ' 美元' + (v[6] > 0 ? '（含 2025 年以前 ' + nf(v[6], 0) + '）' : '') : '已繳清' + (v[9] > 0 ? '並預繳 ' + nf(v[9], 0) + ' 美元' : ''));
+      }).join('；') + '。') : '',
       B.cf && B.cf.v[key] && f0r(key) ? el('p', {class: 'label'}, '反事實試算：若美國依聯合國比例分攤，' + n.zh + '在公約一般信託基金 2027–2028 年約付 ' + usd(B.cf.v[key][1]) + '，實際多付 ' + usd(f0r(key).v[4] - B.cf.v[key][1]) + '（' + nf((f0r(key).v[4] / B.cf.v[key][1] - 1) * 100, 1) + '%）。', el('a', {href: '#budget', onclick: e => { e.preventDefault(); document.getElementById('cf')?.scrollIntoView({behavior: 'smooth'}); }}, '說明')) : '',
       line ? el('div', {}, el('div', {class: 'label', style: 'margin-top:8px'}, '公約一般信託基金歷年分攤額（美元；2021、2022 年為暫行預算）'), el('div', {class: 'chart'}, line)) : '');
   };
