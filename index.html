@@ -448,7 +448,7 @@ function openBudget(parts) {
   document.body.classList.add('reading');
   $('#knav').classList.remove('on'); $('#bnav').classList.add('on');
   if (window.BUDGET && partyShow && parts?.[0] === 'party' && document.getElementById('party-card')) { partyShow(parts[1] || ''); document.getElementById('party-card').scrollIntoView(); return; }
-  const go = () => { renderBudget(parts || []); };
+  const go = () => { (parts?.[0] === 'taiwan' ? renderTaiwan : renderBudget)(parts || []); };
   if (window.BUDGET) return go();
   $('#main').replaceChildren(el('div', {class: 'empty'}, '載入中…'));
   const s = el('script', {src: 'data/budget.js'});
@@ -481,7 +481,7 @@ function renderBudget(parts) {
       'CP ' + F.CP.contrib.rows.length + '、NP ' + F.NP.contrib.rows.length + '（含歐盟）')),
     staffNow ? el('div', {class: 'kpi'}, el('div', {class: 'l'}, '秘書處核心預算員額'), el('div', {class: 'v'}, String(staffNow[2])), el('div', {class: 'd'}, '2025–2026 核定 ' + staffNow[1] + ' 個')) : null));
   if (kpiCsv) box.append(kpiCsv);
-  box.append(...[sankeyCard(B), rankCard(B), mapCard(B), trendCard(B), ...(B.status ? [statusCard(B)] : []), B.arrears ? arrearsCard(B) : null, ...(B.status ? [execCard(B)] : []), B.fin ? finCard(B) : null, B.fin ? auditCard() : null, lorenzCard(B), B.cf ? cfCard(B) : null, B.kmgbf ? kmgbfCard(B) : null, B.kmgbf && B.years?.['2027'] ? yerevanCard(B) : null, groupsCard(B), partyCard(B, parts), tableCard(B), footer()].filter(Boolean));
+  box.append(...[sankeyCard(B), rankCard(B), mapCard(B), trendCard(B), ...(B.status ? [statusCard(B)] : []), B.arrears ? arrearsCard(B) : null, ...(B.status ? [execCard(B)] : []), B.fin ? finCard(B) : null, B.fin ? auditCard() : null, lorenzCard(B), B.cf ? cfCard(B) : null, twLinkCard(), B.kmgbf ? kmgbfCard(B) : null, B.kmgbf && B.years?.['2027'] ? yerevanCard(B) : null, groupsCard(B), partyCard(B, parts), tableCard(B), footer()].filter(Boolean));
   $('#main').replaceChildren(box);
   if (parts[0] === 'party') document.getElementById('party-card')?.scrollIntoView();
   else $('#main').scrollTop = 0;
@@ -1277,6 +1277,121 @@ function groupsCard(B) {
     el('p', {class: 'label'}, '人力：合作與參與單位有 3 名 P-2，分別負責合作、性別與傳統知識（', el('a', {href: (s4 ? s4.url : '') + '#page=19', target: '_blank', rel: 'noopener'}, 'CBD/COP/17/4 第 80 段 ↗'), '），沒有負責青年的職位。2026 年額外核定活動基金的各筆認捐，用途說明沒有提到婦女、青年或性別。以上都是「視資源而定」的自願經費，部分條文仍在方括號內，以正式決議為準。'),
     el('div', {class: 'src'}, '資料來源：', el('a', {href: a2 ? a2.url : '#', target: '_blank', rel: 'noopener'}, 'CBD/COP/17/4/Add.2（2026-09-29）↗'), '；', ...docRef('6ac02bade811bc9bfc681810', 8, 'CBD/COP/17/4/Add.5 第 19 段', '19'), '；', el('a', {href: (s4 ? s4.url : '') + '#page=19', target: '_blank', rel: 'noopener'}, 'CBD/COP/17/4 第 80 段 ↗')));
   return card;
+}
+
+// ---- 臺灣分攤試算：如果臺灣是 CBD 締約方，依現行分攤規則要繳多少（獨立頁面 #budget/taiwan） ----
+// 分攤模型：各締約方聯合國比例 × 同一倍數 k，使合計 100%；上限 22%，原表被壓在 0.01% 的低度開發國家維持 0.01%，沒有聯合國比例者（歐盟）固定。
+// 先以同一規則重算原表；名古屋議定書的金額以小數 3 位的比例計算，其餘以未四捨五入的比例計算，取與原表吻合者
+function shareModel(f) {
+  const rows = f.contrib.rows, T = [2, 3].map(i => rows.reduce((s, r) => s + (r.v[i] || 0), 0)), un = rows.reduce((s, r) => s + (r.v[0] || 0), 0);
+  const ldc = new Set(rows.filter(r => r.v[0] && Math.abs(r.v[2] - T[0] * 1e-4) <= 1 && r.v[0] * 100 / un > 0.01).map(r => r.key));
+  const fixed = rows.filter(r => !r.v[0]).reduce((s, r) => s + r.v[1], 0), units = rows.filter(r => r.v[0]).map(r => [r.key, r.v[0]]);
+  const adjust = us => {
+    let lo = 0.1, hi = 3;
+    for (let i = 0; i < 100; i++) { const k = (lo + hi) / 2, t = fixed + us.reduce((s, [n, u]) => s + Math.min(k * u, ldc.has(n) ? 0.01 : 22), 0); if (t < 100) lo = k; else hi = k; }
+    const k = (lo + hi) / 2; return {k, a: Object.fromEntries(us.map(([n, u]) => [n, Math.min(k * u, ldc.has(n) ? 0.01 : 22)]))};
+  };
+  const base = adjust(units), miss = rnd => rows.filter(r => r.v[0] && [0, 1].some(i => Math.abs(T[i] * (rnd ? Math.round(base.a[r.key] * 1000) / 1000 : base.a[r.key]) / 100 - r.v[2 + i]) > 1.01)).length;
+  const m0 = miss(false), m1 = miss(true), rnd = m1 < m0, bad = Math.min(m0, m1);
+  const amt = s => [0, 1].map(i => Math.round(T[i] * (rnd ? Math.round(s * 1000) / 1000 : s) / 100));
+  const maxDiff = Math.max(0, ...rows.filter(r => r.v[0]).flatMap(r => amt(base.a[r.key]).map((a, i) => Math.abs(a - r.v[2 + i]))));
+  return {rows, T, units, adjust, base, rnd, bad, amt, maxDiff};
+}
+function twLinkCard() {
+  return el('section', {class: 'card', id: 'tw-link'}, el('h3', {}, '如果臺灣是締約方，要繳多少？'),
+    el('p', {class: 'label'}, '用本屆分攤規則試算臺灣加入公約與兩項議定書的分攤款，並對照臺灣自己的保育經費；附小測驗。'),
+    el('p', {}, el('a', {class: 'btn', href: '#budget/taiwan'}, '開啟試算與小測驗 →')));
+}
+function renderTaiwan() {
+  teardown();
+  const B = window.BUDGET, box = el('div', {class: 'doc'}), TW = B.tw || {}, fx = B.fx?.rate;
+  const M = Object.fromEntries(B.funds.map(f => [f.key, shareModel(f)])), cop = B.funds.find(f => f.key === 'COP');
+  const NAME = {COP: '生物多樣性公約', CP: '卡塔赫納生物安全議定書', NP: '名古屋議定書'};
+  const refs = ['Belgium', 'Sweden', 'Poland', 'Switzerland', 'Netherlands (Kingdom of the)'].map(n => cop.contrib.rows.find(r => r.en === n)).filter(Boolean);
+  const def = TW.un_rate ?? null, init = def ?? 0.8;
+  const rate = el('input', {type: 'range', min: '0.1', max: '2', step: '0.001', value: String(init), 'aria-label': '假設的聯合國分攤比例', style: 'width:100%'});
+  const rateOut = el('b', {style: 'font-size:28px'}), vol = el('input', {type: 'range', min: '0', max: '1000000', step: '10000', value: '0', 'aria-label': '自願捐款（美元）', style: 'width:100%'});
+  const chk = Object.fromEntries(Object.keys(NAME).map(k => [k, el('input', {type: 'checkbox', checked: '', 'aria-label': NAME[k]})]));
+  const kp = el('div', {class: 'kpis'}), area = el('div', {class: 'chart'}), detail = el('div'), volOut = el('div');
+  const tick = el('div', {class: 'ctrl', style: 'margin-top:6px'}, el('span', {class: 'label'}, '參考國的聯合國比例：'));
+  refs.forEach(r => tick.append(el('button', {class: 'chip', title: r.en + ' ' + r.v[0] + '%',
+    onclick: () => { rate.value = r.v[0]; draw(); }}, (r.zh || r.en).replace(/（.*）|王國/g, '') + ' ' + r.v[0])));
+  const ntd = v => fx ? nf(v * fx / 1e4, 0) + ' 萬元' : '';
+  const draw = () => {
+    const r = +rate.value; rateOut.textContent = nf(r, 3) + '%';
+    let tot = 0; const res = {};
+    for (const k of Object.keys(M)) {
+      if (!chk[k].checked) continue;
+      const m = M[k], X = m.adjust(m.units.concat([['__TW__', r]])), a = m.amt(X.a.__TW__);
+      res[k] = {share: X.a.__TW__, a, sum: a[0] + a[1], k0: m.base.k, k1: X.k}; tot += a[0] + a[1];
+    }
+    const per = TW.pop?.value ? tot / 2 * fx / TW.pop.value : null, core = 1891597e3;
+    const c = res.COP, rank = c ? cop.contrib.rows.filter(x => x.v[4] > c.sum).length + 1 : null;
+    kp.replaceChildren(
+      el('div', {class: 'kpi'}, el('div', {class: 'l'}, '兩年應繳分攤（2027–2028）'), el('div', {class: 'v'}, usd(tot).replace(/（.*）/, '')), el('div', {class: 'd'}, fx ? '約新臺幣 ' + ntd(tot) + '；每年約 ' + ntd(tot / 2) : '')),
+      el('div', {class: 'kpi'}, el('div', {class: 'l'}, '占臺灣核心保育經費'), el('div', {class: 'v'}, fx ? nf(tot / 2 * fx / core * 100, 2) + '%' : '—'), el('div', {class: 'd'}, '每年分攤 ÷ 115 年度六項核心保育計畫 18.92 億元')),
+      el('div', {class: 'kpi'}, el('div', {class: 'l'}, per != null ? '每人每年' : '公約基金排名'), el('div', {class: 'v'}, per != null ? '約 ' + nf(per, 2) + ' 元' : rank ? '第 ' + rank + ' 名' : '—'), el('div', {class: 'd'}, per != null ? '人口 ' + nf(TW.pop.value, 0) + '（' + TW.pop.date + '）' : rank ? '197 個締約方中（依公約基金兩年分攤額）' : '')));
+    detail.replaceChildren(el('div', {class: 'dtwrap', style: 'max-height:none'}, el('table', {class: 'dt'},
+      el('thead', {}, el('tr', {}, ...['條約', '臺灣的調整後比例', '2027 年', '2028 年', '兩年合計（美元）', '其他締約方少付'].map((h, i) => el('th', {class: i ? '' : 't'}, h)))),
+      el('tbody', {}, ...Object.entries(res).map(([k, x]) => el('tr', {}, el('td', {class: 't'}, NAME[k]), el('td', {}, nf(x.share, 3) + '%'), el('td', {}, nf(x.a[0], 0)), el('td', {}, nf(x.a[1], 0)), el('td', {}, nf(x.sum, 0)), el('td', {}, nf((1 - x.k1 / x.k0) * 100, 1) + '%')))))));
+    // 公約基金：臺灣與分攤額相近的締約方
+    if (c) {
+      const near = cop.contrib.rows.filter(x => x.v[4] > 0).map(x => ({n: x.zh || x.en, v: x.v[4]})).concat([{n: '臺灣（試算）', v: c.sum, tw: true}]).sort((a, b) => b.v - a.v);
+      const i = near.findIndex(x => x.tw), win = near.slice(Math.max(0, i - 5), i + 6), max = win[0].v, W = 880, lw = 190, bw = W - lw - 150, rh = 26;
+      const svg = sv('svg', {viewBox: `0 0 ${W} ${win.length * rh + 6}`, role: 'group', 'aria-label': '公約基金分攤額與臺灣相近的締約方'});
+      win.forEach((x, j) => { const y = j * rh + 3; svg.append(sv('text', {x: lw - 8, y: y + 17, 'text-anchor': 'end', style: x.tw ? 'font-weight:700' : ''}, x.n));
+        const b = sv('rect', {x: lw, y: y + 4, width: Math.max(2, bw * x.v / max), height: rh - 9, rx: 3, fill: x.tw ? 'var(--s2)' : 'var(--s1)'}); tipOn(b, () => [usd(x.v), x.n, '公約一般信託基金 2027–2028 合計']);
+        svg.append(b, sv('text', {x: lw + bw * x.v / max + 8, y: y + 17, class: 'mut', 'font-size': 12}, nf(x.v, 0))); });
+      area.replaceChildren(svg);
+    } else area.replaceChildren(el('p', {class: 'label'}, '勾選「生物多樣性公約」可看與臺灣分攤額相近的締約方。'));
+    const v = +vol.value, EQ = [['性別行動計畫能力建構工作坊（Add.2 第 11 頁）', 258318], ['合成生物學能力建構工作坊（Add.2 第 11 頁）', 316626], ['會前線上簡報（Add.2 第 18 頁）', 53110]];
+    volOut.replaceChildren(el('p', {class: 'label'}, '自願捐款 ' + usd(v) + (v ? '，相當於秘書處估算中的：' : '：拖動上方拉桿試試看。')),
+      v ? el('ul', {style: 'margin:4px 0 0 18px;padding:0;line-height:1.7'}, ...EQ.map(([t, c]) => el('li', {}, t + ' ' + usd(c).replace(/（.*）/, '') + ' → 約 ' + nf(v / c, 1) + ' 項'))) : '');
+  };
+  [rate, vol, ...Object.values(chk)].forEach(x => x.addEventListener('input', draw));
+  const ck = el('div', {class: 'ctrl', style: 'gap:16px'}, ...Object.keys(NAME).map(k => el('label', {style: 'display:flex;gap:6px;align-items:center'}, chk[k], NAME[k])));
+  const fundsOK = Object.entries(M).map(([k, m]) => NAME[k] + (m.bad ? ' ' + m.units.length + ' 列中 ' + (m.units.length - m.bad) + ' 列吻合，' + m.bad + ' 列差 ' + nf(m.maxDiff, 0) + ' 美元以內（原表這幾列的比例疑為捨去尾數）' : ' ' + m.units.length + ' 列全部吻合')).join('；');
+  // 小測驗
+  const QZ = [
+    ['美國是生物多樣性公約的締約方嗎？', ['是', '不是'], 1, '美國 1993 年簽署公約但沒有批准，兩項議定書也沒有簽署。所以美國的聯合國比例（22%）不在分攤表上，其他締約方的比例被放大。', ['https://www.cbd.int/information/parties.shtml', 'CBD 締約方名單 ↗']],
+    ['公約基金分攤最多的締約方付全部的幾 %？', ['9%', '22%', '35%'], 1, '中國的聯合國比例 20.004%，放大後超過 22%，被壓在 22% 上限。這個上限和聯合國分攤比例方法相同。', ['#' + cop.id + '/p013/Contribution%20table', 'L.31/Rev.1 分攤表']],
+    ['一定要是聯合國會員國才能成為 CBD 締約方嗎？', ['是', '不是'], 1, '庫克群島與紐埃都不在聯合國第 79/249 號決議的會員國分攤表中，卻是 CBD 締約方，各分攤最低的 0.001%（兩年 392 美元）。', ['#' + cop.id + '/p013/Contribution%20table', 'L.31/Rev.1 分攤表']],
+    ['締約方的分攤款什麼時候到期？', ['預算年度的 1 月 1 日', '大會開會時', '年底前'], 0, '分攤款在預算年度的 1 月 1 日到期；到 2026 年 10 月中，公約基金仍有 120 個締約方沒繳清當年分攤。', ['#' + cop.id + '/p004/16', 'L.31/Rev.1 第 16 段']],
+    ['欠繳分攤兩年以上的締約方會怎樣？', ['被取消締約方資格', '不能擔任主席團成員', '沒有任何影響'], 1, '欠繳兩年以上者不能擔任主席團成員，也不能提名遵約委員會成員；低度開發國家與小島嶼開發中國家除外。', ['#' + cop.id + '/p005/20', 'L.31/Rev.1 第 20 段']],
+    ['公約核心預算最大的一塊花在哪裡？', ['補助各國保育計畫', '人事費', '會議場地'], 1, '2027–2028 年人事費約占支出項目小計的 70.6%。核心預算是秘書處的協調經費，不會撥給各國做保育。', ['#' + B.table1.id + '/p008/Table%201', 'L.31/Rev.1 表 1']],
+    ['繳了分攤款，臺灣的保育成果會因此增加嗎？', ['會，錢會回到臺灣', '不會直接增加'], 1, '分攤款支付的是秘書處的治理成本。締約方得到的是權利（表決、擔任主席團成員、主辦會議、正式參與談判），也負有義務（國家報告、國家生物多樣性策略與行動計畫）；保育成果取決於國內投入。', ['#budget', '預算頁']]];
+  let score = 0, done = 0;
+  const qbox = el('div', {style: 'display:flex;flex-direction:column;gap:14px'}, ...QZ.map(([q, opts, ans, why, [href, lab]], qi) => {
+    const fb = el('div', {class: 'label', style: 'margin-top:4px'}), bs = opts.map((o, oi) => el('button', {class: 'chip', onclick: () => {
+      if (bs[0].disabled) return; bs.forEach((b, bi) => { b.disabled = true; if (bi === ans) b.classList.add('on'); });
+      done++; if (oi === ans) score++; fb.replaceChildren(el('b', {}, oi === ans ? '答對了。' : '正確答案是「' + opts[ans] + '」。'), why + ' ', el('a', {href, ...(href.startsWith('http') ? {target: '_blank', rel: 'noopener'} : {})}, lab));
+      qsum.textContent = '已答 ' + done + '／' + QZ.length + ' 題，答對 ' + score + ' 題';
+    }}, o));
+    return el('div', {style: 'border-top:1px solid var(--line);padding-top:10px'}, el('div', {style: 'font-weight:600'}, (qi + 1) + '. ' + q), el('div', {class: 'ctrl', style: 'margin-top:6px'}, ...bs), fb);
+  })), qsum = el('div', {class: 'label'}, '已答 0／' + QZ.length + ' 題');
+  box.append(el('div', {class: 'dhead'}, el('div', {class: 'label'}, el('a', {href: '#budget'}, '← 預算與分攤'), '　試算與小測驗'),
+      el('h2', {}, '如果臺灣是 CBD 締約方，要繳多少？'), el('p', {class: 'en', lang: 'en'}, 'If Taiwan were a Party to the CBD: a contribution simulator')),
+    el('section', {class: 'card'}, el('h3', {}, '先說明：這是試算，不是預測'),
+      el('p', {class: 'label'}, '成為締約方不一定要是聯合國會員國：庫克群島與紐埃都不在聯合國分攤表上，卻是 CBD 締約方。臺灣實際能否加入涉及國際法上的資格問題，本頁不討論，只用本屆決議草案的分攤規則試算金額：各締約方的聯合國分攤比例乘上同一倍數，使合計為 100%；上限 22%，低度開發國家上限 0.01%，歐盟固定 2.5%。臺灣加入後，所有比例重新計算。'),
+      el('p', {class: 'label'}, '模型檢查：先用同一規則重算原表——' + fundsOK + '。')),
+    el('section', {class: 'card'}, el('h3', {}, '1. 設定臺灣的聯合國分攤比例'),
+      el('p', {class: 'label'}, def != null ? '預設 ' + nf(def, 3) + '%：' + (TW.method || '') : '預設估算值待補（需 IMF 資料，見下方說明）；目前為示意值 0.8%。可拖動拉桿，或點所得規模相近國家的實際比例。'),
+      el('div', {style: 'display:flex;align-items:center;gap:12px'}, rateOut, el('span', {class: 'label'}, '假設的聯合國分攤比例')), rate, tick, ck),
+    el('section', {class: 'card'}, el('h3', {}, '2. 臺灣要繳多少'), kp, detail, unitNote('美元；公約基金與分攤額相近的締約方（橘色為臺灣試算）'), area,
+      el('p', {class: 'label'}, '「其他締約方少付」：臺灣加入後倍數下降，每個未碰到上限的締約方分攤比例都等比例下降。')),
+    el('section', {class: 'card'}, el('h3', {}, '3. 想多出一點：自願捐款能做什麼'), vol, volOut,
+      el('p', {class: 'label'}, '換算依據是秘書處估算 2027–2028 年交辦工作所需經費（CBD/COP/17/4/Add.2，含 13% 計畫支援費用）。實例：韓國認捐 16.5 億韓元（秘書處帳上 747,796 美元）支持 2026–2028 年的 Bio-Bridge 計畫（秘書處繳款狀況表，2026-10-16）。這些是秘書處的工作經費，不是保育成果。')),
+    el('section', {class: 'card'}, el('h3', {}, '4. 加入後得到什麼、要做什麼'),
+      el('ul', {style: 'margin:4px 0 0 18px;padding:0;line-height:1.8'},
+        el('li', {}, el('b', {}, '權利：'), '在締約方大會表決、擔任主席團成員、主辦會議、正式參與談判與文件起草。'),
+        el('li', {}, el('b', {}, '義務：'), '按時繳交分攤款（1 月 1 日到期）、提交國家報告、訂定國家生物多樣性策略與行動計畫；欠繳兩年以上不能擔任主席團成員。'),
+        el('li', {}, el('b', {}, '錢的去向：'), '分攤款支付秘書處的人事、會議與營運，不會撥回各國；保育成果取決於國內投入。臺灣 115 年度六項核心保育計畫合計約 18.92 億元。'))),
+    el('section', {class: 'card'}, el('h3', {}, '5. 小測驗'), qbox, qsum),
+    el('div', {class: 'src'}, '資料來源：', ...docRef(cop.id, 13, 'CBD/COP/17/L.31/Rev.1 分攤表', 'Contribution table'), '；', el('a', {href: B.cf?.src || '#', target: '_blank', rel: 'noopener'}, '聯合國大會第 79/249 號決議 ↗'),
+      '；臺灣核心保育經費：林保署、海保署、生多所、主計總處 115 年度預算', ...(TW.src ? ['；', ...TW.src.flatMap((s, i) => [i ? '、' : '', el('a', {href: s[1], target: '_blank', rel: 'noopener'}, s[0] + ' ↗')])] : [])),
+    footer());
+  draw();
+  $('#main').replaceChildren(box); $('#main').scrollTop = 0;
 }
 
 // ---- KMGBF 分類色（三大類＋長期目標＋跨目標／程序）：顏色依分類，不依排名 ----
