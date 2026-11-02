@@ -1,56 +1,388 @@
 {
  "rules": {
-  "natureStart": 30, "natureWin": 60, "natureProgress": 2, "natureAchieve": 3, "natureCoop": 1,
-  "fpicPenalty": 2, "jailTurns": 2, "bail": 2, "blockStake": 2, "roleScenarioChance": 0.6
+  "natureStart": 30,
+  "natureWin": 70,
+  "natureProgress": 1,
+  "natureAchieve": 3,
+  "natureCoop": 1,
+  "fpicPenalty": 2,
+  "jailTurns": 2,
+  "bail": 2,
+  "blockStake": 2,
+  "roleScenarioChance": 0.6
  },
  "squares": {
-  "T1T2":     {"name": "空間規劃與復育", "targets": ["T1", "T2"], "cost": {"m": 2, "k": 2}, "need": 2, "key": ["south", "iplc"], "fpic": true, "zone": "A"},
-  "T3":       {"name": "30×30", "targets": ["T3"], "cost": {"m": 2, "i": 1, "k": 1}, "need": 2, "key": ["iplc", "south"], "fpic": true, "zone": "A"},
-  "T4T5":     {"name": "物種救援與合法利用", "targets": ["T4", "T5"], "cost": {"m": 1, "k": 2}, "need": 2, "key": ["ngo", "south"], "zone": "A"},
-  "T6":       {"name": "入侵種減半", "targets": ["T6"], "cost": {"m": 2, "k": 1}, "need": 2, "key": ["ngo", "youth"], "zone": "A"},
-  "T7":       {"name": "污染減量", "targets": ["T7"], "cost": {"m": 2, "i": 1}, "need": 2, "key": ["north", "ngo"], "zone": "A"},
-  "T8":       {"name": "氣候與海洋", "targets": ["T8"], "cost": {"m": 1, "i": 1, "k": 1}, "need": 2, "key": ["youth", "south"], "zone": "A"},
-  "T9T10":    {"name": "永續利用與農林漁", "targets": ["T9", "T10"], "cost": {"m": 1, "i": 1, "k": 2}, "need": 2, "key": ["iplc", "women"], "zone": "B"},
-  "T11T12":   {"name": "自然的貢獻與城市綠藍空間", "targets": ["T11", "T12"], "cost": {"m": 1, "i": 1, "k": 1}, "need": 2, "key": ["youth", "women"], "zone": "B"},
-  "T13":      {"name": "利益分享", "targets": ["T13"], "cost": {"i": 2, "k": 1}, "need": 2, "key": ["iplc", "south"], "fpic": true, "zone": "B"},
-  "T14T15":   {"name": "主流化與企業揭露", "targets": ["T14", "T15"], "cost": {"m": 1, "i": 2}, "need": 2, "key": ["ngo", "north"], "zone": "C"},
-  "T16T17":   {"name": "永續消費與生物安全", "targets": ["T16", "T17"], "cost": {"m": 1, "i": 1, "k": 1}, "need": 2, "key": ["women", "youth"], "zone": "C"},
-  "T18":      {"name": "有害補貼改革", "targets": ["T18"], "cost": {"i": 3}, "need": 2, "key": ["north", "ngo"], "zone": "C"},
-  "T19T20":   {"name": "資金動員與能力建構", "targets": ["T19", "T20"], "cost": {"m": 3, "k": 1}, "need": 2, "key": ["north", "igo"], "zone": "C"},
-  "T21T22T23":{"name": "知識、參與與性別", "targets": ["T21", "T22", "T23"], "cost": {"i": 1, "k": 2}, "need": 2, "key": ["iplc", "women", "youth"], "fpic": true, "zone": "C"}
+  "T1T2": {
+   "name": "空間規劃與復育",
+   "targets": [
+    "T1",
+    "T2"
+   ],
+   "cost": {
+    "m": 2,
+    "k": 2
+   },
+   "need": 2,
+   "key": [
+    "south",
+    "iplc"
+   ],
+   "fpic": true,
+   "zone": "A"
+  },
+  "T3": {
+   "name": "30×30",
+   "targets": [
+    "T3"
+   ],
+   "cost": {
+    "m": 2,
+    "i": 1,
+    "k": 1
+   },
+   "need": 2,
+   "key": [
+    "iplc",
+    "south"
+   ],
+   "fpic": true,
+   "zone": "A"
+  },
+  "T4T5": {
+   "name": "物種救援與合法利用",
+   "targets": [
+    "T4",
+    "T5"
+   ],
+   "cost": {
+    "m": 1,
+    "k": 2
+   },
+   "need": 2,
+   "key": [
+    "ngo",
+    "south"
+   ],
+   "zone": "A"
+  },
+  "T6": {
+   "name": "入侵種減半",
+   "targets": [
+    "T6"
+   ],
+   "cost": {
+    "m": 2,
+    "k": 1
+   },
+   "need": 2,
+   "key": [
+    "ngo",
+    "youth"
+   ],
+   "zone": "A"
+  },
+  "T7": {
+   "name": "污染減量",
+   "targets": [
+    "T7"
+   ],
+   "cost": {
+    "m": 2,
+    "i": 1
+   },
+   "need": 2,
+   "key": [
+    "north",
+    "ngo"
+   ],
+   "zone": "A"
+  },
+  "T8": {
+   "name": "氣候與海洋",
+   "targets": [
+    "T8"
+   ],
+   "cost": {
+    "m": 1,
+    "i": 1,
+    "k": 1
+   },
+   "need": 2,
+   "key": [
+    "youth",
+    "south"
+   ],
+   "zone": "A"
+  },
+  "T9T10": {
+   "name": "永續利用與農林漁",
+   "targets": [
+    "T9",
+    "T10"
+   ],
+   "cost": {
+    "m": 1,
+    "i": 1,
+    "k": 2
+   },
+   "need": 2,
+   "key": [
+    "iplc",
+    "women"
+   ],
+   "zone": "B"
+  },
+  "T11T12": {
+   "name": "自然的貢獻與城市綠藍空間",
+   "targets": [
+    "T11",
+    "T12"
+   ],
+   "cost": {
+    "m": 1,
+    "i": 1,
+    "k": 1
+   },
+   "need": 2,
+   "key": [
+    "youth",
+    "women"
+   ],
+   "zone": "B"
+  },
+  "T13": {
+   "name": "利益分享",
+   "targets": [
+    "T13"
+   ],
+   "cost": {
+    "i": 2,
+    "k": 1
+   },
+   "need": 2,
+   "key": [
+    "iplc",
+    "south"
+   ],
+   "fpic": true,
+   "zone": "B"
+  },
+  "T14T15": {
+   "name": "主流化與企業揭露",
+   "targets": [
+    "T14",
+    "T15"
+   ],
+   "cost": {
+    "m": 1,
+    "i": 2
+   },
+   "need": 2,
+   "key": [
+    "ngo",
+    "north"
+   ],
+   "zone": "C"
+  },
+  "T16T17": {
+   "name": "永續消費與生物安全",
+   "targets": [
+    "T16",
+    "T17"
+   ],
+   "cost": {
+    "m": 1,
+    "i": 1,
+    "k": 1
+   },
+   "need": 2,
+   "key": [
+    "women",
+    "youth"
+   ],
+   "zone": "C"
+  },
+  "T18": {
+   "name": "有害補貼改革",
+   "targets": [
+    "T18"
+   ],
+   "cost": {
+    "i": 3
+   },
+   "need": 2,
+   "key": [
+    "north",
+    "ngo"
+   ],
+   "zone": "C"
+  },
+  "T19T20": {
+   "name": "資金動員與能力建構",
+   "targets": [
+    "T19",
+    "T20"
+   ],
+   "cost": {
+    "m": 3,
+    "k": 1
+   },
+   "need": 2,
+   "key": [
+    "north",
+    "igo"
+   ],
+   "zone": "C"
+  },
+  "T21T22T23": {
+   "name": "知識、參與與性別",
+   "targets": [
+    "T21",
+    "T22",
+    "T23"
+   ],
+   "cost": {
+    "i": 1,
+    "k": 2
+   },
+   "need": 2,
+   "key": [
+    "iplc",
+    "women",
+    "youth"
+   ],
+   "fpic": true,
+   "zone": "C"
+  }
  },
  "board": [
-  {"type": "start", "name": "年度預算"},
-  {"type": "target", "sq": "T1T2"},
-  {"type": "scenario", "name": "情境題"},
-  {"type": "target", "sq": "T3"},
-  {"type": "fund", "fund": "gef"},
-  {"type": "target", "sq": "T4T5"},
-  {"type": "crisis", "name": "危機"},
-  {"type": "target", "sq": "T6"},
-  {"type": "jail", "name": "方括號"},
-  {"type": "target", "sq": "T7"},
-  {"type": "scenario", "name": "情境題"},
-  {"type": "fund", "fund": "bilateral"},
-  {"type": "target", "sq": "T8"},
-  {"type": "target", "sq": "T9T10"},
-  {"type": "crisis", "name": "危機"},
-  {"type": "target", "sq": "T11T12"},
-  {"type": "plenary", "name": "凌晨四點的全會"},
-  {"type": "target", "sq": "T13"},
-  {"type": "scenario", "name": "情境題"},
-  {"type": "fund", "fund": "cali"},
-  {"type": "target", "sq": "T14T15"},
-  {"type": "scenario", "name": "情境題"},
-  {"type": "fund", "fund": "philanthropy"},
-  {"type": "target", "sq": "T16T17"},
-  {"type": "gojail", "name": "送進接觸小組"},
-  {"type": "target", "sq": "T18"},
-  {"type": "crisis", "name": "危機"},
-  {"type": "fund", "fund": "gbff"},
-  {"type": "target", "sq": "T19T20"},
-  {"type": "scenario", "name": "情境題"},
-  {"type": "fund", "fund": "debt"},
-  {"type": "target", "sq": "T21T22T23"}
+  {
+   "type": "start",
+   "name": "年度預算"
+  },
+  {
+   "type": "target",
+   "sq": "T1T2"
+  },
+  {
+   "type": "scenario",
+   "name": "情境題"
+  },
+  {
+   "type": "target",
+   "sq": "T3"
+  },
+  {
+   "type": "fund",
+   "fund": "gef"
+  },
+  {
+   "type": "target",
+   "sq": "T4T5"
+  },
+  {
+   "type": "crisis",
+   "name": "危機"
+  },
+  {
+   "type": "target",
+   "sq": "T6"
+  },
+  {
+   "type": "jail",
+   "name": "方括號"
+  },
+  {
+   "type": "target",
+   "sq": "T7"
+  },
+  {
+   "type": "scenario",
+   "name": "情境題"
+  },
+  {
+   "type": "fund",
+   "fund": "bilateral"
+  },
+  {
+   "type": "target",
+   "sq": "T8"
+  },
+  {
+   "type": "target",
+   "sq": "T9T10"
+  },
+  {
+   "type": "crisis",
+   "name": "危機"
+  },
+  {
+   "type": "target",
+   "sq": "T11T12"
+  },
+  {
+   "type": "plenary",
+   "name": "凌晨四點的全會"
+  },
+  {
+   "type": "target",
+   "sq": "T13"
+  },
+  {
+   "type": "scenario",
+   "name": "情境題"
+  },
+  {
+   "type": "fund",
+   "fund": "cali"
+  },
+  {
+   "type": "target",
+   "sq": "T14T15"
+  },
+  {
+   "type": "scenario",
+   "name": "情境題"
+  },
+  {
+   "type": "fund",
+   "fund": "philanthropy"
+  },
+  {
+   "type": "target",
+   "sq": "T16T17"
+  },
+  {
+   "type": "gojail",
+   "name": "送進接觸小組"
+  },
+  {
+   "type": "target",
+   "sq": "T18"
+  },
+  {
+   "type": "crisis",
+   "name": "危機"
+  },
+  {
+   "type": "fund",
+   "fund": "gbff"
+  },
+  {
+   "type": "target",
+   "sq": "T19T20"
+  },
+  {
+   "type": "scenario",
+   "name": "情境題"
+  },
+  {
+   "type": "fund",
+   "fund": "debt"
+  },
+  {
+   "type": "target",
+   "sq": "T21T22T23"
+  }
  ]
 }

@@ -20,15 +20,16 @@ function shuffle(S, a) {
 const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
 
 export const MODES = {
-  standard: { years: [2026, 2030], roundsPerYear: 3 },
-  quick: { years: [2028, 2030], roundsPerYear: 2 },
+  standard: { years: [2026, 2030], turnsPerYear: 12 },
+  quick: { years: [2028, 2030], turnsPerYear: 8, natureBonus: 18 },   // 快速模式從 2028 年開始，前兩年已有進展
 };
 
 export function newGame(D, { roles, ai = [], names = [], mode = "standard", seed = 1 }) {
   const M = MODES[mode];
   const S = {
     v: 1, mode, seed: seed >>> 0, round: 0, turn: 0, cur: 0,
-    year: M.years[0], nature: D.rules.natureStart, over: false,
+    rpy: Math.max(1, Math.round(M.turnsPerYear / roles.length)),   // 每年輪數依人數調整，讓總回合數接近固定
+    year: M.years[0], nature: D.rules.natureStart + (M.natureBonus || 0), over: false,
     players: roles.map((r, n) => {
       const R = D.roles[r];
       return {
@@ -89,6 +90,12 @@ function apply(S, D, pi, fx, why) {
   if (fx.nature) addNature(S, D, fx.nature, why);
   if (fx.prog) for (const [sq, n] of Object.entries(fx.prog)) progress(S, D, sq, n, [pi], why);
   if (fx.delayed) { p.delayed.push({ ...fx.delayed, at: p.lap + (fx.delayed.laps || 1) }); emit(S, { t: "delayed", p: pi, d: fx.delayed }); }
+  if (fx.pool) for (const [k, n] of Object.entries(fx.pool)) { S.pools[k] = (S.pools[k] || 0) + n; emit(S, { t: "pool", fund: k, n }); }
+  if (fx.toPoorest) {
+    let best = -1, bt = 1e9;
+    S.players.forEach((q, n) => { const t = RES.reduce((s, r) => s + q.res[r], 0); if (n !== pi && t < bt) { bt = t; best = n; } });
+    if (best >= 0) { pay(S.players[best], fx.toPoorest, +1); p.st.given += RES.reduce((s, r) => s + (fx.toPoorest[r] || 0), 0); emit(S, { t: "res", p: best, d: fx.toPoorest, why }); }
+  }
   if (fx.jail) toJail(S, D, pi);
   if (fx.rule) { S.rules[fx.rule] = (S.rules[fx.rule] || 0) + (fx.ruleRounds || 6); emit(S, { t: "rule", rule: fx.rule }); }
 }
@@ -114,7 +121,7 @@ function toJail(S, D, pi) {
 // ---------- 待決事項：pool（資源池）是共用機制 ----------
 // 目標投資、基金背書、危機應變、救出方括號都用同一種：列出要填的格子，任何玩家都能把自己的資源放進去。
 function openPool(S, D, kind, spec) {
-  S.pending = { t: "pool", kind, p: S.cur, slots: spec.slots.map((s) => ({ ...s, by: null })), ...spec };
+  S.pending = { t: "pool", kind, p: S.cur, ...spec, slots: spec.slots.map((s) => ({ ...s, by: null })) };
 }
 export function poolNeed(pd) { return pd.slots.filter((s) => s.by === null).length; }
 export function canFill(S, D, pd, pi, si) {
@@ -176,7 +183,8 @@ const H = {
     if (o.cost) pay(P(S), o.cost);
     emit(S, { t: "chose", p: S.cur, card: pd.card, kind: pd.kind, i: a.i, label: o.label, result: o.result });
     apply(S, D, S.cur, o.fx, pd.title);
-    if (o.next) return o.next === "fund" ? fundApply(S, D, pd.fund) : null;
+    if (o.next === "fund") return fundApply(S, D, pd.fund);
+    if (o.next === "ask") return askAid(S, D, pd.fund, o);
     S.pending = { t: "ack", p: S.cur, card: pd.card, kind: pd.kind, title: pd.title, result: o.result, know: pd.know, then: "end" };
   },
   pool(S, D, pd, a) {
@@ -242,6 +250,10 @@ function land(S, D) {
     case "plenary": return drawPlenary(S, D);
   }
 }
+function withFallback(S, pd) {   // 每個選項都付不起時，補一個不用付費的選項，避免卡關
+  if (!pd.options.some((o) => !o.cost || canPay(S.players[pd.p], o.cost))) pd.options = [...pd.options, { label: "資源不足，只能旁觀", fx: {}, result: "這次你無能為力，只能看著事情發生。" }];
+  return pd;
+}
 function endTurnSoon(S, D, msg) { S.pending = { t: "ack", p: S.cur, kind: "info", title: msg, then: "end" }; }
 
 // ---------- 目標格（闖關） ----------
@@ -273,7 +285,7 @@ function landFund(S, D, fk) {
     opts.push(o);
   }
   if (!opts.length) opts.push({ label: "這個機制你不適用，參觀一下", fx: {}, result: f.notEligible || "你不符合申請資格。" });
-  S.pending = { t: "choose", p: S.cur, kind: "fund", fund: fk, card: fk, title: f.name, text: f.text, options: opts, know: f.know };
+  S.pending = withFallback(S, { t: "choose", p: S.cur, kind: "fund", fund: fk, card: fk, title: f.name, text: f.text, options: opts, know: f.know });
 }
 function fundApply(S, D, fk) {
   // 需要締約方背書（GEF／GBFF）：非締約方要找締約方玩家出 1 影響力
@@ -282,6 +294,16 @@ function fundApply(S, D, fk) {
   for (const r of RES) for (let n = 0; n < (f.applyCost?.[r] || 0); n++) slots.push({ r });
   if (!slots.length) return fundPay(S, D, fk);
   openPool(S, D, "fund", { fund: fk, slots, title: f.name + "：提案" });
+}
+function askAid(S, D, fk, o) {
+  const f = D.funds[fk];
+  if (hasRole(S, o.role) < 0) {   // 場上沒有出資國：擲骰
+    const n = 1 + Math.floor(rand(S) * 2);
+    apply(S, D, S.cur, { m: n }, f.name);
+    S.pending = { t: "ack", p: S.cur, kind: "fund", card: fk, title: f.name, result: `獲得 ${n} 💰 援助`, know: f.know, then: "end" };
+    return;
+  }
+  openPool(S, D, "ask", { fund: fk, slots: Array.from({ length: o.n }, () => ({ r: "m", role: o.role, notSelf: true })), title: "請求" + D.roles[o.role].name + "援助", partial: true });
 }
 function fundPay(S, D, fk) {
   const f = D.funds[fk], p = P(S), g = D.roles[p.role].group;
@@ -294,7 +316,11 @@ function fundPay(S, D, fk) {
     amt -= 1; S.players[igo].res.m += 1;
     emit(S, { t: "res", p: igo, d: { m: 1 }, why: "執行機構費" }); msg += `，其中 1 💰 為執行機構的執行機構費`;
   }
-  if (amt <= 0) msg = f.empty || "基金帳上沒錢了，提案只能排隊。";
+  if (f.halfTo && amt > 0) {      // 卡利基金：一半給原住民族與地方社區
+    const h = hasRole(S, f.halfTo), half = Math.ceil(amt / 2);
+    if (h >= 0 && h !== S.cur) { amt -= half; S.players[h].res.m += half; emit(S, { t: "res", p: h, d: { m: half }, why: f.name }); msg += `，其中 ${half} 💰 撥給原住民族與地方社區`; }
+  }
+  if (amt <= 0 && !msg.includes("撥給")) msg = f.empty || "基金帳上沒錢了，提案只能排隊。";
   else if (f.delay && !S.rules.fastTrack) { apply(S, D, S.cur, { delayed: { m: amt, laps: 1, why: f.name } }); msg += "；下次經過起點時撥款到位"; }
   else apply(S, D, S.cur, { m: amt }, f.name);
   S.pending = { t: "ack", p: S.cur, kind: "fund", card: fk, title: f.name, result: msg, know: f.know, then: "end" };
@@ -307,11 +333,11 @@ function drawScenario(S, D) {
   const deck = useRole ? mine : "sc_any";
   const id = deal(S, deck, () => Object.keys(D.scenarios).filter((x) => D.scenarios[x].role === (useRole ? p.role : "any")));
   const c = D.scenarios[id];
-  S.pending = { t: "choose", p: S.cur, kind: "scenario", card: id, title: c.title, text: c.text, options: c.options, know: c.know, targets: c.targets };
+  S.pending = withFallback(S, { t: "choose", p: S.cur, kind: "scenario", card: id, title: c.title, text: c.text, options: c.options, know: c.know, targets: c.targets });
 }
 function drawPlenary(S, D) {
   const id = deal(S, "plenary", () => Object.keys(D.plenary)), c = D.plenary[id];
-  if (c.options) { S.pending = { t: "choose", p: S.cur, kind: "plenary", card: id, title: c.title, text: c.text, options: c.options, know: c.know }; return; }
+  if (c.options) { S.pending = withFallback(S, { t: "choose", p: S.cur, kind: "plenary", card: id, title: c.title, text: c.text, options: c.options, know: c.know }); return; }
   apply(S, D, S.cur, c.fx, c.title);
   S.pending = { t: "ack", p: S.cur, kind: "plenary", card: id, title: c.title, result: c.text, know: c.know, then: "end" };
 }
@@ -352,6 +378,11 @@ function poolResolve(S, D, pd, ok) {
   if (pd.kind === "fund") {
     if (!doIt) return done("end", "提案沒有湊齊要件，撤回", { kind: "fund", title: D.funds[pd.fund].name });
     const end = fundPay(S, D, pd.fund); return end;
+  }
+  if (pd.kind === "ask") {
+    const f = D.funds[pd.fund], got = filled.length;
+    if (got) { S.players[S.cur].res.m += got; for (const w of who) S.players[w].res.i += 1; emit(S, { t: "res", p: S.cur, d: { m: got }, why: f.name }); }
+    return done("end", got ? `北方工業國提供 ${got} 💰 援助，換得 🤝+1` : "北方工業國表示：今年預算有困難。", { kind: "fund", card: pd.fund, title: f.name, know: f.know });
   }
   if (pd.kind === "rescue") {
     const p = P(S);
@@ -412,7 +443,7 @@ function endRound(S, D) {
   S.round++;
   for (const k of Object.keys(S.rules)) if (--S.rules[k] <= 0) delete S.rules[k];
   const M = MODES[S.mode];
-  if (S.round % M.roundsPerYear) { S.pending = { t: "roll", p: 0 }; return; }
+  if (S.round % S.rpy) { S.pending = { t: "roll", p: 0 }; return; }
   if (S.year >= M.years[1]) return finish(S, D);
   S.year++;
   emit(S, { t: "year", year: S.year });

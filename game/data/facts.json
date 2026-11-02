@@ -1,0 +1,845 @@
+{
+ "note": "每筆事實附英文原文引句，已以腳本核對引句出現在原文中。L 文件為會期中的決議草案。",
+ "facts": {
+  "f01": {
+   "zh": "目標 2：到 2030 年，至少 30% 已劣化的陸域、內陸水域及海洋與沿岸生態系面積要處於有效復育之中。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 2",
+   "quote": "Ensure that by 2030 at least 30 per cent of areas of degraded terrestrial, inland water, and marine and coastal ecosystems are under effective restoration",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f02": {
+   "zh": "目標 3（常稱「30x30」）：到 2030 年，至少 30% 的陸域與內陸水域，以及 30% 的海洋與沿岸區域，要獲得有效保育與管理。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 3",
+   "quote": "Ensure and enable that by 2030 at least 30 per cent of terrestrial and inland water areas, and of marine and coastal areas, especially areas of particular importance for biodiversity and ecosystem functions and services, are effectively conserved and managed",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f03": {
+   "zh": "目標 3 的保護區與保育共生地體系，在適用時要承認原住民族與傳統領域，並整合到更廣泛的地景、海景與海洋之中。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 3",
+   "quote": "recognizing indigenous and traditional territories, where applicable, and integrated into wider landscapes, seascapes and the ocean",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f04": {
+   "zh": "目標 3 要求承認並尊重原住民族與地方社區的權利，包括對其傳統領域的權利。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 3",
+   "quote": "recognizing and respecting the rights of indigenous peoples and local communities, including over their traditional territories.",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f05": {
+   "zh": "目標 6：到 2030 年，其他已知或潛在外來入侵種的引入與立足速率至少降低 50%，並在島嶼等優先地點根除或控制外來入侵種。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 6",
+   "quote": "reducing the rates of introduction and establishment of other known or potential invasive alien species by at least 50 per cent by 2030, and eradicating or controlling invasive alien species, especially in priority sites, such as islands.",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f06": {
+   "zh": "目標 7(a)：到 2030 年，流失到環境中的過量養分至少減半，包括透過更有效率的養分循環與利用。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 7 (a)",
+   "quote": "(a) by reducing excess nutrients lost to the environment by at least half, including through more efficient nutrient cycling and use;",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f07": {
+   "zh": "目標 7(b)：農藥與高度危害化學品的整體風險至少減半，包括透過以科學為基礎的整合性有害生物管理，並考量糧食安全與生計。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 7 (b)",
+   "quote": "(b) by reducing the overall risk from pesticides and highly hazardous chemicals by at least half, including through integrated pest management, based on science, taking into account food security and livelihoods;",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f08": {
+   "zh": "目標 7(c)：防止、減少並致力於消除塑膠污染。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 7 (c)",
+   "quote": "(c) by preventing, reducing, and working towards eliminating plastic pollution.",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f09": {
+   "zh": "目標 10：農業、水產養殖、漁業與林業要永續管理，包括大幅增加生物多樣性友善作法的應用，例如永續集約化、農業生態及其他創新方法。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 10",
+   "quote": "including through a substantial increase of the application of biodiversity friendly practices, such as sustainable intensification, agroecological and other innovative approaches",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f10": {
+   "zh": "目標 13：到 2030 年，依適用的國際取得與利益分享文書，促成分享的利益大幅增加。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 13",
+   "quote": "and by 2030, facilitating a significant increase of the benefits shared, in accordance with applicable international access and benefit-sharing instruments.",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f11": {
+   "zh": "目標 14（主流化）：逐步使所有相關公私部門活動，以及財政與金融流向，與綱要的目標與標的一致。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 14",
+   "quote": "progressively aligning all relevant public and private activities, and fiscal and financial flows with the goals and targets of this framework.",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f12": {
+   "zh": "目標 15(a)：大型與跨國企業及金融機構要定期監測、評估並透明揭露其對生物多樣性的風險、依賴與衝擊，範圍涵蓋營運、供應鏈與價值鏈及投資組合。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 15 (a)",
+   "quote": "(a) Regularly monitor, assess, and transparently disclose their risks, dependencies and impacts on biodiversity, including with requirements for all large as well as transnational companies and financial institutions along their operations, supply and value chains, and portfolios;",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f13": {
+   "zh": "目標 16：到 2030 年公平地減少全球消費足跡，包括將全球糧食浪費減半、大幅減少過度消費與廢棄物產生。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 16",
+   "quote": "and by 2030, reduce the global footprint of consumption in an equitable manner, including through halving global food waste, significantly reducing overconsumption and substantially reducing waste generation",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f14": {
+   "zh": "目標 18：有害生物多樣性的誘因（包括補貼）要在 2025 年前辨識出來，並從最有害的開始，到 2030 年每年至少減少 5,000 億美元。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 18",
+   "quote": "Identify by 2025, and eliminate, phase out or reform incentives, including subsidies, harmful for biodiversity, in a proportionate, just, fair, effective and equitable way, while substantially and progressively reducing them by at least $500 billion per year by 2030, starting with the most harmful incentives",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f15": {
+   "zh": "目標 19：為落實國家生物多樣性策略與行動計畫，到 2030 年每年要從所有來源動員至少 2,000 億美元。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 19",
+   "quote": "to implement national biodiversity strategies and action plans, mobilizing at least $200 billion per year by 2030",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f16": {
+   "zh": "目標 19(a)：提供給開發中國家（特別是低度開發國家、小島嶼開發中國家及經濟轉型國家）的生物多樣性相關國際財務資源，到 2025 年至少每年 200 億美元，到 2030 年至少每年 300 億美元。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 19 (a)",
+   "quote": "to developing countries, in particular the least developed countries and small island developing States, as well as countries with economies in transition, to at least $20 billion per year by 2025, and to at least $30 billion per year by 2030;",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f17": {
+   "zh": "目標 19(b)：大幅增加國內資源動員，並透過擬定與實施國家生物多樣性財務計畫或類似工具加以促進。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 19 (b)",
+   "quote": "(b) Significantly increasing domestic resource mobilization, facilitated by the preparation and implementation of national biodiversity finance plans or similar instruments according to national needs, priorities and circumstances;",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f18": {
+   "zh": "目標 19(d)：激勵創新財務機制，例如生態系服務給付、綠色債券、生物多樣性抵換與信用，以及利益分享機制，並須設有環境與社會保障措施。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 19 (d)",
+   "quote": "(d) Stimulating innovative schemes such as payment for ecosystem services, green bonds, biodiversity offsets and credits, and benefit-sharing mechanisms, with environmental and social safeguards;",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f19": {
+   "zh": "目標 19(f)：強化集體行動的角色，包括原住民族與地方社區的集體行動、以地球母親為中心的行動與非市場導向的方法。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 19 (f)",
+   "quote": "(f) Enhancing the role of collective actions, including by indigenous peoples and local communities, Mother Earth centric actions and non-market-based approaches",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f20": {
+   "zh": "目標 22：原住民族與地方社區參與生物多樣性決策時，其文化及其對土地、領域、資源與傳統知識的權利要受到尊重。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 22",
+   "quote": "respecting their cultures and their rights over lands, territories, resources, and traditional knowledge",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f21": {
+   "zh": "目標 22：婦女與女孩、兒童與青年及身心障礙者都要能充分參與生物多樣性決策，環境人權捍衛者也要獲得充分保護。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 22",
+   "quote": "as well as by women and girls, children and youth, and persons with disabilities and ensure the full protection of environmental human rights defenders.",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f22": {
+   "zh": "目標 23：透過具性別回應的方法確保綱要執行中的性別平等，讓所有婦女與女孩都有平等的機會與能力為公約三大目標做出貢獻。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Target 23",
+   "quote": "Ensure gender equality in the implementation of the Framework through a gender-responsive approach, where all women and girls have equal opportunity and capacity to contribute to the three objectives of the Convention",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f23": {
+   "zh": "長期目標 D：逐步縮小每年 7,000 億美元的生物多樣性資金缺口。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Goal D",
+   "quote": "progressively closing the biodiversity finance gap of $700 billion per year",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f24": {
+   "zh": "長期目標 A：遏止已知受威脅物種因人為造成的滅絕；到 2050 年，所有物種的滅絕速率與風險降低為十分之一。",
+   "sym": "CBD/COP/DEC/15/4",
+   "para": "Goal A",
+   "quote": "Human induced extinction of known threatened species is halted, and, by 2050, the extinction rate and risk of all species are reduced tenfold",
+   "url": "https://www.cbd.int/doc/decisions/cop-15/cop-15-dec-04-en.pdf",
+   "draft": false
+  },
+  "f25": {
+   "zh": "GEF 第八期（GEF-8）共分配 19.2 億美元給全球環境基金信託基金的生物多樣性重點領域，其中 14.5 億美元透過「透明資源分配制度」（STAR）分配給各國。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 5",
+   "quote": "For the GEF-8 period, a total of $1.92 billion was allocated to the Biodiversity Focal Area of the GEF Trust Fund, of which $1.45 billion is provided to countries through the System for Transparent Allocation of Resources (STAR) for biodiversity",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f26": {
+   "zh": "GEF-8 期間支持綱要的計畫共撬動 296.9 億美元的共同融資，其中 24.1 億美元來自私部門、130.5 億美元來自受援國政府；GEF 每投入 1 美元，約帶動 6.40 美元的共同融資。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 2",
+   "quote": "The corresponding GEF projects and programmes leveraged co-financing of $29.69 billion, including $2.41 billion from the private sector and $13.05 billion from recipient country governments, equivalent to a co-financing ratio of $6.40 for each dollar of GEF investment in the reporting period.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f27": {
+   "zh": "共有 144 個國家受惠於 GEF-8 核准、支持昆明－蒙特婁全球生物多樣性綱要的計畫。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 3",
+   "quote": "In total, 144 countries have benefited from GEF-8 approvals supporting the KMGBF.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f28": {
+   "zh": "報告期間，小島嶼開發中國家與低度開發國家合計獲得 GEF 支持總額的 41.6%。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 3",
+   "quote": "Together, small island developing States (SIDS) and least developed countries (LDCs) benefited from 41.6 percent of the total GEF support in the reporting period.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f29": {
+   "zh": "GEF 各基金中與生物多樣性相關的經費，有三分之一（33.3%）用於非洲。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 3",
+   "quote": "One third (33.3 percent) of the biodiversity-relevant funding programmed across funds and programming lines benefited Africa",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f30": {
+   "zh": "GEF-8 計畫預期對目標 3 的貢獻：22 億 4,730 萬公頃保育區域新設或改善管理，其中保護區 22 億 700 萬公頃、保育共生地（OECMs）4,020 萬公頃。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 4",
+   "quote": "2,247.3 million ha of conservation areas, including 2,207 million ha of protected areas and 40.2 million ha of other effective area-based conservation measures (OECM) created or under improved management.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f31": {
+   "zh": "GEF-8 計畫預期對目標 2 的貢獻：1,470 萬公頃的土地與生態系處於復育之中。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 4",
+   "quote": "14.7 million ha of land and ecosystems under restoration.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f32": {
+   "zh": "GEF-8 計畫預期讓 4,200 萬人從生物多樣性保育、永續利用或復育中受益，其中包括 2,090 萬名女性。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 4",
+   "quote": "42.0 million people benefitting from the conservation, sustainable use, or restoration of biodiversity, including 20.9 million women.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f33": {
+   "zh": "GEF 的一項總括計畫支持 98 個國家擬定國家生物多樣性財務計畫。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 7",
+   "quote": "supports 98 countries to develop national biodiversity finance plans.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f34": {
+   "zh": "GEF 支持更新國家生物多樣性策略與行動計畫（NBSAP）與撰寫第七次國家報告的總括計畫（2023 年 6 月核准）涵蓋 139 國；截至 2026 年 6 月 15 日，其中 57 國已提交 NBSAP，91 國已提交第七次國家報告。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 7",
+   "quote": "approved in June 2023, supports 139 countries. As of June 15, 2026, 57 have submitted their NBSAP and 91 have submitted their seventh National Report.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f35": {
+   "zh": "GEF 專門給原住民族與地方社區的第二期經費「保育之心倡議」（GEF-8 Heart of Conservation Initiative，GEF 出資 2,253 萬 5,780 美元）於 2024 年 12 月獲 GEF 理事會核准。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 9",
+   "quote": "The second tranche of the GEF’s dedicated funding for Indigenous Peoples and local communities (IPLC), the GEF-8 Heart of Conservation Initiative (GEF project financing: $22,535,780), was approved by the Council in December 2024.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f36": {
+   "zh": "GEF-8「保育之心倡議」（Heart of Conservation Initiative）公開徵件，收到 800 件申請，由原住民族領袖從中選出 10 個子計畫。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 9",
+   "quote": "An open call for subproject partner organizations resulted in ten subprojects were selected by Indigenous leaders out of the eight hundred applications received.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f37": {
+   "zh": "報告期間 GEF 核准 8 個直接貢獻綱要的混合融資計畫，包括在印尼、盧安達與馬達加斯加的 3 檔創新「生物多樣性成果債券」。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 12",
+   "quote": "Eight blended finance projects that make direct contributions to the KMGBF were approved during the reporting period, including three innovative biodiversity outcome bonds in Indonesia, Rwanda, and Madagascar",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f38": {
+   "zh": "在生物多樣性相關的混合融資計畫中，GEF 每投資 1 美元，可再撬動 16.60 美元。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 12",
+   "quote": "Each dollar of GEF investment in a biodiversity-related blended finance project leverages an additional $16.60.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f39": {
+   "zh": "GEF 小額贈款計畫（SGP）完成的 992 個生物多樣性計畫，改善了最多 154 處保護區與最多 260 處原住民族與地方社區保育地的管理，總面積最多 1,050 萬公頃。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 13",
+   "quote": "The 992 SGP biodiversity projects completed during this period improved the management of up to 154 protected areas and up to 260 IPLC conserved areas, covering a total of up to 10.5 million ha.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f40": {
+   "zh": "GEF 第九期增資（GEF-9，2026 年 7 月至 2030 年 6 月）由 21 個捐助方認捐，初始增資水準為 39 億美元。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 18",
+   "quote": "Pledges made by 21 donors resulted in an initial replenishment level in the amount of $3.90 billion for the period from July 1, 2026, to June 30, 2030.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f41": {
+   "zh": "GEF-9 總資源的 35% 分配給生物多樣性重點領域，生物多樣性仍是最大的重點領域。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 18",
+   "quote": "35 percent of the total GEF-9 resources are allocated to the Biodiversity Focal Area, which will remain the largest Focal Area.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f42": {
+   "zh": "全球生物多樣性綱要基金（GBFF）的由來：第 15 屆締約方大會請 GEF 設立一個專門且容易取得的基金，能從所有來源快速動員並撥付新的與額外的資源。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 14",
+   "quote": "CBD COP 15 requested the GEF to establish a dedicated and accessible fund that can quickly mobilize and disburse new and additional resources from all sources.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f43": {
+   "zh": "GBFF 自 2023 年 8 月啟動至 2026 年 6 月 30 日，共獲得 11 個國家政府與 1 個次國家政府簽署承諾的 3 億 8,720 萬美元。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 15",
+   "quote": "From its launch in August 2023 to June 30, 2026, the GBFF received $387.2 million in signed commitments from 11 sovereign and one subnational government.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f44": {
+   "zh": "GBFF 透過五輪競爭性遴選，共規劃 3 億 6,210 萬美元，支持 87 個國家，其中 47 國為小島嶼開發中國家與低度開發國家。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 15",
+   "quote": "These resources have been used to support projects in a competitive manner through five selection rounds, which programmed a total of $362.1 million across 87 countries, including 47 SIDS and LDCs.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f45": {
+   "zh": "截至 2026 年 6 月 30 日，已有 31 個準備完成的 GBFF 計畫（GBFF 出資 1 億 4,950 萬美元）獲 GEF 執行長核可，可以開始執行。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 15",
+   "quote": "as of June 30, 2026, 31 fully prepared GBFF projects (representing GBFF financing of $149.5 million) had been endorsed by the Chief Executive Officer (CEO), thereby clearing them for implementation.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f46": {
+   "zh": "GBFF 已規劃經費中有 31.8% 用於支持原住民族與地方社區的生物多樣性行動，超過 20% 的目標。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 16",
+   "quote": "31.8 percent of programmed GBFF financing was allocated to support actions by IPLCs for biodiversity, compared to a 20 percent target.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f47": {
+   "zh": "GBFF 經費有 38.8% 規劃給小島嶼開發中國家與低度開發國家，高於「36% 加 3%」的目標。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Executive summary, para 16",
+   "quote": "38.8 percent of GBFF funding was programmed to benefit SIDS and LDCs, compared to a target of 36 percent plus 3 percent",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f48": {
+   "zh": "第 16 屆大會決議 16/33 感謝奧地利、加拿大、丹麥、法國、德國、日本、盧森堡、紐西蘭、挪威、西班牙、英國及魁北克政府對 GBFF 的出資，當時合計約 3 億 8,200 萬美元。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "Section IV table, quoting decision 16/33 para 13",
+   "quote": "Notes with appreciation the contributions made to the capitalization of the Global Biodiversity Framework Fund by donor countries and other governments, namely, Austria, Canada, Denmark, France, Germany, Japan, Luxembourg, New Zealand, Norway, Spain, the United Kingdom of Great Britain and Northern Ireland and the government of Quebec, which amounted to about 382 million United States dollars",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f49": {
+   "zh": "GBFF 評估指出，18 個 GEF 執行機構中有 13 個至少執行一個 GBFF 計畫，機構參與相對多元。",
+   "sym": "CBD/COP/17/5/Add.1",
+   "para": "para 169 (evaluation of the GBFF)",
+   "quote": "Agency participation was relatively diversified, with 13 of 18 GEF Agencies implementing at least one project.",
+   "url": "https://www.cbd.int/doc/c/e0d0/f1a4/bcaf41ec98b1b49239b7dedb/cop-17-05-add1-en.pdf",
+   "draft": false
+  },
+  "f50": {
+   "zh": "第 17 屆締約方大會期間，德國、冰島、摩納哥、柏林市與魁北克省向 GBFF 認捐，合計約 6,000 萬美元。",
+   "sym": "CBD/COP/17/L.20",
+   "para": "para 2",
+   "quote": "Also welcomes the pledges made during the seventeenth meeting of the Conference of the Parties by Germany, Iceland, Monaco, the City of Berlin and the Province of Québec to the Global Biodiversity Framework Fund, which amounted to approximately 60 million dollars;",
+   "url": "https://www.cbd.int/doc/c/5cec/07bf/ef2c8178c4d96854011fc564/cop-17-l-20-en.pdf",
+   "draft": true
+  },
+  "f51": {
+   "zh": "決議草案肯定 GBFF 的角色：它補充 GEF 信託基金，提供合格的開發中國家締約方資金，以達成綱要的目標與標的。",
+   "sym": "CBD/COP/17/L.20",
+   "para": "para 15",
+   "quote": "Recognizes the value of the Global Biodiversity Framework Fund in complementing the Global Environment Facility Trust Fund by providing financial support to eligible developing country Parties for achieving the goals and targets of the Framework;",
+   "url": "https://www.cbd.int/doc/c/5cec/07bf/ef2c8178c4d96854011fc564/cop-17-l-20-en.pdf",
+   "draft": true
+  },
+  "f52": {
+   "zh": "決議草案也承認，許多合格締約方尚未獲得 GBFF 的支持。",
+   "sym": "CBD/COP/17/L.20",
+   "para": "para 18",
+   "quote": "while recognizing that many eligible Parties have not yet received support from the Fund",
+   "url": "https://www.cbd.int/doc/c/5cec/07bf/ef2c8178c4d96854011fc564/cop-17-l-20-en.pdf",
+   "draft": true
+  },
+  "f53": {
+   "zh": "決議草案請 GBFF 與其執行機構改善共同融資安排，同時承認共同融資並不是必要條件。",
+   "sym": "CBD/COP/17/L.20",
+   "para": "para 22 (b)",
+   "quote": "Improve co-financing arrangements, as appropriate, while recognizing that co-financing is not a requirement",
+   "url": "https://www.cbd.int/doc/c/5cec/07bf/ef2c8178c4d96854011fc564/cop-17-l-20-en.pdf",
+   "draft": true
+  },
+  "f54": {
+   "zh": "各參與國對 GEF 第九期增資的認捐，依議定的參考匯率計算約 44 億美元。",
+   "sym": "CBD/COP/17/L.20",
+   "para": "para 1",
+   "quote": "which amounted to approximately 4.4 billion United States dollars, using the agreed reference exchange rates for the replenishment period",
+   "url": "https://www.cbd.int/doc/c/5cec/07bf/ef2c8178c4d96854011fc564/cop-17-l-20-en.pdf",
+   "draft": true
+  },
+  "f55": {
+   "zh": "GEF 第九期增資談判結束時，金額比第八期減少 27%。",
+   "sym": "CBD/COP/17/L.20",
+   "para": "para 3",
+   "quote": "concluded with a reduction of 27 per cent compared with the eighth replenishment period",
+   "url": "https://www.cbd.int/doc/c/5cec/07bf/ef2c8178c4d96854011fc564/cop-17-l-20-en.pdf",
+   "draft": true
+  },
+  "f56": {
+   "zh": "之後追加的認捐，預估可將 GEF-9 相較 GEF-8 的減幅縮小到 17%；整個第九期仍開放新的或追加的認捐。",
+   "sym": "CBD/COP/17/L.20",
+   "para": "para 3",
+   "quote": "would indicatively bring the reduction down to 17 per cent, and the envelope remains open for new or additional pledges throughout the ninth replenishment cycle",
+   "url": "https://www.cbd.int/doc/c/5cec/07bf/ef2c8178c4d96854011fc564/cop-17-l-20-en.pdf",
+   "draft": true
+  },
+  "f57": {
+   "zh": "決議草案歡迎 GEF-9 將 35% 資源分配給生物多樣性重點領域（最大的重點領域），並以在該期間至少 70% 經費投入生物多樣性為目標。",
+   "sym": "CBD/COP/17/L.20",
+   "para": "para 9",
+   "quote": "Welcomes the allocation of 35 per cent of the ninth replenishment resources to the biodiversity focal area, which is the largest focal area, and the aim of committing at least 70 per cent of funding to biodiversity over that period",
+   "url": "https://www.cbd.int/doc/c/5cec/07bf/ef2c8178c4d96854011fc564/cop-17-l-20-en.pdf",
+   "draft": true
+  },
+  "f58": {
+   "zh": "GEF-9 設定期望目標：將 20% 的資源規劃用於支持原住民族與地方社區。",
+   "sym": "CBD/COP/17/L.20",
+   "para": "para 10",
+   "quote": "an aspirational target of programming 20 per cent of resources to support indigenous peoples and local communities",
+   "url": "https://www.cbd.int/doc/c/5cec/07bf/ef2c8178c4d96854011fc564/cop-17-l-20-en.pdf",
+   "draft": true
+  },
+  "f59": {
+   "zh": "GEF-9 加強支持低度開發國家與小島嶼開發中國家，對這些國家設定 35% 的期望基準。",
+   "sym": "CBD/COP/17/L.20",
+   "para": "para 10",
+   "quote": "strengthened support to least developed countries and small island developing States, with an aspirational benchmark of 35 per cent for those countries",
+   "url": "https://www.cbd.int/doc/c/5cec/07bf/ef2c8178c4d96854011fc564/cop-17-l-20-en.pdf",
+   "draft": true
+  },
+  "f60": {
+   "zh": "GEF-9 新設期望目標：將 25% 的資源規劃用於動員私人資本。",
+   "sym": "CBD/COP/17/L.20",
+   "para": "para 10",
+   "quote": "the introduction of the aspirational target of programming 25 per cent to mobilize private capital",
+   "url": "https://www.cbd.int/doc/c/5cec/07bf/ef2c8178c4d96854011fc564/cop-17-l-20-en.pdf",
+   "draft": true
+  },
+  "f61": {
+   "zh": "決議草案請 GEF 強化原住民族與地方社區、婦女與青年在計畫各階段（包括計畫決策）的有效參與。",
+   "sym": "CBD/COP/17/L.20",
+   "para": "para 13 (h)",
+   "quote": "Strengthening the effective participation of indigenous people and local communities, women and youth at all stages of the project cycle, including in project decision-making",
+   "url": "https://www.cbd.int/doc/c/5cec/07bf/ef2c8178c4d96854011fc564/cop-17-l-20-en.pdf",
+   "draft": true
+  },
+  "f62": {
+   "zh": "第 16 屆締約方大會（決議 16/2）通過運作方式，啟動「公平公正分享利用遺傳資源數位序列資訊（DSI）所產生利益的多邊機制」，其中包括卡利基金（Cali Fund）。",
+   "sym": "CBD/COP/17/6",
+   "para": "para 1",
+   "quote": "In its decision 16/2, the Conference of the Parties at its sixteenth meeting adopted modalities for operationalizing the Multilateral Mechanism for the Fair and Equitable Sharing of Benefits from the Use of Digital Sequence Information on Genetic Resources, including the Cali Fund",
+   "url": "https://www.cbd.int/doc/c/4187/5e9e/1c3f1df74338adafe25945e7/cop-17-06-en.pdf",
+   "draft": false
+  },
+  "f63": {
+   "zh": "卡利基金的指示性捐款率：私人企業利潤的 1%，或營收的 0.1%。",
+   "sym": "CBD/COP/17/6",
+   "para": "Draft decision, para 3",
+   "quote": "Reaffirms the expected contribution rates of 1 per cent of the profits or 0.1 per cent of the revenue of private entities, as indicative rates;",
+   "url": "https://www.cbd.int/doc/c/4187/5e9e/1c3f1df74338adafe25945e7/cop-17-06-en.pdf",
+   "draft": false
+  },
+  "f64": {
+   "zh": "在本國被歸類為中小企業者，不被預期須捐款給卡利基金，但鼓勵其捐款。",
+   "sym": "CBD/COP/17/6",
+   "para": "Draft decision, para 2",
+   "quote": "affirms that entities classified as small or medium-sized enterprises in their national jurisdiction are not expected to contribute to the Cali Fund but are encouraged to do so;",
+   "url": "https://www.cbd.int/doc/c/4187/5e9e/1c3f1df74338adafe25945e7/cop-17-06-en.pdf",
+   "draft": false
+  },
+  "f65": {
+   "zh": "決議草案敦促仰賴公開可取得 DSI 的私人企業，以捐款給卡利基金的方式分享利用 DSI 所產生的利益。",
+   "sym": "CBD/COP/17/6",
+   "para": "Draft decision, para 4",
+   "quote": "Urges private entities reliant on publicly available digital sequence information on genetic resources to share the benefits arising from its use by contributing to the Cali Fund;",
+   "url": "https://www.cbd.int/doc/c/4187/5e9e/1c3f1df74338adafe25945e7/cop-17-06-en.pdf",
+   "draft": false
+  },
+  "f66": {
+   "zh": "企業按指示性捐款率捐款，即可取得卡利基金證書。",
+   "sym": "CBD/COP/17/6",
+   "para": "Draft decision, para 5",
+   "quote": "Reaffirms that a contribution at the level of paragraph 3 above will entitle entities to a Cali Fund certificate;",
+   "url": "https://www.cbd.int/doc/c/4187/5e9e/1c3f1df74338adafe25945e7/cop-17-06-en.pdf",
+   "draft": false
+  },
+  "f67": {
+   "zh": "持有卡利基金證書者，在證書所屬年度內、於多邊機制範圍內使用 DSI，不被預期須再分享其他貨幣利益。",
+   "sym": "CBD/COP/17/6",
+   "para": "Draft decision, para 11",
+   "quote": "a holder of a Cali Fund certificate will not be expected to share further monetary benefits from the use of such information within the scope of the Multilateral Mechanism for the year to which the certificate relates",
+   "url": "https://www.cbd.int/doc/c/4187/5e9e/1c3f1df74338adafe25945e7/cop-17-06-en.pdf",
+   "draft": false
+  },
+  "f68": {
+   "zh": "捐款率研究估計：若所有被辨識出的企業都完全遵循，卡利基金每年可募得 36.5 億美元。",
+   "sym": "CBD/COP/17/6",
+   "para": "para 11",
+   "quote": "According to the study, full compliance by all identified companies would generate $3.65 billion annually.",
+   "url": "https://www.cbd.int/doc/c/4187/5e9e/1c3f1df74338adafe25945e7/cop-17-06-en.pdf",
+   "draft": false
+  },
+  "f69": {
+   "zh": "依產業參與程度、企業所有權結構與 DSI 使用強度調整後，研究的中位估計為每年 9 億 2,900 萬美元。",
+   "sym": "CBD/COP/17/6",
+   "para": "para 11",
+   "quote": "Adjustments for sector-level participation, company ownership structure and intensity of use of digital sequence information on genetic resources (simulating a product-based contribution calculation) resulted in a central estimate of $929 million annually.",
+   "url": "https://www.cbd.int/doc/c/4187/5e9e/1c3f1df74338adafe25945e7/cop-17-06-en.pdf",
+   "draft": false
+  },
+  "f70": {
+   "zh": "若參與率只和最相似的機制（糧食和農業植物遺傳資源國際條約的多邊取得與利益分享系統）相同，卡利基金每年只會收到 500 萬美元。",
+   "sym": "CBD/COP/17/6",
+   "para": "para 11",
+   "quote": "participation rate equivalent to that observed in the most similar financial mechanism to the Cali Fund, the Multilateral System of Access and Benefit-Sharing of the International Treaty on Plant Genetic Resources for Food and Agriculture, would result in contributions of $5 million annually",
+   "url": "https://www.cbd.int/doc/c/4187/5e9e/1c3f1df74338adafe25945e7/cop-17-06-en.pdf",
+   "draft": false
+  },
+  "f71": {
+   "zh": "研究顯示，製藥產業與少數幾個司法管轄區是否參與，會大幅影響卡利基金捐款的可預測性。",
+   "sym": "CBD/COP/17/6",
+   "para": "para 12",
+   "quote": "the study shows that the engagement of the pharmaceutical sector and a small number of jurisdictions significantly affects the predictability of contributions.",
+   "url": "https://www.cbd.int/doc/c/4187/5e9e/1c3f1df74338adafe25945e7/cop-17-06-en.pdf",
+   "draft": false
+  },
+  "f72": {
+   "zh": "卡利基金分配公式的第一步是「公平基數」：給締約方的經費有一半平均分給所有受援國政府，另一半再依各項準則計算分配。",
+   "sym": "CBD/COP/17/6",
+   "para": "para 18",
+   "quote": "An equity base was added as a first step to the formula, in order to distribute equally half the available funds of the funding stream for Parties to all recipient Governments, before the application of the criteria-based formula to the remaining half of the funds.",
+   "url": "https://www.cbd.int/doc/c/4187/5e9e/1c3f1df74338adafe25945e7/cop-17-06-en.pdf",
+   "draft": false
+  },
+  "f73": {
+   "zh": "分配方法專家小組提出四項準則：(a) 生物多樣性豐富度；(b) 公開資料庫中遺傳資源的地理來源；(c) 保育與永續利用生物多樣性的能力需求；(d) 與傳統知識及原住民族與地方社區相關的措施。",
+   "sym": "CBD/COP/17/6",
+   "para": "para 18",
+   "quote": "The four criteria identified by the Group are: (a) biodiversity richness; (b) geographic origin of the genetic resources in public databases; (c) capacity needs for the conservation and sustainable use of biodiversity; and (d) measures related to traditional knowledge and indigenous peoples and local communities.",
+   "url": "https://www.cbd.int/doc/c/4187/5e9e/1c3f1df74338adafe25945e7/cop-17-06-en.pdf",
+   "draft": false
+  },
+  "f74": {
+   "zh": "依決議 16/2，在適當且視國家情況下，卡利基金至少一半的經費應支持原住民族與地方社區自行認定的需求。",
+   "sym": "CBD/COP/17/6/Add.2",
+   "para": "para 8",
+   "quote": "Where appropriate, and subject to national circumstances, at least half of the funding of the Cali Fund should support the self-identified needs of indigenous peoples and local communities, as stated in paragraph 21 of the annex to decision 16/2.",
+   "url": "https://www.cbd.int/doc/c/162c/8e6d/9fc229844784245b1a2945b0/cop-17-06-add2-en.pdf",
+   "draft": false
+  },
+  "f75": {
+   "zh": "選項 1 的分配公式中，低度開發國家與小島嶼開發中國家可在公平基數上額外多得 25%。",
+   "sym": "CBD/COP/17/6/Add.2",
+   "para": "para 11 (c) (i)",
+   "quote": "least developed countries and small island developing States are given 25 per cent additional value of this base value",
+   "url": "https://www.cbd.int/doc/c/162c/8e6d/9fc229844784245b1a2945b0/cop-17-06-add2-en.pdf",
+   "draft": false
+  },
+  "f76": {
+   "zh": "在第 16 屆與第 17 屆締約方大會之間的兩年，卡利基金共收到兩筆捐款。",
+   "sym": "CBD/COP/17/6/Add.1",
+   "para": "para 19",
+   "quote": "The Cali Fund received two contributions in the biennium between the sixteenth and seventeenth meetings of the Conference of the Parties, as indicated in the table below.",
+   "url": "https://www.cbd.int/doc/c/6b87/3340/437ce3439ade2c65f4d8e296/cop-17-06-add1-en.pdf",
+   "draft": false
+  },
+  "f77": {
+   "zh": "截至 2026 年 9 月 15 日，卡利基金的捐款為 Prozomix Limited 5,000 美元、TierraViva AI Limited 1,000 美元，合計 6,000 美元。",
+   "sym": "CBD/COP/17/6/Add.1",
+   "para": "para 19, table: Contributions to the Cali Fund, as at 15 September 2026 (USD)",
+   "quote": "Prozomix Limited 5 000 5 000 TierraViva AI Limited 1 000 1 000 6 000 6 000",
+   "url": "https://www.cbd.int/doc/c/6b87/3340/437ce3439ade2c65f4d8e296/cop-17-06-add1-en.pdf",
+   "draft": false
+  },
+  "f78": {
+   "zh": "到目前為止，卡利基金尚未撥付任何分配款。",
+   "sym": "CBD/COP/17/6/Add.1",
+   "para": "para 20",
+   "quote": "The Cali Fund has disbursed no allocations to date.",
+   "url": "https://www.cbd.int/doc/c/6b87/3340/437ce3439ade2c65f4d8e296/cop-17-06-add1-en.pdf",
+   "draft": false
+  },
+  "f79": {
+   "zh": "指導委員會指出，卡利基金成立兩年後的資本化程度偏低。",
+   "sym": "CBD/COP/17/6/Add.1",
+   "para": "para 40",
+   "quote": "The level of capitalization of the Cali Fund after two years is low.",
+   "url": "https://www.cbd.int/doc/c/6b87/3340/437ce3439ade2c65f4d8e296/cop-17-06-add1-en.pdf",
+   "draft": false
+  },
+  "f80": {
+   "zh": "與其他基金不同，卡利基金沒有種子資金，目前也只有臨時秘書處。",
+   "sym": "CBD/COP/17/6/Add.1",
+   "para": "para 41",
+   "quote": "The Cali Fund, however, is different in that it lacks seed money and currently has an interim Secretariat.",
+   "url": "https://www.cbd.int/doc/c/6b87/3340/437ce3439ade2c65f4d8e296/cop-17-06-add1-en.pdf",
+   "draft": false
+  },
+  "f81": {
+   "zh": "卡利基金對金額 50 萬美元以上、期程三年以上的計畫，自動採用分期撥款。",
+   "sym": "CBD/COP/17/6/Add.1",
+   "para": "para 32",
+   "quote": "The tranche disbursement approach would automatically apply for all programmes of $500,000 or more and with a duration of three or more years",
+   "url": "https://www.cbd.int/doc/c/6b87/3340/437ce3439ade2c65f4d8e296/cop-17-06-add1-en.pdf",
+   "draft": false
+  },
+  "f82": {
+   "zh": "「卡利基金之友」是由英國與智利政府發起的締約方聯盟，承諾共同推動多邊機制與卡利基金的有效落實。",
+   "sym": "CBD/COP/17/6/Add.1",
+   "para": "para 37",
+   "quote": "a coalition of Parties launched by the Government of the United Kingdom of Great Britain and Northern Ireland and the Government of Chile to pledge collective commitment to promoting the effective implementation of the Multilateral Mechanism, including the Cali Fund",
+   "url": "https://www.cbd.int/doc/c/6b87/3340/437ce3439ade2c65f4d8e296/cop-17-06-add1-en.pdf",
+   "draft": false
+  },
+  "f83": {
+   "zh": "多邊機制指導委員會的原住民族與地方社區成員：第 17 屆大會後選出 3 位任半屆、4 位任完整一屆。",
+   "sym": "CBD/COP/17/6",
+   "para": "Annex II, rule 11, para 1 (b)",
+   "quote": "(b) Three members from indigenous peoples and local communities will be selected to serve for half a term, and four members from indigenous peoples and local communities will be selected to serve for a full term;",
+   "url": "https://www.cbd.int/doc/c/4187/5e9e/1c3f1df74338adafe25945e7/cop-17-06-en.pdf",
+   "draft": false
+  },
+  "f84": {
+   "zh": "締約方大會在決議 16/34 通過 2025–2030 年資源動員策略。",
+   "sym": "CBD/COP/17/5",
+   "para": "para 4",
+   "quote": "In its decision 16/34 (para. 7), the Conference of the Parties adopted the strategy for resource mobilization for the period 2025–2030",
+   "url": "https://www.cbd.int/doc/c/21fd/f14e/6facb9d3f14bfc4b14a6710e/cop-17-05-en.pdf",
+   "draft": false
+  },
+  "f85": {
+   "zh": "締約方大會在決議 16/34 決定，要在 2030 年前處理全球生物多樣性資金缺口，兩條路線為：(a) 建立公約第 21 條所設想的資金機制永久安排；(b) 評估並改善來自所有來源的資金動員。",
+   "sym": "CBD/COP/17/5",
+   "para": "para 4",
+   "quote": "address the global biodiversity finance gap by 2030 by (a) establishing the permanent arrangement for the financial mechanism envisioned under Article 21; and (b) assessing and improving the mobilization of finance from all sources.",
+   "url": "https://www.cbd.int/doc/c/21fd/f14e/6facb9d3f14bfc4b14a6710e/cop-17-05-en.pdf",
+   "draft": false
+  },
+  "f86": {
+   "zh": "秘書處委託的三份研究接受同儕審查：氣候資金研究收到 32 份審查意見、債務永續研究 30 份、保障措施研究 26 份。",
+   "sym": "CBD/COP/17/5",
+   "para": "para 9",
+   "quote": "a total of 32 reviews of the study related to climate finance, 30 reviews of the study related to debt sustainability and 26 reviews of the study related to safeguards were received",
+   "url": "https://www.cbd.int/doc/c/21fd/f14e/6facb9d3f14bfc4b14a6710e/cop-17-05-en.pdf",
+   "draft": false
+  },
+  "f87": {
+   "zh": "第 17 屆大會高階會議期間，規劃於 2026 年 10 月 27 日在葉里溫舉行財政部長與環境部長高階對話。",
+   "sym": "CBD/COP/17/5",
+   "para": "para 16",
+   "quote": "a high-level dialogue between ministers of finance and ministers of environment is planned to take place in Yerevan on 27 October 2026",
+   "url": "https://www.cbd.int/doc/c/21fd/f14e/6facb9d3f14bfc4b14a6710e/cop-17-05-en.pdf",
+   "draft": false
+  },
+  "f88": {
+   "zh": "資源動員決議草案指出，要達成目標 19，特別是其 (a) 款的國際資金數額，還需要更多努力。",
+   "sym": "CBD/COP/17/L.29",
+   "para": "para 3",
+   "quote": "Notes that further efforts are required to mobilize biodiversity-related financial flows to achieve Target 19 of the Framework, in particular its subparagraph (a);",
+   "url": "https://www.cbd.int/doc/c/bc7d/5890/a7b7b9584ddb107c95522a79/cop-17-l-29-en.pdf",
+   "draft": true
+  },
+  "f89": {
+   "zh": "部長諮商提案文字指出：公共國際生物多樣性資金目前只由少數國家與來源提供，若有更多締約方出資，可改善資金動員。",
+   "sym": "CBD/COP/17/L.29",
+   "para": "Preamble (proposal)",
+   "quote": "public international biodiversity finance is currently provided and mobilized by a limited number of countries and sources, and that contributions from more Parties would improve the mobilization of biodiversity finance",
+   "url": "https://www.cbd.int/doc/c/bc7d/5890/a7b7b9584ddb107c95522a79/cop-17-l-29-en.pdf",
+   "draft": true
+  },
+  "f90": {
+   "zh": "提案文字：通過公約第 21 條資金機制運作機構的組織架構準則。",
+   "sym": "CBD/COP/17/L.29",
+   "para": "para 4 (proposal)",
+   "quote": "Adopts the criteria for the institutional structure to operate the financial mechanism envisaged under Article 21 of the Convention",
+   "url": "https://www.cbd.int/doc/c/bc7d/5890/a7b7b9584ddb107c95522a79/cop-17-l-29-en.pdf",
+   "draft": true
+  },
+  "f91": {
+   "zh": "附屬執行機構將為第 18 屆大會準備決議要素：是設立新機構（單獨或與既有機構並行）來運作資金機制，或確認由既有機構擔任。",
+   "sym": "CBD/COP/17/L.29",
+   "para": "para 6 (b)",
+   "quote": "(b) Prepare elements of a draft decision, for consideration by the Conference of the Parties at its eighteenth meeting, either to establish a new entity to operate the financial mechanism, whether by itself or alongside an existing entity or entities, or to confirm an existing entity or entities in that role",
+   "url": "https://www.cbd.int/doc/c/bc7d/5890/a7b7b9584ddb107c95522a79/cop-17-l-29-en.pdf",
+   "draft": true
+  },
+  "f92": {
+   "zh": "草案（仍在括號內）擬委託研究：評估生物多樣性信用與抵換作為生物多樣性支出的概念與實務意義，以及它們是否真的為保育帶來額外性。",
+   "sym": "CBD/COP/17/L.29",
+   "para": "para 11 (b) (bracketed)",
+   "quote": "A study to evaluate the conceptual and practical relevance of biodiversity credits and offsets as a financial biodiversity-related expenditure, considering whether biodiversity credits and offsets generate additionality in biodiversity conservation",
+   "url": "https://www.cbd.int/doc/c/bc7d/5890/a7b7b9584ddb107c95522a79/cop-17-l-29-en.pdf",
+   "draft": true
+  },
+  "f93": {
+   "zh": "決議草案請各國自願評估以債務相關工具落實國家生物多樣性策略與行動計畫，並納入國家生物多樣性財務計畫，但不得增加附加條件或壓縮國家財政空間。",
+   "sym": "CBD/COP/17/L.29",
+   "para": "para 23 (b)",
+   "quote": "applying debt-related instruments to the implementation of national biodiversity strategies and action plans, and the way that such instruments could be addressed in national biodiversity finance plans or similar instruments and planning frameworks, without creating additional conditionalities or constraining national fiscal space",
+   "url": "https://www.cbd.int/doc/c/bc7d/5890/a7b7b9584ddb107c95522a79/cop-17-l-29-en.pdf",
+   "draft": true
+  },
+  "f94": {
+   "zh": "全球審查發現：在動員與追蹤私部門資金、正向誘因，以及削減有害補貼等方面，整體進展有限。",
+   "sym": "CBD/COP/17/L.15",
+   "para": "para 5 (c) (iii)",
+   "quote": "Collectively, limited progress has been made in mobilizing and tracking private sector finance and positive incentives and in reducing incentives, including subsidies, harmful to biodiversity;",
+   "url": "https://www.cbd.int/doc/c/a1ad/0628/41987af10d6a81059f6b3e90/cop-17-l-15-en.pdf",
+   "draft": true
+  },
+  "f95": {
+   "zh": "全球審查發現：與目標 6、12、15、16、18、19 對應的國家目標，最少被締約方自評為「進度符合」。",
+   "sym": "CBD/COP/17/L.15",
+   "para": "para 5 (b) (i)",
+   "quote": "national targets associated with Targets 6, 12, 15, 16, 18 and 19 were least frequently self-assessed by Parties as being on track",
+   "url": "https://www.cbd.int/doc/c/a1ad/0628/41987af10d6a81059f6b3e90/cop-17-l-15-en.pdf",
+   "draft": true
+  },
+  "f96": {
+   "zh": "共有 129 個締約方在 2026 年 3 月 8 日前及時提交國家報告，作為撰寫全球報告的依據。",
+   "sym": "CBD/COP/17/L.15",
+   "para": "Preamble",
+   "quote": "Recognizing that 129 Parties had submitted national reports in time for consideration in the preparation of the global report, that is, by 8 March 2026",
+   "url": "https://www.cbd.int/doc/c/a1ad/0628/41987af10d6a81059f6b3e90/cop-17-l-15-en.pdf",
+   "draft": true
+  },
+  "f97": {
+   "zh": "性別行動計畫是支持以性別回應方式落實綱要的主要工具。",
+   "sym": "CBD/COP/17/L.2",
+   "para": "para 2",
+   "quote": "Recognizes the role of the Gender Plan of Action as the primary instrument to support the gender-responsive implementation of the Kunming-Montreal Global Biodiversity Framework",
+   "url": "https://www.cbd.int/doc/c/f2cf/4092/2d2e2de285f783a1efe3df0d/cop-17-l-02-en.pdf",
+   "draft": true
+  },
+  "f98": {
+   "zh": "期中檢討決議草案鼓勵投入人力與財務資源，包括針對婦女主導的倡議提供支持，特別是原住民族與地方社區中的婦女倡議。",
+   "sym": "CBD/COP/17/L.2",
+   "para": "para 3 (d)",
+   "quote": "Promoting the allocation of adequate human and financial resources and strengthening institutional capacity for a rights-based gender-responsive implementation of the Plan of Action, including through targeted support for women-led initiatives, especially among indigenous peoples and local communities",
+   "url": "https://www.cbd.int/doc/c/f2cf/4092/2d2e2de285f783a1efe3df0d/cop-17-l-02-en.pdf",
+   "draft": true
+  },
+  "f99": {
+   "zh": "決議草案邀請 GEF 等國際金融機構改善資金取得程序，包括以簡化的取得方式支持婦女主導的倡議。",
+   "sym": "CBD/COP/17/L.2",
+   "para": "para 5",
+   "quote": "Invites relevant international financial institutions, including the Global Environment Facility, to support gender-responsive biodiversity actions and improve processes related to access to funding, including through simplified access modalities, for women-led initiatives",
+   "url": "https://www.cbd.int/doc/c/f2cf/4092/2d2e2de285f783a1efe3df0d/cop-17-l-02-en.pdf",
+   "draft": true
+  },
+  "f100": {
+   "zh": "秘書處將對性別行動計畫進行最終檢討，盤點每項目標與指示性行動的執行進展，供第 19 屆大會前的附屬執行機構會議審議。",
+   "sym": "CBD/COP/17/L.2",
+   "para": "para 6 (c)",
+   "quote": "To undertake a final review of the Gender Plan of Action by identifying progress in the implementation of each objective and indicative action identified therein, as well as lessons learned and next steps, for consideration by the Subsidiary Body on Implementation at a meeting held before the nineteenth meeting of the Conference of the Parties.",
+   "url": "https://www.cbd.int/doc/c/f2cf/4092/2d2e2de285f783a1efe3df0d/cop-17-l-02-en.pdf",
+   "draft": true
+  },
+  "f101": {
+   "zh": "全球審查發現：資訊與司法取得、土地與傳統知識等權利、環境人權捍衛者保護，以及具性別回應的生物多樣性治理，在各國國家目標中較少被反映。",
+   "sym": "CBD/COP/17/L.15",
+   "para": "para 5 (e) (iii)",
+   "quote": "issues related to the following were less well reflected in national targets: access to information and justice, rights over lands, territories, resources and traditional knowledge, and the protection of environmental human rights defenders or gender-responsive biodiversity governance",
+   "url": "https://www.cbd.int/doc/c/a1ad/0628/41987af10d6a81059f6b3e90/cop-17-l-15-en.pdf",
+   "draft": true
+  },
+  "f102": {
+   "zh": "「生物多樣性教育全球行動計畫」草案在擬定過程中，諮詢了原住民族與地方社區、婦女與青年代表，包括全球青年生物多樣性網絡（GYBN）。",
+   "sym": "CBD/COP/17/L.4",
+   "para": "Annex, para 1",
+   "quote": "the Executive Secretary prepared the global plan of action for education on biodiversity through a collaborative and participatory process involving consultations with Parties, observers, relevant organizations, indigenous peoples and local communities, and women and youth representatives, including the Global Youth Biodiversity Network.",
+   "url": "https://www.cbd.int/doc/c/8632/5cb1/e6d633b4e6b18b1d5af43d1f/cop-17-l-04-en.pdf",
+   "draft": true
+  },
+  "f103": {
+   "zh": "全球審查發現：原住民族與地方社區、婦女、青年與身心障礙者在參與落實綱要時，面臨資源、技術能力、資訊取得、有效參與與協調機制有限等挑戰。",
+   "sym": "CBD/COP/17/L.15",
+   "para": "para 5 (e) (i)",
+   "quote": "indigenous peoples and local communities, women, youth and persons with disabilities face challenges related to limited resources, technical capacities, access to information and knowledge, effective participation and coordination mechanisms",
+   "url": "https://www.cbd.int/doc/c/a1ad/0628/41987af10d6a81059f6b3e90/cop-17-l-15-en.pdf",
+   "draft": true
+  },
+  "f104": {
+   "zh": "秘書處估計，2027–2028 雙年期需要 65 萬 5,296 美元，以確保原住民族與地方社區能參與公約各項會議（原住民族與地方社區參與特別自願信託基金）。",
+   "sym": "CBD/COP/17/4",
+   "para": "para 22",
+   "quote": "With regard to the Special Voluntary Trust Fund for Facilitating the Participation of Indigenous Peoples and Local Communities, the Secretariat estimated that an amount of $655,296 would be required for the biennium 2027–2028 to ensure the participation of indigenous peoples and local communities",
+   "url": "https://www.cbd.int/doc/c/1184/2cd3/45b33416ff90ca3353c32b3e/sbi-07-15-en.pdf",
+   "draft": false
+  },
+  "f105": {
+   "zh": "最終預算決議草案中，原住民族與地方社區參與特別自願信託基金 2027–2028 年需求為小計 56 萬 5,000 美元，加 13% 計畫支援費用後共 63 萬 8,500 美元。",
+   "sym": "CBD/COP/17/L.31/Rev.1",
+   "para": "Table 7: Resource requirements for the Special Voluntary Trust Fund for Facilitating the Participation of Indigenous Peoples and Local Communities, 2027–2028 (thousands of USD)",
+   "quote": "Subtotal 565.0 Programme support costs (13 per cent) 73.5 Total costs 638.5",
+   "url": "https://www.cbd.int/doc/c/a50c/0dad/c87f478347bc7bec1b5e4278/cop-17-l-31-rev1-en.pdf",
+   "draft": true
+  }
+ }
+}
