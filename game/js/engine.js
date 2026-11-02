@@ -1,7 +1,7 @@
 // 30×30 大作戰：規則引擎。純邏輯、不碰 DOM，瀏覽器與 node 共用。
 // 狀態全部放在一個可 JSON 化的物件 S；UI 與電腦角色都只透過 pending（待決事項）＋ act() 推進遊戲。
+import { tr } from "./i18n.js";
 export const RES = ["m", "i", "k"];          // 資金、影響力、知識
-export const RES_ZH = { m: "資金", i: "影響力", k: "知識" };
 export const RES_ICON = { m: "💰", i: "🤝", k: "📚" };
 
 // mulberry32：亂數種子存在 S.seed，存檔後可重現
@@ -18,6 +18,7 @@ function shuffle(S, a) {
   return a;
 }
 const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+const T = (D, key, p) => tr(D.lang || "zh", key, p);   // 引擎產生的訊息依 D.lang 選語言
 
 export const MODES = {
   standard: { years: [2026, 2030], turnsPerYear: 12 },
@@ -106,7 +107,7 @@ function progress(S, D, sq, n, who, why) {
   for (const w of who) if (!S.contrib[sq].includes(w)) S.contrib[sq].push(w);
   addNature(S, D, D.rules.natureProgress * n, why || q.name);
   if (achieved(S, D, sq)) {
-    addNature(S, D, D.rules.natureAchieve, q.name + " 達成");
+    addNature(S, D, D.rules.natureAchieve, T(D, "e.achievedWhy", { name: q.name }));
     for (const w of S.contrib[sq]) S.players[w].st.targets.push(sq);
     emit(S, { t: "achieve", sq, who: S.contrib[sq].slice() });
   }
@@ -162,15 +163,15 @@ const H = {
       return;
     }
     if (a.t === "rescue" && p.jail) {   // 請其他玩家幫忙脫困
-      openPool(S, D, "rescue", { slots: [{ r: "i", notSelf: true }], title: "請盟友出面斡旋，移除方括號" });
+      openPool(S, D, "rescue", { slots: [{ r: "i", notSelf: true }], title: T(D, "e.rescueTitle") });
       return;
     }
     if (a.t !== "roll") return;
     const d1 = die(S), d2 = die(S), dbl = d1 === d2;
     emit(S, { t: "dice", p: S.cur, d: [d1, d2] });
     if (p.jail) {
-      if (dbl) { p.jail = 0; emit(S, { t: "free", p: S.cur, why: "擲出對子，方括號全數移除" }); }
-      else { p.jail--; if (!p.jail) emit(S, { t: "free", p: S.cur, why: "拖到下一屆，終於移除方括號" }); return endTurn(S, D); }
+      if (dbl) { p.jail = 0; emit(S, { t: "free", p: S.cur, why: T(D, "e.freeDbl") }); }
+      else { p.jail--; if (!p.jail) emit(S, { t: "free", p: S.cur, why: T(D, "e.freeWait") }); return endTurn(S, D); }
     }
     p.doubles = dbl ? p.doubles + 1 : 0;
     if (p.doubles >= 3) { p.doubles = 0; toJail(S, D, S.cur); return endTurn(S, D); }
@@ -230,19 +231,19 @@ function passStart(S, D, pi) {
   p.lap = (p.lap || 0) + 1;
   const inc = D.roles[p.role].income;
   pay(p, inc, +1);
-  emit(S, { t: "res", p: pi, d: inc, why: "年度預算" });
+  emit(S, { t: "res", p: pi, d: inc, why: T(D, "e.budget") });
   // 延遲撥款到位
   const due = p.delayed.filter((x) => x.at <= p.lap);
   p.delayed = p.delayed.filter((x) => x.at > p.lap);
-  for (const x of due) { pay(p, x, +1); emit(S, { t: "res", p: pi, d: { m: x.m || 0, i: x.i || 0, k: x.k || 0 }, why: "撥款到位：" + (x.why || "") }); }
+  for (const x of due) { pay(p, x, +1); emit(S, { t: "res", p: pi, d: { m: x.m || 0, i: x.i || 0, k: x.k || 0 }, why: T(D, "e.disbursed", { why: x.why || "" }) }); }
 }
 
 function land(S, D) {
   const p = P(S), b = D.board[p.pos];
   emit(S, { t: "land", p: S.cur, sq: p.pos });
   switch (b.type) {
-    case "start": case "jail": return endTurnSoon(S, D, b.type === "jail" ? "只是路過，方括號裡的人向你揮手" : "回到起點");
-    case "gojail": toJail(S, D, S.cur); return endTurnSoon(S, D, "你的提案被加滿方括號，送去「接觸小組」繼續談");
+    case "start": case "jail": return endTurnSoon(S, D, T(D, b.type === "jail" ? "e.passJail" : "e.passStart"));
+    case "gojail": toJail(S, D, S.cur); return endTurnSoon(S, D, T(D, "e.goJail"));
     case "target": return landTarget(S, D, b.sq);
     case "fund": return landFund(S, D, b.fund);
     case "scenario": return drawScenario(S, D);
@@ -250,8 +251,8 @@ function land(S, D) {
     case "plenary": return drawPlenary(S, D);
   }
 }
-function withFallback(S, pd) {   // 每個選項都付不起時，補一個不用付費的選項，避免卡關
-  if (!pd.options.some((o) => !o.cost || canPay(S.players[pd.p], o.cost))) pd.options = [...pd.options, { label: "資源不足，只能旁觀", fx: {}, result: "這次你無能為力，只能看著事情發生。" }];
+function withFallback(S, D, pd) {   // 每個選項都付不起時，補一個不用付費的選項，避免卡關
+  if (!pd.options.some((o) => !o.cost || canPay(S.players[pd.p], o.cost))) pd.options = [...pd.options, { label: T(D, "e.fallback"), fx: {}, result: T(D, "e.fallbackRes") }];
   return pd;
 }
 function endTurnSoon(S, D, msg) { S.pending = { t: "ack", p: S.cur, kind: "info", title: msg, then: "end" }; }
@@ -267,8 +268,8 @@ export function targetCost(S, D, sq, pi) {
 function landTarget(S, D, sq) {
   const q = D.squares[sq];
   if (achieved(S, D, sq)) {
-    apply(S, D, S.cur, { k: 1 }, q.name + "已達成：分享經驗");
-    return endTurnSoon(S, D, `「${q.name}」已達成，你帶走一份經驗分享（📚+1）`);
+    apply(S, D, S.cur, { k: 1 }, T(D, "e.shareWhy", { name: q.name }));
+    return endTurnSoon(S, D, T(D, "e.share", { name: q.name }));
   }
   const cost = targetCost(S, D, sq, S.cur), slots = [];
   for (const r of RES) for (let n = 0; n < (cost[r] || 0); n++) slots.push({ r });
@@ -284,44 +285,44 @@ function landFund(S, D, fk) {
     if (o.not && (o.not.includes(g) || o.not.includes(p.role))) continue;
     opts.push(o);
   }
-  if (!opts.length) opts.push({ label: "這個機制你不適用，參觀一下", fx: {}, result: f.notEligible || "你不符合申請資格。" });
-  S.pending = withFallback(S, { t: "choose", p: S.cur, kind: "fund", fund: fk, card: fk, title: f.name, text: f.text, options: opts, know: f.know });
+  if (!opts.length) opts.push({ label: T(D, "e.notEligible"), fx: {}, result: f.notEligible || T(D, "e.notEligibleRes") });
+  S.pending = withFallback(S, D, { t: "choose", p: S.cur, kind: "fund", fund: fk, card: fk, title: f.name, text: f.text, options: opts, know: f.know });
 }
 function fundApply(S, D, fk) {
   // 需要締約方背書（GEF／GBFF）：非締約方要找締約方玩家出 1 影響力
   const f = D.funds[fk], p = P(S), g = D.roles[p.role].group, slots = [];
-  if (f.endorse && g !== "party" && S.players.some((q) => D.roles[q.role].group === "party")) slots.push({ r: "i", role: "party", notSelf: true, label: "締約方背書" });
+  if (f.endorse && g !== "party" && S.players.some((q) => D.roles[q.role].group === "party")) slots.push({ r: "i", role: "party", notSelf: true, label: T(D, "e.endorse") });
   for (const r of RES) for (let n = 0; n < (f.applyCost?.[r] || 0); n++) slots.push({ r });
   if (!slots.length) return fundPay(S, D, fk);
-  openPool(S, D, "fund", { fund: fk, slots, title: f.name + "：提案" });
+  openPool(S, D, "fund", { fund: fk, slots, title: T(D, "e.proposal", { name: f.name }) });
 }
 function askAid(S, D, fk, o) {
   const f = D.funds[fk];
   if (hasRole(S, o.role) < 0) {   // 場上沒有出資國：擲骰
     const n = 1 + Math.floor(rand(S) * 2);
     apply(S, D, S.cur, { m: n }, f.name);
-    S.pending = { t: "ack", p: S.cur, kind: "fund", card: fk, title: f.name, result: `獲得 ${n} 💰 援助`, know: f.know, then: "end" };
+    S.pending = { t: "ack", p: S.cur, kind: "fund", card: fk, title: f.name, result: T(D, "e.aidRoll", { n }), know: f.know, then: "end" };
     return;
   }
-  openPool(S, D, "ask", { fund: fk, slots: Array.from({ length: o.n }, () => ({ r: "m", role: o.role, notSelf: true })), title: "請求" + D.roles[o.role].name + "援助", partial: true });
+  openPool(S, D, "ask", { fund: fk, slots: Array.from({ length: o.n }, () => ({ r: "m", role: o.role, notSelf: true })), title: T(D, "e.askTitle", { role: D.roles[o.role].name }), partial: true });
 }
 function fundPay(S, D, fk) {
   const f = D.funds[fk], p = P(S), g = D.roles[p.role].group;
   let amt = f.grant + (f.bonus?.[g] || f.bonus?.[p.role] || 0);
   if (S.pools[fk] !== null) { amt = Math.min(amt, S.pools[fk]); S.pools[fk] -= amt; }
   p.st.funds += amt;
-  let msg = `申請通過，核定 ${amt} 💰`;
+  let msg = T(D, "e.approved", { n: amt }), shared = false;
   const igo = hasRole(S, "igo");
   if (f.fee && igo >= 0 && igo !== S.cur && amt > 0) {   // 執行機構收取執行機構費
     amt -= 1; S.players[igo].res.m += 1;
-    emit(S, { t: "res", p: igo, d: { m: 1 }, why: "執行機構費" }); msg += `，其中 1 💰 為執行機構的執行機構費`;
+    emit(S, { t: "res", p: igo, d: { m: 1 }, why: T(D, "e.fee") }); msg += T(D, "e.feeMsg");
   }
   if (f.halfTo && amt > 0) {      // 卡利基金：一半給原住民族與地方社區
     const h = hasRole(S, f.halfTo), half = Math.ceil(amt / 2);
-    if (h >= 0 && h !== S.cur) { amt -= half; S.players[h].res.m += half; emit(S, { t: "res", p: h, d: { m: half }, why: f.name }); msg += `，其中 ${half} 💰 撥給原住民族與地方社區`; }
+    if (h >= 0 && h !== S.cur) { amt -= half; S.players[h].res.m += half; emit(S, { t: "res", p: h, d: { m: half }, why: f.name }); msg += T(D, "e.halfMsg", { n: half }); shared = true; }
   }
-  if (amt <= 0 && !msg.includes("撥給")) msg = f.empty || "基金帳上沒錢了，提案只能排隊。";
-  else if (f.delay && !S.rules.fastTrack) { apply(S, D, S.cur, { delayed: { m: amt, laps: 1, why: f.name } }); msg += "；下次經過起點時撥款到位"; }
+  if (amt <= 0 && !shared) msg = f.empty || T(D, "e.empty");
+  else if (f.delay && !S.rules.fastTrack) { apply(S, D, S.cur, { delayed: { m: amt, laps: 1, why: f.name } }); msg += T(D, "e.delayMsg"); }
   else apply(S, D, S.cur, { m: amt }, f.name);
   S.pending = { t: "ack", p: S.cur, kind: "fund", card: fk, title: f.name, result: msg, know: f.know, then: "end" };
 }
@@ -333,11 +334,11 @@ function drawScenario(S, D) {
   const deck = useRole ? mine : "sc_any";
   const id = deal(S, deck, () => Object.keys(D.scenarios).filter((x) => D.scenarios[x].role === (useRole ? p.role : "any")));
   const c = D.scenarios[id];
-  S.pending = withFallback(S, { t: "choose", p: S.cur, kind: "scenario", card: id, title: c.title, text: c.text, options: c.options, know: c.know, targets: c.targets });
+  S.pending = withFallback(S, D, { t: "choose", p: S.cur, kind: "scenario", card: id, title: c.title, text: c.text, options: c.options, know: c.know, targets: c.targets });
 }
 function drawPlenary(S, D) {
   const id = deal(S, "plenary", () => Object.keys(D.plenary)), c = D.plenary[id];
-  if (c.options) { S.pending = withFallback(S, { t: "choose", p: S.cur, kind: "plenary", card: id, title: c.title, text: c.text, options: c.options, know: c.know }); return; }
+  if (c.options) { S.pending = withFallback(S, D, { t: "choose", p: S.cur, kind: "plenary", card: id, title: c.title, text: c.text, options: c.options, know: c.know }); return; }
   apply(S, D, S.cur, c.fx, c.title);
   S.pending = { t: "ack", p: S.cur, kind: "plenary", card: id, title: c.title, result: c.text, know: c.know, then: "end" };
 }
@@ -358,37 +359,37 @@ function poolResolve(S, D, pd, ok) {
   const done = (then = "end", result, extra = {}) => { S.pending = { t: "ack", p: S.cur, then, result, ...extra }; };
   if (pd.kind === "target") {
     const q = D.squares[pd.sq];
-    if (!doIt) return done("end", `暫不投入「${q.name}」`, { kind: "target", title: q.name });
-    let msg = `「${q.name}」推進一步`;
+    if (!doIt) return done("end", T(D, "e.hold", { name: q.name }), { kind: "target", title: q.name });
+    let msg = T(D, "e.step", { name: q.name });
     const keyHit = q.key.some((k) => who.some((w) => S.players[w].role === k || D.roles[S.players[w].role].group === k));
     progress(S, D, pd.sq, 1, who, q.name);
-    if (who.length >= 2) { addNature(S, D, D.rules.natureCoop, "跨角色合作"); msg += "；跨角色合作加成"; }
+    if (who.length >= 2) { addNature(S, D, D.rules.natureCoop, T(D, "e.coop")); msg += T(D, "e.coopMsg"); }
     if (keyHit) for (const w of who) if (q.key.includes(S.players[w].role) || q.key.includes(D.roles[S.players[w].role].group)) S.players[w].st.key++;
     const wi = hasRole(S, "women");
-    if (wi >= 0 && who.includes(wi) && who.length >= 2) { addNature(S, D, 1, "性別主流化"); msg += "；性別主流化 +1"; }
+    if (wi >= 0 && who.includes(wi) && who.length >= 2) { addNature(S, D, 1, T(D, "e.gender")); msg += T(D, "e.genderMsg"); }
     const ip = hasRole(S, "iplc");
     if (q.fpic && ip >= 0 && !who.includes(ip)) {
-      addNature(S, D, -D.rules.fpicPenalty, "未經自由、事先及知情同意");
+      addNature(S, D, -D.rules.fpicPenalty, T(D, "e.noFpic"));
       for (const w of who) S.players[w].st.fpicBreak++;
-      apply(S, D, ip, { i: 1 }, "權利受忽略，發起倡議");
-      msg += "；但原住民族與地方社區沒有參與決策，自然指數 −" + D.rules.fpicPenalty;
+      apply(S, D, ip, { i: 1 }, T(D, "e.advocacy"));
+      msg += T(D, "e.noFpicMsg", { n: D.rules.fpicPenalty });
     }
     return done("end", msg, { kind: "target", title: q.name, know: q.know, sq: pd.sq });
   }
   if (pd.kind === "fund") {
-    if (!doIt) return done("end", "提案沒有湊齊要件，撤回", { kind: "fund", title: D.funds[pd.fund].name });
+    if (!doIt) return done("end", T(D, "e.withdrawn"), { kind: "fund", title: D.funds[pd.fund].name });
     const end = fundPay(S, D, pd.fund); return end;
   }
   if (pd.kind === "ask") {
     const f = D.funds[pd.fund], got = filled.length;
     if (got) { S.players[S.cur].res.m += got; for (const w of who) S.players[w].res.i += 1; emit(S, { t: "res", p: S.cur, d: { m: got }, why: f.name }); }
-    return done("end", got ? `北方工業國提供 ${got} 💰 援助，換得 🤝+1` : "北方工業國表示：今年預算有困難。", { kind: "fund", card: pd.fund, title: f.name, know: f.know });
+    return done("end", T(D, got ? "e.aidGot" : "e.aidNone", { role: D.roles.north.name, n: got }), { kind: "fund", card: pd.fund, title: f.name, know: f.know });
   }
   if (pd.kind === "rescue") {
     const p = P(S);
     if (!doIt) { S.pending = { t: "roll", p: S.cur }; return; }
     p.jail = 0; for (const w of who) S.players[w].st.rescues++;
-    emit(S, { t: "free", p: S.cur, why: "盟友斡旋成功" });
+    emit(S, { t: "free", p: S.cur, why: T(D, "e.rescued") });
     S.pending = { t: "roll", p: S.cur };
     return;
   }
@@ -396,12 +397,12 @@ function poolResolve(S, D, pd, ok) {
     const c = D.crises[pd.crisis], got = filled.length, need = pd.slots.length;
     for (const w of who) S.players[w].st.crisis++;
     let loss, msg;
-    if (got >= need) { loss = c.lossOk ?? 0; msg = c.ok || "眾人合力，危機化解"; }
-    else if (got >= Math.ceil(need / 2)) { loss = Math.ceil(c.loss / 2); msg = c.half || "勉強撐住，但仍有損失"; }
-    else { loss = c.loss; msg = c.fail || "沒人出手，損失慘重"; }
+    if (got >= need) { loss = c.lossOk ?? 0; msg = c.ok || T(D, "e.crisisOk"); }
+    else if (got >= Math.ceil(need / 2)) { loss = Math.ceil(c.loss / 2); msg = c.half || T(D, "e.crisisHalf"); }
+    else { loss = c.loss; msg = c.fail || T(D, "e.crisisFail"); }
     addNature(S, D, -loss, c.title);
     if (got < need && c.failFx) apply(S, D, S.cur, c.failFx, c.title);
-    return done(pd.yearly ? "roll" : "end", msg + (loss ? `（自然指數 −${loss}）` : ""), { kind: "crisis", card: pd.crisis, title: c.title, know: c.know });
+    return done(pd.yearly ? "roll" : "end", msg + (loss ? T(D, "e.loss", { n: loss }) : ""), { kind: "crisis", card: pd.crisis, title: c.title, know: c.know });
   }
 }
 
@@ -414,14 +415,14 @@ function startCop(S, D) {
 function copResolve(S, D, pd) {
   const c = D.cop[pd.card], tally = c.options.map(() => 0);
   const opposed = pd.votes.some((v) => v.o === -1 && v.stake >= D.rules.blockStake);
-  pd.votes.forEach((v) => { if (v.o >= 0) tally[v.o] += 1 + v.stake; });
+  pd.votes.forEach((v, n) => { if (v.o >= 0) tally[v.o] += 1 + v.stake * (D.roles[S.players[n].role].copWeight || 1); });   // 小島國：押注算兩倍
   const best = Math.max(...tally), win = tally.indexOf(best), tie = tally.filter((x) => x === best).length > 1;
   let msg;
-  if (opposed) msg = "有代表團強烈反對，主席宣布：本條文全部留在方括號，延到下屆再談。";
-  else if (tie) msg = "雙方僵持不下，條文留在方括號。";
+  if (opposed) msg = T(D, "e.copBlock");
+  else if (tie) msg = T(D, "e.copTie");
   else {
     const o = c.options[win];
-    msg = `共識通過：${o.label}。${o.result || ""}`;
+    msg = T(D, "e.copPass", { label: o.label, result: o.result || "" });
     for (let n = 0; n < S.players.length; n++) if (pd.votes[n].o === win) S.players[n].st.key++;
     apply(S, D, S.cur, o.fx, c.title);
   }
@@ -464,9 +465,9 @@ export function score(S, D, pi) {
   const p = S.players[pi], R = D.roles[p.role], rows = [];
   for (const m of R.missions) rows.push({ text: m.text, pts: missionMet(S, D, pi, m) ? m.pts : 0, max: m.pts });
   const badges = new Set(p.st.targets).size;
-  rows.push({ text: `目標徽章 ×${badges}`, pts: badges, max: null });
+  rows.push({ text: T(D, "e.badges", { n: badges }), pts: badges, max: null });
   const left = Math.floor(RES.reduce((s, r) => s + p.res[r], 0) / 4);
-  rows.push({ text: "剩餘資源（每 4 單位 1 分）", pts: left, max: null });
+  rows.push({ text: T(D, "e.left"), pts: left, max: null });
   return { rows, total: rows.reduce((s, r) => s + r.pts, 0) };
 }
 function missionMet(S, D, pi, m) {

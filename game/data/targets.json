@@ -10,7 +10,7 @@
   "T2": {
    "short": "30% 復育",
    "zh": "確保到 2030 年，至少 30% 已劣化的陸域、內陸水域及海洋與沿岸生態系面積處於有效復育之中，以提升生物多樣性與生態系功能與服務、生態完整性及連結性。",
-   "explain": "已經劣化的陸域、淡水、海洋與沿岸生態系，到 2030 年至少要有 30% 正在進行「有效」的復育，目的是恢復生物多樣性、生態系服務與生態連結。",
+   "explain": "已經劣化的陸域、淡水、海洋與沿岸生態系，到 2030 年至少要有 30% 正在進行「有效」的復育，目的是提升生物多樣性、生態系功能與服務、生態完整性與連結。",
    "en": "Ensure that by 2030 at least 30 per cent of areas of degraded terrestrial, inland water, and marine and coastal ecosystems are under effective restoration, in order to enhance biodiversity and ecosystem functions and services, ecological integrity and connectivity."
   },
   "T3": {
@@ -46,7 +46,7 @@
   "T8": {
    "short": "氣候與海洋酸化",
    "zh": "透過減緩、調適與減災行動，包括自然解方和／或以生態系為基礎的方法，將氣候變遷與海洋酸化對生物多樣性的衝擊降至最低並提升其韌性，同時將氣候行動對生物多樣性的負面衝擊降至最低、促進正面衝擊。",
-   "explain": "降低氣候變遷與海洋酸化對生物多樣性的衝擊，並運用自然解方等方式提升韌性；同時，氣候行動本身（例如能源或造林計畫）也不能反過來傷害生物多樣性。",
+   "explain": "降低氣候變遷與海洋酸化對生物多樣性的衝擊，並運用自然解方等方式提升韌性；同時，氣候行動本身也不能反過來傷害生物多樣性。",
    "en": "Minimize the impact of climate change and ocean acidification on biodiversity and increase its resilience through mitigation, adaptation, and disaster risk reduction actions, including through nature-based solutions and/or ecosystem-based approaches, while minimizing negative and fostering positive impacts of climate action on biodiversity."
   },
   "T9": {
@@ -58,7 +58,7 @@
   "T10": {
    "short": "永續農林漁",
    "zh": "確保農業、水產養殖、漁業與林業區域獲得永續管理，特別是透過生物多樣性的永續利用，包括大幅增加對生物多樣性友善作法的應用，例如永續集約化、農業生態及其他創新方法，以增進這些生產系統的韌性與長期效率與生產力，並促進糧食安全、保育與復育生物多樣性，以及維持自然對人類的貢獻，包括生態系功能與服務。",
-   "explain": "農、林、漁、牧與水產養殖的生產地區要永續管理，大幅擴大生物多樣性友善的作法（例如農業生態），讓生產系統更有韌性、更有效率，同時兼顧糧食安全與生物多樣性。",
+   "explain": "農業、水產養殖、漁業與林業的生產地區要永續管理，大幅擴大生物多樣性友善的作法（例如農業生態），讓生產系統更有韌性，並維持長期的效率與生產力，同時兼顧糧食安全與生物多樣性。",
    "en": "Ensure that areas under agriculture, aquaculture, fisheries and forestry are managed sustainably, in particular through the sustainable use of biodiversity, including through a substantial increase of the application of biodiversity friendly practices, such as sustainable intensification, agroecological and other innovative approaches, contributing to the resilience and long-term efficiency and productivity of these production systems, and to food security, conserving and restoring biodiversity and maintaining nature’s contributions to people, including ecosystem functions and services."
   },
   "T11": {
@@ -88,7 +88,7 @@
   "T15": {
    "short": "企業揭露",
    "zh": "採取法律、行政或政策措施，鼓勵並促使企業，特別是確保大型與跨國企業及金融機構： (a) 定期監測、評估並透明揭露其對生物多樣性的風險、依賴與衝擊，包括要求所有大型與跨國企業及金融機構揭露其營運、供應鏈與價值鏈及投資組合的相關資訊； (b) 向消費者提供所需資訊，以促進永續消費模式； (c) 酌情報告其遵守取得與利益分享法規與措施的情形； 以逐步減少對生物多樣性的負面衝擊、增加正面衝擊，降低企業與金融機構的生物多樣性相關風險，並促進確保永續生產模式的行動。",
-   "explain": "政府要用法律、行政或政策工具，讓企業（特別是大型、跨國企業與金融機構）定期評估並公開揭露自己對生物多樣性的風險、依賴與衝擊（含供應鏈與投資組合），提供消費者所需資訊，並報告利益分享規定的遵循情形。",
+   "explain": "政府要用法律、行政或政策工具，鼓勵並促使企業，特別是確保大型與跨國企業及金融機構，定期監測、評估並透明揭露自己對生物多樣性的風險、依賴與衝擊（含供應鏈與投資組合），提供消費者所需資訊，並報告利益分享規定的遵循情形。",
    "en": "Take legal, administrative or policy measures to encourage and enable business, and in particular to ensure that large and transnational companies and financial institutions: (a) Regularly monitor, assess, and transparently disclose their risks, dependencies and impacts on biodiversity, including with requirements for all large as well as transnational companies and financial institutions along their operations, supply and value chains, and portfolios; (b) Provide information needed to consumers to promote sustainable consumption patterns; (c) Report on compliance with access and benefit-sharing regulations and measures, as applicable; in order to progressively reduce negative impacts on biodiversity, increase positive impacts, reduce biodiversity-related risks to business and financial institutions, and promote actions to ensure sustainable patterns of production."
   },
   "T16": {
@@ -100,7 +100,7 @@
   "T17": {
    "short": "生物安全",
    "zh": "在所有國家建立、強化能力並實施《生物多樣性公約》第 8(g) 條所列的生物安全措施，以及第 19 條所列的生物技術處理及其利益分配措施。",
-   "explain": "各國要建立並落實生物安全措施（公約第 8(g) 條，例如基因改造生物的風險管理），以及生物技術的處理與利益分配措施（公約第 19 條），並強化相關能力。",
+   "explain": "各國要建立並落實生物安全措施（公約第 8(g) 條），以及生物技術的處理與利益分配措施（公約第 19 條），並強化相關能力。",
    "en": "Establish, strengthen capacity for, and implement in all countries, biosafety measures as set out in Article 8(g) of the Convention on Biological Diversity and measures for the handling of biotechnology and distribution of its benefits as set out in Article 19 of the Convention."
   },
   "T18": {
@@ -124,13 +124,13 @@
   "T21": {
    "short": "知識取得",
    "zh": "確保決策者、實務工作者與公眾能取得最佳可得的資料、資訊與知識，以引導有效且公平的治理、生物多樣性的整合與參與式管理，並強化溝通、意識提升、教育、監測、研究與知識管理；在此脈絡下，原住民族與地方社區的傳統知識、創新、作法與技術，也應僅在取得其自由、事先及知情同意後才能取用，並依國家法律為之。",
-   "explain": "讓決策者、實務工作者與一般大眾都能取得最好的資料、資訊與知識，用來改善治理、管理、教育與研究；取用原住民族與地方社區的傳統知識，必須先取得他們自由、事先及知情的同意。",
+   "explain": "讓決策者、實務工作者與一般大眾都能取得最好的資料、資訊與知識，用來改善治理、管理、教育與研究；取用原住民族與地方社區的傳統知識，僅應在取得他們自由、事先及知情的同意後為之，並依循國家法律。",
    "en": "Ensure that the best available data, information and knowledge are accessible to decision makers, practitioners and the public to guide effective and equitable governance, integrated and participatory management of biodiversity, and to strengthen communication, awareness-raising, education, monitoring, research and knowledge management and, also in this context, traditional knowledge, innovations, practices and technologies of indigenous peoples and local communities should only be accessed with their free, prior and informed consent, in accordance with national legislation."
   },
   "T22": {
    "short": "參與與權利",
    "zh": "確保原住民族與地方社區，以及婦女與女孩、兒童與青年及身心障礙者，在生物多樣性相關決策中享有充分、公平、包容、有效且具性別回應的代表與參與，以及司法與資訊的取得，並尊重原住民族與地方社區的文化及其對土地、領域、資源與傳統知識的權利；同時確保環境人權捍衛者獲得充分保護。",
-   "explain": "原住民族與地方社區、婦女與女孩、兒童與青年及身心障礙者，都要能充分參與生物多樣性決策，並能取得資訊與司法救濟；原住民族對土地、領域、資源與傳統知識的權利要受到尊重，環境人權捍衛者要受到保護。",
+   "explain": "原住民族與地方社區、婦女與女孩、兒童與青年及身心障礙者，都要能充分參與生物多樣性決策，並能取得資訊與司法救濟；原住民族與地方社區對土地、領域、資源與傳統知識的權利要受到尊重，環境人權捍衛者要受到保護。",
    "en": "Ensure the full, equitable, inclusive, effective and gender-responsive representation and participation in decision-making, and access to justice and information related to biodiversity by indigenous peoples and local communities, respecting their cultures and their rights over lands, territories, resources, and traditional knowledge, as well as by women and girls, children and youth, and persons with disabilities and ensure the full protection of environmental human rights defenders."
   },
   "T23": {

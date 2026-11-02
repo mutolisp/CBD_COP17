@@ -5,22 +5,27 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>30×30 大作戰</title>
 <meta name="description" content="以昆明—蒙特婁全球生物多樣性綱要為題的角色扮演桌遊：締約方、NGO、國際組織、原住民族與地方社區、青年、婦女一起在 2030 年前讓自然復原。">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌏</text></svg>">
+<meta name="theme-color" content="#1f6f4a">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="game.css">
 </head>
 <body>
 <header class="top">
-  <h1><span aria-hidden="true">🌏</span> 30×30 大作戰</h1>
+  <h1><span aria-hidden="true">🌏</span> <span id="appTitle">30×30 大作戰</span></h1>
   <div id="hud" class="hud" aria-live="polite"></div>
   <nav class="menu">
     <button type="button" id="btnRules">玩法</button>
     <button type="button" id="btnNew">新局</button>
     <button type="button" id="btnBig" aria-pressed="false" title="投影用大字">大字</button>
+    <button type="button" id="btnSound" aria-pressed="true">🔊</button>
+    <button type="button" id="btnLang" lang="en" title="Switch to English">EN</button>
   </nav>
 </header>
 <main id="app"></main>
 <dialog id="modal"><div id="modalBody"></div></dialog>
-<noscript>這個遊戲需要啟用 JavaScript。</noscript>
+<noscript>這個遊戲需要啟用 JavaScript。This game requires JavaScript.</noscript>
 <script type="module" src="js/ui.js"></script>
 </body>
 </html>

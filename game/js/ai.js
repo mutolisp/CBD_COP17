@@ -3,7 +3,7 @@ import { RES, canFill, canPay, poolNeed } from "./engine.js";
 
 const PERSONA = {
   north: { give: 0.45, keep: 3 }, south: { give: 0.6, keep: 1 }, ngo: { give: 0.8, keep: 1 },
-  igo: { give: 0.6, keep: 2 }, iplc: { give: 0.7, keep: 1 }, youth: { give: 0.9, keep: 0 }, women: { give: 0.8, keep: 1 },
+  igo: { give: 0.6, keep: 2 }, iplc: { give: 0.7, keep: 1 }, youth: { give: 0.9, keep: 0 }, women: { give: 0.8, keep: 1 }, sids: { give: 0.6, keep: 1 },
 };
 const total = (p) => RES.reduce((s, r) => s + p.res[r], 0);
 

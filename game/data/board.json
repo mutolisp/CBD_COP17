@@ -77,7 +77,8 @@
    "need": 2,
    "key": [
     "ngo",
-    "youth"
+    "youth",
+    "sids"
    ],
    "zone": "A"
   },
@@ -110,7 +111,8 @@
    "need": 2,
    "key": [
     "youth",
-    "south"
+    "south",
+    "sids"
    ],
    "zone": "A"
   },

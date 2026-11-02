@@ -1,0 +1,1765 @@
+{
+ "board": {
+  "squares": {
+   "T1T2": {
+    "name": "Spatial Planning & Restoration"
+   },
+   "T4T5": {
+    "name": "Species Rescue & Legal Use"
+   },
+   "T6": {
+    "name": "Halve Invasive Species"
+   },
+   "T7": {
+    "name": "Pollution Reduction"
+   },
+   "T8": {
+    "name": "Climate & Oceans"
+   },
+   "T9T10": {
+    "name": "Sustainable Use & Production"
+   },
+   "T11T12": {
+    "name": "Nature's Services & Green Cities"
+   },
+   "T13": {
+    "name": "Benefit-Sharing"
+   },
+   "T14T15": {
+    "name": "Mainstreaming & Business Disclosure"
+   },
+   "T16T17": {
+    "name": "Sustainable Consumption & Biosafety"
+   },
+   "T18": {
+    "name": "Harmful Subsidies Reform"
+   },
+   "T19T20": {
+    "name": "Resource Mobilization & Capacity-Building"
+   },
+   "T21T22T23": {
+    "name": "Knowledge, Participation & Gender"
+   }
+  },
+  "board": {
+   "0": {
+    "name": "Annual Budget"
+   },
+   "2": {
+    "name": "Scenario"
+   },
+   "6": {
+    "name": "Crisis"
+   },
+   "8": {
+    "name": "Brackets"
+   },
+   "10": {
+    "name": "Scenario"
+   },
+   "14": {
+    "name": "Crisis"
+   },
+   "16": {
+    "name": "4 a.m. Plenary"
+   },
+   "18": {
+    "name": "Scenario"
+   },
+   "21": {
+    "name": "Scenario"
+   },
+   "24": {
+    "name": "Sent to a Contact Group"
+   },
+   "26": {
+    "name": "Crisis"
+   },
+   "29": {
+    "name": "Scenario"
+   }
+  }
+ },
+ "roles": {
+  "north": {
+   "name": "Northern Industrial State",
+   "groupName": "Party",
+   "tagline": "The deepest pockets, but every year parliament asks: why is this money going abroad?",
+   "power": "Big Funder: pay 1 💰 less when investing in \"Resource Mobilization & Capacity-Building\" or \"Pollution Reduction\".",
+   "dilemma": "Domestic elections and budget cuts can derail your commitments; international finance pledges must be honoured, or everyone suffers.",
+   "missions": {
+    "0": {
+     "text": "Keep your promises: give 6 or more resource units to other roles"
+    },
+    "1": {
+     "text": "Achieve both \"Resource Mobilization & Capacity-Building\" and \"Harmful Subsidies Reform\""
+    },
+    "2": {
+     "text": "Treasury Gatekeeper: hold 6 💰 or more at the end"
+    }
+   }
+  },
+  "south": {
+   "name": "Rainforest Nation",
+   "groupName": "Party",
+   "tagline": "A tenth of the world's species live in your territory, but so do the roads, the mines and the voters.",
+   "power": "Biodiversity Hotspot: pay 1 📚 less when investing in \"Spatial Planning & Restoration\", \"30×30\" or \"Species Rescue\".",
+   "dilemma": "Trade-offs between development and conservation; international funds arrive slowly, and local communities can't wait.",
+   "missions": {
+    "0": {
+     "text": "Achieve both \"30×30\" and \"Spatial Planning & Restoration\""
+    },
+    "1": {
+     "text": "Obtain a total of 4 💰 or more from the fund mechanisms"
+    },
+    "2": {
+     "text": "Be a key player on 4 target squares"
+    }
+   }
+  },
+  "ngo": {
+   "name": "Conservation NGO",
+   "groupName": "NGO",
+   "tagline": "You have volunteers, monitoring data, and a fundraising proposal that is never finished.",
+   "power": "Watchdog & Advocacy: pay 1 🤝 less when investing in \"Business Disclosure\" or \"Harmful Subsidies Reform\".",
+   "dilemma": "You live on donations, and credibility is your only capital; too mild and no one listens, too radical and you can't get into the meeting room.",
+   "missions": {
+    "0": {
+     "text": "Take part in 4 crisis responses"
+    },
+    "1": {
+     "text": "Achieve both \"Business Disclosure\" and \"Species Rescue\""
+    },
+    "2": {
+     "text": "Earn 3 target badges"
+    }
+   }
+  },
+  "igo": {
+   "name": "International Organization",
+   "groupName": "IGO",
+   "tagline": "You are one of the GEF's implementing agencies. Your procedures are rigorous; everyone needs you and everyone complains you're slow.",
+   "power": "Implementing Agency: whenever another player receives a disbursement from the GEF or GBFF, you collect a 1 💰 agency fee. Pay 1 📚 less when investing in \"Resource Mobilization & Capacity-Building\" or \"Knowledge, Participation & Gender\".",
+   "dilemma": "Agency fees keep you alive, but everyone feels the money gets stuck with you.",
+   "missions": {
+    "0": {
+     "text": "Help other roles: give away 5 or more resource units"
+    },
+    "1": {
+     "text": "6 or more target squares achieved across the table"
+    },
+    "2": {
+     "text": "Be a key player on 2 target squares"
+    }
+   }
+  },
+  "iplc": {
+   "name": "IPLC",
+   "groupName": "IPLC",
+   "tagline": "Your ancestors left you this forest. When the protected-area map was drawn right up to your door, did anyone ask you?",
+   "power": "Traditional Knowledge & Free, Prior and Informed Consent (FPIC): if a 🪶 target square is invested in without your participation, Nature Index −2 and you gain 1 🤝. Pay 1 📚 less when investing in \"Sustainable Use\" or \"Benefit-Sharing\".",
+   "dilemma": "The richest traditional knowledge and the most effective management, yet the hardest time getting funds directly.",
+   "missions": {
+    "0": {
+     "text": "No investment violates FPIC during the whole game"
+    },
+    "1": {
+     "text": "Achieve both \"Benefit-Sharing\" and \"Knowledge, Participation & Gender\""
+    },
+    "2": {
+     "text": "Be a key player on 4 target squares"
+    }
+   }
+  },
+  "youth": {
+   "name": "Youth",
+   "groupName": "Youth",
+   "tagline": "The world of 2050 belongs to you, but right now you have to find your own airfare just to get to the meeting.",
+   "power": "Community Mobilization: pay 1 🤝 less when investing in \"Climate\", \"Urban Green-Blue Spaces\" or \"Sustainable Consumption\".",
+   "dilemma": "The most time and passion, the least money; your voice is often treated as decoration.",
+   "missions": {
+    "0": {
+     "text": "Nature Index at 80 or more at the end"
+    },
+    "1": {
+     "text": "Take part in 3 crisis responses"
+    },
+    "2": {
+     "text": "Earn 3 target badges"
+    },
+    "3": {
+     "text": "Rescue a partner from the brackets once"
+    }
+   }
+  },
+  "women": {
+   "name": "Women's Group",
+   "groupName": "Women",
+   "tagline": "You manage the water, the seeds and the household budget, yet you rarely sit at the head of the negotiating table.",
+   "power": "Gender Mainstreaming: cross-role investments you take part in give an extra Nature Index +1. Pay 1 🤝 less when investing in \"Knowledge, Participation & Gender\" or \"Sustainable Use\".",
+   "dilemma": "The Gender Plan of Action has little funding; you must work with others to amplify your impact.",
+   "missions": {
+    "0": {
+     "text": "Achieve \"Knowledge, Participation & Gender\""
+    },
+    "1": {
+     "text": "Earn 3 target badges"
+    },
+    "2": {
+     "text": "Give 5 or more resource units to support others"
+    }
+   }
+  },
+  "sids": {
+   "name": "Island State",
+   "groupName": "Party",
+   "tagline": "Every centimetre of sea-level rise takes a little more of your country. Your entire environment ministry is five people, yet the COP runs three working groups at once.",
+   "power": "Coalition Voice: when taking positions at the Conference of the Parties, the influence you stake counts double. Pay 1 🤝 less when investing in \"Halve Invasive Species\" or \"Climate & Oceans\".",
+   "dilemma": "Hit hardest by climate change and invasive species, yet with the least staff and funding; even sending a delegate to meetings depends on financial support.",
+   "missions": {
+    "0": {
+     "text": "Achieve both \"Halve Invasive Species\" and \"Climate & Oceans\""
+    },
+    "1": {
+     "text": "Obtain 3 💰 or more from the funding mechanisms"
+    },
+    "2": {
+     "text": "Be a key player on 3 target squares or COP decisions"
+    }
+   }
+  }
+ },
+ "funds": {
+  "gef": {
+   "name": "Global Environment Facility (GEF)",
+   "text": "The entity operating the Convention's financial mechanism. The most money, the most complete procedures, and the slowest.",
+   "options": {
+    "0": {
+     "label": "Submit a project application (4 💰, disbursed next time you pass Start)"
+    },
+    "1": {
+     "label": "Don't apply; study past project results instead",
+     "result": "You read a results report (📚+1)."
+    }
+   },
+   "game": "Game simplification: non-Party applicants need a Party's endorsement, the implementing agency takes 1 💰, and disbursement is delayed one lap, all to represent procedural costs. These do not reflect the GEF's actual fees or timelines.",
+   "know": {
+    "q": "The GEF's ninth replenishment is smaller than the eighth. How will this affect projects in developing countries?"
+   },
+   "short": "GEF"
+  },
+  "gbff": {
+   "name": "Global Biodiversity Framework Fund (GBFF)",
+   "text": "A dedicated fund the GEF was asked to set up after COP 15. It does not require co-financing, and the share going to Indigenous peoples and local communities is above its target.",
+   "options": {
+    "0": {
+     "label": "Submit a project application (3 💰, IPLC get 1 extra)"
+    },
+    "1": {
+     "label": "Pledge 2 💰 to the GBFF (fund +3, influence +1, nature +1)",
+     "result": "Your pledge lets projects in more countries get started."
+    },
+    "2": {
+     "label": "Pass by",
+     "result": "There's still some balance in the fund. Come back next time."
+    }
+   },
+   "empty": "The GBFF is out of money; many eligible Parties are still in the queue.",
+   "game": "Game simplification: pledges only increase the fund while it has a balance; application amounts and disbursement delays are game settings.",
+   "know": {
+    "q": "The GBFF does not require co-financing. What does that mean for countries and communities with few resources?"
+   },
+   "short": "GBFF"
+  },
+  "cali": {
+   "name": "Cali Fund",
+   "text": "Companies that profit from using digital sequence information (DSI) on genetic resources should contribute at an indicative rate; at least half of the funds should support Indigenous peoples and local communities. So far, almost no companies have contributed.",
+   "options": {
+    "0": {
+     "label": "Apply for an allocation"
+    },
+    "1": {
+     "label": "Persuade a biotech company to contribute (🤝2: fund +3, nature +1)",
+     "result": "A biotech company announces a contribution and receives a Cali Fund certificate."
+    },
+    "2": {
+     "label": "Pass by",
+     "result": "The number in the fund's account is still very small."
+    }
+   },
+   "empty": "The Cali Fund has no money and has not made any allocations yet. Persuade some companies to contribute first.",
+   "game": "Game simplification: half of each disbursement goes to the IPLC player, reflecting the rule that at least half of the funds support Indigenous peoples and local communities.",
+   "know": {
+    "q": "Studies estimated the Cali Fund could raise hundreds of millions of US dollars a year, but it has received only a few thousand. Where does the gap come from?"
+   }
+  },
+  "bilateral": {
+   "name": "Bilateral Aid",
+   "text": "Funding provided directly from one country to another (or to an organization). In the game, the Northern Industrial State decides whether to give and to whom.",
+   "options": {
+    "0": {
+     "label": "Ask the Northern Industrial State for aid (they decide how much)"
+    },
+    "1": {
+     "label": "Give aid to the role with the fewest resources (💰2 → influence +2, nature +1)",
+     "result": "You have honoured part of your international finance pledge."
+    },
+    "2": {
+     "label": "Pass by",
+     "result": "No new aid agreements this year."
+    }
+   },
+   "game": "If no one plays the Northern Industrial State, aid requests are decided by a die roll instead (1–2 💰).",
+   "know": {
+    "q": "International biodiversity finance relies on just a few countries. Is that stable? Who else should pay?"
+   }
+  },
+  "philanthropy": {
+   "name": "Philanthropic Foundations",
+   "text": "Grants from private foundations. In the game, amounts are small and the bar is low; only roles other than Parties can apply.",
+   "options": {
+    "0": {
+     "label": "Write a proposal (📚1 → 2 💰; civil-society groups get 1 extra)"
+    },
+    "1": {
+     "label": "Connect a partner with funders (nature +1, influence +1)",
+     "result": "You introduced a local group to the foundation."
+    }
+   },
+   "game": "Philanthropic foundation amounts and eligibility are game settings.",
+   "know": {
+    "q": "Can private and philanthropic money fill the gap in public funding?"
+   },
+   "short": "Philanthropy"
+  },
+  "debt": {
+   "name": "Debt & Innovative Finance",
+   "text": "Innovative finance mechanisms such as debt-related instruments, outcome bonds and payments for ecosystem services. They may bring in large sums, but may also carry risks.",
+   "options": {
+    "0": {
+     "label": "Raise conservation funds with a debt instrument (3 💰 arrives next lap, nature +1)",
+     "fx": {
+      "delayed": {
+       "why": "Debt instrument"
+      }
+     },
+     "result": "The finance ministry and the environment ministry sit at the same table for the first time."
+    },
+    "1": {
+     "label": "Help design an outcome bond (📚1 → influence +2, nature +1)",
+     "result": "Your monitoring methods convince investors that the outcomes can be verified."
+    },
+    "2": {
+     "label": "Buy biodiversity credits of dubious origin (💰1 → influence +2, but nature −1)",
+     "result": "The press release looks great, but journalists can't find any additional conservation gains."
+    }
+   },
+   "game": "Innovative finance amounts and effects are game settings.",
+   "know": {
+    "q": "How can we make sure biodiversity credits actually deliver \"additional\" conservation outcomes?"
+   },
+   "short": "Debt & Finance"
+  }
+ },
+ "scenarios": {
+  "n1": {
+   "title": "Parliament Slashes the Budget",
+   "text": "The new finance minister demands \"cut foreign aid by 30% first.\" Do you still pay the international biodiversity funding you pledged this year?",
+   "options": {
+    "0": {
+     "label": "Honour the pledge, find funds at home",
+     "result": "Your international partners remember your credibility. Influence rises."
+    },
+    "1": {
+     "label": "Pay half, explain domestic difficulties",
+     "result": "Everyone says they understand, but the meeting room gets a little chillier."
+    },
+    "2": {
+     "label": "Postpone payment",
+     "result": "The treasury breathes a sigh of relief, but no one at the negotiating table wants to ally with you."
+    }
+   },
+   "know": {
+    "q": "If developed countries break their international funding commitments to developing countries, how does that affect other countries' willingness to implement the targets?"
+   }
+  },
+  "n2": {
+   "title": "Big Farm Subsidies",
+   "text": "Farmers' groups surround parliament, opposing the switch from fertilizer subsidies to ecological payments. The election is six months away.",
+   "options": {
+    "0": {
+     "label": "Three-year transition with support",
+     "result": "The transition is slow but steady. Harmful subsidies start to shrink."
+    },
+    "1": {
+     "label": "Keep the status quo until after the election",
+     "result": "The votes are saved. So are the algae in the rivers."
+    }
+   },
+   "know": {
+    "q": "Who loses when harmful subsidies are reformed? How can reform be designed so that vulnerable farmers don't bear all the costs?"
+   }
+  },
+  "n3": {
+   "title": "Imported Forest Footprint",
+   "text": "An investigative report finds that some of the coffee and beef in domestic supermarkets comes from newly cleared rainforest.",
+   "options": {
+    "0": {
+     "label": "Legislate supply-chain due diligence for companies",
+     "result": "Companies complain about rising costs, but start disclosing where their raw materials come from."
+    },
+    "1": {
+     "label": "Encourage voluntary labels",
+     "result": "More and more labels. More and more confused consumers."
+    },
+    "2": {
+     "label": "That's the exporters' problem",
+     "result": "The Rainforest Nation's delegate shakes their head at you in the corridor."
+    }
+   },
+   "know": {
+    "q": "Consuming countries or producing countries: who should be responsible for deforestation far away?"
+   }
+  },
+  "n4": {
+   "title": "Courting the Rainforest Nation",
+   "text": "The Rainforest Nation says privately: if you directly fund their protected areas, they will back your proposal at the COP.",
+   "options": {
+    "0": {
+     "label": "Fund it, require Indigenous participation in governance",
+     "result": "Bilateral cooperation takes shape, and the money reaches local communities."
+    },
+    "1": {
+     "label": "Fund the central government only",
+     "result": "The deal goes through, but local communities say they never saw a thing."
+    },
+    "2": {
+     "label": "Decline; may the best Party win",
+     "result": "Your proposal will have to find its own way through."
+    }
+   },
+   "know": {
+    "q": "Is attaching conditions to bilateral aid a good thing, or interference in domestic affairs?"
+   }
+  },
+  "n5": {
+   "title": "Invaders at Home",
+   "text": "Alien ants have appeared near the port. Scientists warn that unless they are eradicated within a year, they will spread nationwide.",
+   "options": {
+    "0": {
+     "label": "Set up an inter-ministerial response team now",
+     "result": "Eradication comes in time and becomes a case study for other countries."
+    },
+    "1": {
+     "label": "Leave it to local governments",
+     "result": "Every county moves at its own pace. The ants move faster than the paperwork."
+    }
+   },
+   "know": {
+    "q": "Why is it often said that, with invasive alien species, \"prevention is better than cure\"?"
+   }
+  },
+  "s1": {
+   "title": "The Mining Project",
+   "text": "A mining company wants to open a mine on the edge of a national park, promising two thousand jobs. The local Indigenous community strongly opposes it.",
+   "options": {
+    "0": {
+     "label": "Reject it, designate a protected area",
+     "result": "You lose some tax revenue. The forest is saved."
+    },
+    "1": {
+     "label": "Require the community's free, prior and informed consent",
+     "result": "Negotiations drag on, but trust is built, and the community proposes an ecotourism alternative."
+    },
+    "2": {
+     "label": "Approve it, development first",
+     "result": "The budget is flush, but the protests make international news."
+    }
+   },
+   "know": {
+    "q": "Must \"development\" and \"conservation\" always be either/or? Who has the right to decide a piece of land's future?"
+   }
+  },
+  "s2": {
+   "title": "The NBSAP",
+   "text": "You need to update your national biodiversity strategy and action plan (NBSAP), and the submission deadline is close.",
+   "options": {
+    "0": {
+     "label": "Hold national consultations with Indigenous peoples, women and youth",
+     "result": "The plan is two months late, but everyone is willing to pitch in. For the next three rounds, everyone pays 1 less unit when investing in target squares."
+    },
+    "1": {
+     "label": "Hire consultants to write it in two weeks",
+     "result": "Submitted on time. A beautiful document. When it comes to implementation, nobody has read it."
+    }
+   },
+   "know": {
+    "q": "For a national plan, which matters more: writing it fast or writing it well?"
+   }
+  },
+  "s3": {
+   "title": "Tourist Flood",
+   "text": "Your national park goes viral on social media. Visitor numbers grow fivefold in a year.",
+   "options": {
+    "0": {
+     "label": "Cap visitors, ticket revenue funds conservation",
+     "result": "Visitors complain it's hard to book, but conservation now has a stable source of funding."
+    },
+    "1": {
+     "label": "No limits, maximize tourism revenue",
+     "result": "Revenue explodes. So does the litter along the trails."
+    }
+   },
+   "know": {
+    "q": "Under what conditions is ecotourism truly \"eco\"?"
+   }
+  },
+  "s4": {
+   "title": "Genetic Resources Taken",
+   "text": "A multinational pharmaceutical company used digital sequence information (DSI) from your rainforest plants to develop a new drug, without sharing any benefits.",
+   "options": {
+    "0": {
+     "label": "Push a multilateral benefit-sharing mechanism at the COP",
+     "result": "Delegates nod, and companies start considering contributions to the Cali Fund."
+    },
+    "1": {
+     "label": "Negotiate bilaterally, seek compensation",
+     "result": "You win a settlement, but other countries still lose out on their own."
+    }
+   },
+   "know": {
+    "q": "Once a gene sequence is uploaded to a database, is it still a country's genetic resource?"
+   }
+  },
+  "s5": {
+   "title": "COP Host Country",
+   "text": "You are nominated to host the next COP, and must first advance the money for the venue and security.",
+   "options": {
+    "0": {
+     "label": "Take it on, show leadership",
+     "result": "The agenda you chair puts your country in front of the world."
+    },
+    "1": {
+     "label": "Decline, keep the money at home",
+     "result": "Another country steps in, and you carry a little less weight at the negotiating table."
+    }
+   },
+   "know": {
+    "q": "What benefits and pressures does hosting an international meeting bring to a country?"
+   }
+  },
+  "g1": {
+   "title": "Exposing Greenwashing",
+   "text": "A big company claims \"one tree planted for every drink sold.\" Your volunteers discover the trees are all a single alien species.",
+   "options": {
+    "0": {
+     "label": "Publish the investigation",
+     "result": "Wide media coverage. The company pledges to switch to native trees and disclose information."
+    },
+    "1": {
+     "label": "Talk privately, get a donation",
+     "result": "Fundraising target met, but you know this won't last."
+    }
+   },
+   "know": {
+    "q": "If an NGO takes corporate money, does that weaken its watchdog role?"
+   }
+  },
+  "g2": {
+   "title": "Citizen Science Blitz",
+   "text": "You rally thousands of people to record species on their phones. Data pours in, but its quality is uneven.",
+   "options": {
+    "0": {
+     "label": "Bring in expert validation, open the data",
+     "result": "The data underpins government policymaking. Every role gains 1 📚."
+    },
+    "1": {
+     "label": "Publish leaderboards now, chase buzz",
+     "result": "Lots of buzz. Scientists are hesitant to cite it."
+    }
+   },
+   "know": {
+    "q": "What makes citizen science data trustworthy to decision-makers?"
+   }
+  },
+  "g3": {
+   "title": "Inside or Outside?",
+   "text": "The COP gives you only two observer badges, and another group of partners wants to protest outside.",
+   "options": {
+    "0": {
+     "label": "Speak inside + act outside, in concert",
+     "result": "At lunchtime, every delegate is discussing your demands."
+    },
+    "1": {
+     "label": "Lobby inside only",
+     "result": "You collect business cards from a few national delegates."
+    },
+    "2": {
+     "label": "All-out protest outside",
+     "result": "You make the headlines, but your badge is suspended, and you're stuck in brackets for a while."
+    }
+   },
+   "know": {
+    "q": "What is civil society's most effective strategy in international negotiations?"
+   }
+  },
+  "g4": {
+   "title": "The Fundraising Letter",
+   "text": "Cute large mammals raise the most money, but the species truly endangered is a freshwater mussel nobody has heard of.",
+   "options": {
+    "0": {
+     "label": "Tell the mussel's story honestly",
+     "result": "Donations are modest, but the mussel population starts to recover."
+    },
+    "1": {
+     "label": "Fundraise with pandas, divert the money",
+     "result": "The money comes in, but a journalist is asking where it went."
+    }
+   },
+   "know": {
+    "q": "Why do conservation resources often concentrate on a few \"flagship species\"?"
+   }
+  },
+  "g5": {
+   "title": "Poaching Tip-off",
+   "text": "An informant tells you a shipment of pangolin scales will leave the country next week.",
+   "options": {
+    "0": {
+     "label": "Report to law enforcement and assist",
+     "result": "A smuggling ring is busted. Species recovery takes a step forward."
+    },
+    "1": {
+     "label": "Go undercover to film a documentary",
+     "result": "The footage is shocking, but the smugglers are tipped off and reroute the shipment."
+    }
+   },
+   "know": {
+    "q": "Why does tackling illegal wildlife trade require international cooperation?"
+   }
+  },
+  "o1": {
+   "title": "Relax the Review Rules?",
+   "text": "Indigenous organizations complain that your proposal form is eighty pages long. They simply can't finish it.",
+   "options": {
+    "0": {
+     "label": "Design a simplified direct-access window",
+     "result": "For the first time, money flows directly into communities' hands."
+    },
+    "1": {
+     "label": "Keep the standards, send staff to help",
+     "result": "The form is still eighty pages, but now someone is helping."
+    },
+    "2": {
+     "label": "Rules are rules",
+     "result": "A flawless procedure. Zero applications."
+    }
+   },
+   "know": {
+    "q": "How can funding mechanisms balance accountability requirements with local groups' capacity to apply?"
+   }
+  },
+  "o2": {
+   "title": "Pick One Project",
+   "text": "The budget covers only one: a large wetland restoration project, or training a hundred local rangers.",
+   "options": {
+    "0": {
+     "label": "Wetland restoration",
+     "result": "Great photos. Nobody knows yet who pays for maintenance."
+    },
+    "1": {
+     "label": "Train rangers",
+     "result": "Capacity stays local. Every role gains 1 📚."
+    }
+   },
+   "know": {
+    "q": "\"Infrastructure\" or \"capacity-building\": which investment has more lasting effects?"
+   }
+  },
+  "o3": {
+   "title": "Understaffed Secretariat",
+   "text": "The Parties keep assigning more work, but the budget hasn't grown.",
+   "options": {
+    "0": {
+     "label": "Seek voluntary contributions from Parties",
+     "result": "Two countries are willing to contribute, on condition the funds are earmarked."
+    },
+    "1": {
+     "label": "Tell the COP honestly: we can't do it all",
+     "result": "The COP decides: \"subject to the availability of resources.\" Work is put on hold."
+    }
+   },
+   "know": {
+    "q": "When a decision says \"subject to the availability of resources,\" what does that actually mean?"
+   }
+  },
+  "o4": {
+   "title": "Global Monitoring Report",
+   "text": "You are compiling the national reports, but a third of countries haven't submitted.",
+   "options": {
+    "0": {
+     "label": "Offer technical assistance and online tools",
+     "result": "Submission rates rise, and for the first time the data can be compared."
+    },
+    "1": {
+     "label": "Fill gaps with estimates",
+     "result": "The report is published on time, but countries dispute the numbers."
+    }
+   },
+   "know": {
+    "q": "Without data, there's no way to know whether the targets are met. Who should bear the cost of monitoring?"
+   }
+  },
+  "o5": {
+   "title": "Fast-Track Disbursement",
+   "text": "Everyone complains disbursement is too slow. You can sacrifice part of the review process to speed things up.",
+   "options": {
+    "0": {
+     "label": "Open the fast track (no fund disbursement delays for the next 6 rounds)",
+     "result": "The money moves faster. Let's hope nothing goes wrong."
+    },
+    "1": {
+     "label": "Keep current procedures",
+     "result": "Steady, but everyone is still waiting."
+    }
+   },
+   "know": {
+    "q": "Which matters more: disbursement speed or accountability?"
+   }
+  },
+  "p1": {
+   "title": "A Park on Our Doorstep",
+   "text": "The government announces a new national park covering your traditional territories and hunting grounds, without any prior consultation.",
+   "options": {
+    "0": {
+     "label": "Propose co-management, governing with traditional knowledge",
+     "result": "The government accepts co-management. The protected area is managed jointly by the community and the government."
+    },
+    "1": {
+     "label": "Go to court for land rights",
+     "result": "The case will take years, but it is cited internationally."
+    },
+    "2": {
+     "label": "Accept compensation and relocate",
+     "result": "You get the money, but lose your connection to the land, and traditional knowledge begins to fade."
+    }
+   },
+   "know": {
+    "q": "Target 3 requires protected areas to recognize Indigenous and traditional territories. Can \"conservation\" and \"rights\" be achieved together?"
+   }
+  },
+  "p2": {
+   "title": "Bioprospectors Visit",
+   "text": "A biotech company wants to document your knowledge of plants used to heal wounds.",
+   "options": {
+    "0": {
+     "label": "Sign a prior informed consent and benefit-sharing agreement",
+     "result": "The community receives royalties, and the use of its knowledge is protected."
+    },
+    "1": {
+     "label": "Refuse, the knowledge stays with us",
+     "result": "The knowledge stays in the community, and so does zero income."
+    },
+    "2": {
+     "label": "Take the envelope, let them record",
+     "result": "A few years later, a patent on that plant is granted in another country."
+    }
+   },
+   "know": {
+    "q": "How should traditional knowledge be protected? Who \"owns\" knowledge?"
+   }
+  },
+  "p3": {
+   "title": "The Youth Left for the City",
+   "text": "The community's young people work in cities, and fewer and fewer elders remain who can identify medicinal herbs and read the weather.",
+   "options": {
+    "0": {
+     "label": "Start a community school; elders take youth to the mountains",
+     "result": "The knowledge is passed down, and the young people bring back digital documentation skills."
+    },
+    "1": {
+     "label": "Partner with Youth representatives on a digital archive",
+     "result": "Intergenerational collaboration, and the youth gain new perspectives too."
+    }
+   },
+   "know": {
+    "q": "How is the loss of traditional knowledge similar to the loss of species?"
+   }
+  },
+  "p4": {
+   "title": "Carbon Credits Come Knocking",
+   "text": "A carbon credit company is willing to pay, on condition that you don't gather or hunt in the forest for thirty years.",
+   "options": {
+    "0": {
+     "label": "Negotiate to keep customary use rights",
+     "result": "A customary-use clause is added to the contract. Both income and culture are preserved."
+    },
+    "1": {
+     "label": "Sign right away",
+     "result": "Plenty of income, but the people who patrol the mountains become \"contract violators.\""
+    },
+    "2": {
+     "label": "Refuse",
+     "result": "Nothing changes."
+    }
+   },
+   "know": {
+    "q": "Are biodiversity credits or carbon credits an opportunity or a risk for Indigenous peoples?"
+   }
+  },
+  "p5": {
+   "title": "Wildfire Season",
+   "text": "The government bans all fire use, but your traditional small-scale prescribed burns used to prevent big wildfires.",
+   "options": {
+    "0": {
+     "label": "Invite forestry agencies to trial traditional fire management",
+     "result": "That year, the big fire never reached your valley."
+    },
+    "1": {
+     "label": "Obey the ban",
+     "result": "Dead wood keeps piling up on the forest floor."
+    }
+   },
+   "know": {
+    "q": "What can traditional land management teach modern conservation?"
+   }
+  },
+  "y1": {
+   "title": "Who Pays the Airfare?",
+   "text": "You've been chosen as a youth delegate, but the COP has no travel support for youth, so you must pay for your own ticket.",
+   "options": {
+    "0": {
+     "label": "Crowdfund",
+     "result": "Hundreds of small backers chip in. You set off carrying everyone's hopes."
+    },
+    "1": {
+     "label": "Ask the Northern Industrial State to sponsor you",
+     "result": "You make the trip, but the delegation hopes you'll \"tone it down a bit.\""
+    },
+    "2": {
+     "label": "Join online",
+     "result": "Ten hours' time difference: raising your virtual hand to speak at 3 a.m."
+    }
+   },
+   "know": {
+    "q": "If travel funding only supports government delegates, whose voices get heard?"
+   }
+  },
+  "y2": {
+   "title": "Viral Short Video",
+   "text": "Your short video \"How much water does one T-shirt take?\" passes a million views.",
+   "options": {
+    "0": {
+     "label": "Launch a sustainable consumption challenge",
+     "result": "A million people join. Every role gains 1 🤝."
+    },
+    "1": {
+     "label": "Take a fast-fashion sponsorship deal",
+     "result": "Lots of money. A very angry comment section."
+    }
+   },
+   "know": {
+    "q": "Which matters more: individual consumer choices or systemic change?"
+   }
+  },
+  "y3": {
+   "title": "Who Shares Your Table?",
+   "text": "At a youth workshop, someone proposes a joint statement with Indigenous youth.",
+   "options": {
+    "0": {
+     "label": "Co-draft the statement",
+     "result": "The statement gets quoted in plenary."
+    },
+    "1": {
+     "label": "Speak separately; keep the message simple",
+     "result": "The message is clear, but it carries little weight."
+    }
+   },
+   "know": {
+    "q": "When different groups form an alliance, how can they keep each other's issues from being diluted?"
+   }
+  },
+  "y4": {
+   "title": "Finals Week Meets Negotiations",
+   "text": "The COP's key negotiations fall in finals week. You can only pick one.",
+   "options": {
+    "0": {
+     "label": "Skip class to negotiate",
+     "result": "You stay in the contact group until the small hours and learn things no textbook teaches."
+    },
+    "1": {
+     "label": "Studies first",
+     "result": "You ace your exams, and you start studying biodiversity policy too."
+    }
+   },
+   "know": {
+    "q": "What kind of institutional support do young people need to take part in international affairs?"
+   }
+  },
+  "y5": {
+   "title": "The City's Last Wetland",
+   "text": "City hall plans to fill in the last wetland downtown and build a parking lot.",
+   "options": {
+    "0": {
+     "label": "Run eco-tours + a petition",
+     "result": "The city council decides to keep the wetland and turn it into an eco-park."
+    },
+    "1": {
+     "label": "Stage a one-off flash protest",
+     "result": "It makes the news, but construction is only delayed."
+    }
+   },
+   "know": {
+    "q": "What value do green and blue spaces have for city dwellers?"
+   }
+  },
+  "w1": {
+   "title": "Who Keeps the Seeds?",
+   "text": "In the village, it's the women who save traditional crop seeds, yet the agricultural extension course invites only male heads of household.",
+   "options": {
+    "0": {
+     "label": "Push to open the course to whole families, and document women's seed knowledge",
+     "result": "Local varieties are saved, and women join the cooperative's board."
+    },
+    "1": {
+     "label": "Run your own women's seed swap",
+     "result": "The seed swap is a hit, but mainstream policy stays the same."
+    }
+   },
+   "know": {
+    "q": "Target 23 is about gender equality. Why does biodiversity policy need to consider gender?"
+   }
+  },
+  "w2": {
+   "title": "A Gender Plan, No Budget",
+   "text": "The COP adopts the Gender Plan of Action, but its dedicated funding is pitifully small.",
+   "options": {
+    "0": {
+     "label": "Persuade every role to build gender into their plans",
+     "result": "Gender mainstreaming: every role gains 1 📚."
+    },
+    "1": {
+     "label": "Fight for earmarked funds",
+     "result": "You get a small sum, enough for two workshops."
+    }
+   },
+   "know": {
+    "q": "\"Mainstreaming\" or \"earmarked funding\": which approach does more to deliver gender equality?"
+   }
+  },
+  "w3": {
+   "title": "The Long Walk for Water",
+   "text": "The upstream forest is cut, the spring runs dry, and women now walk two extra hours a day to fetch water.",
+   "options": {
+    "0": {
+     "label": "Organize women to restore the watershed forest",
+     "result": "Three years later, the spring is back."
+    },
+    "1": {
+     "label": "Ask the government for piped water",
+     "result": "The pipes are in. The hills are still bare."
+    }
+   },
+   "know": {
+    "q": "Why do women so often bear the heaviest burden when ecosystem services are lost?"
+   }
+  },
+  "w4": {
+   "title": "Empty Chairs at the Table",
+   "text": "You notice that in a key contact group, all twelve delegates are men.",
+   "options": {
+    "0": {
+     "label": "Propose gender balance in delegations",
+     "result": "At the next COP, the share of women delegates rises noticeably."
+    },
+    "1": {
+     "label": "Quietly mentor young women delegates",
+     "result": "Several young women delegates start taking the floor."
+    }
+   },
+   "know": {
+    "q": "How does who makes the decisions shape what gets decided?"
+   }
+  },
+  "w5": {
+   "title": "Microloans",
+   "text": "A bank offers microloans to a women's cooperative to develop organic produce.",
+   "options": {
+    "0": {
+     "label": "Take the loan; build an organic brand",
+     "fx": {
+      "delayed": {
+       "why": "Organic brand income"
+      }
+     },
+     "result": "The first year is tough; income starts the year after."
+    },
+    "1": {
+     "label": "No loan; take it slow",
+     "result": "Slow and steady, and debt-free."
+    }
+   },
+   "know": {
+    "q": "What kind of financial support does sustainable production need?"
+   }
+  },
+  "a1": {
+   "title": "Contact Group at 3 a.m.",
+   "text": "The contact group on finance is still going in the small hours, and someone suggests: \"Let's just bracket it and pick it up tomorrow.\"",
+   "options": {
+    "0": {
+     "label": "Push on and finish now",
+     "result": "Consensus before dawn. You finish your fourth coffee."
+    },
+    "1": {
+     "label": "Agree to bracket it",
+     "result": "The text goes into brackets. So do you."
+    }
+   },
+   "know": {
+    "q": "Why do international negotiations so often drag on to the last minute?"
+   }
+  },
+  "a2": {
+   "title": "Exotic Pets",
+   "text": "An alien turtle species is trending online as a pet, and people start releasing them into park ponds.",
+   "options": {
+    "0": {
+     "label": "Push for pet registration and release controls",
+     "result": "New rules take effect, and the native fish in the ponds get a little breathing room."
+    },
+    "1": {
+     "label": "Hold a removal drive",
+     "result": "Two hundred removed, but they're still on sale online."
+    }
+   },
+   "know": {
+    "q": "Releasing animals is well-meant. Why can it still harm ecosystems?"
+   }
+  },
+  "a3": {
+   "title": "Food Waste",
+   "text": "The venue's buffet throws out piles of food every day.",
+   "options": {
+    "0": {
+     "label": "Push for surplus-food donation and a waste-cutting menu",
+     "result": "The COP issues a \"zero waste\" statement; every role 🤝+1."
+    },
+    "1": {
+     "label": "Pack a few extra boxes to go",
+     "result": "You saved on dinner."
+    }
+   },
+   "know": {
+    "q": "Target 16 is about sustainable consumption and reducing food waste. What can you do in daily life?"
+   }
+  },
+  "a4": {
+   "title": "Indicators Nobody Understands",
+   "text": "The monitoring framework has over a hundred indicators, and your team doesn't know where to start.",
+   "options": {
+    "0": {
+     "label": "Ask an international organization for help; start with headline indicators",
+     "result": "Starting with what matters most, the data falls into place step by step."
+    },
+    "1": {
+     "label": "Do it all yourselves",
+     "result": "It's hard work, but your team's capacity grows enormously."
+    }
+   },
+   "know": {
+    "q": "What goes wrong when there are too many monitoring indicators, or too few?"
+   }
+  },
+  "a5": {
+   "title": "A Corporate Consultancy",
+   "text": "A multinational wants to assess its operations' impacts on biodiversity and invites you to consult.",
+   "options": {
+    "0": {
+     "label": "Accept, but require public results",
+     "result": "The company publicly discloses its biodiversity footprint for the first time."
+    },
+    "1": {
+     "label": "Accept; keep results confidential",
+     "result": "Easy consulting fees. The report goes in a drawer."
+    },
+    "2": {
+     "label": "Decline",
+     "result": "You keep your independence."
+    }
+   },
+   "know": {
+    "q": "Target 15 requires businesses to assess and disclose their dependencies and impacts on biodiversity. Is voluntary disclosure enough?"
+   }
+  },
+  "a6": {
+   "title": "GM Crops Cross the Border",
+   "text": "Seeds of a neighbouring country's GM crop accidentally arrive in your territory in a shipping container.",
+   "options": {
+    "0": {
+     "label": "Launch a biosafety risk assessment",
+     "result": "Assessed by the book; the response is evidence-based."
+    },
+    "1": {
+     "label": "Do nothing",
+     "result": "Nobody knows where they ended up growing."
+    }
+   },
+   "know": {
+    "q": "Why does biosafety need cross-border rules?"
+   }
+  },
+  "a7": {
+   "title": "Reef Tour Boats",
+   "text": "A tour operator wants to run more boat trips to snorkel on the coral reef.",
+   "options": {
+    "0": {
+     "label": "Cap boat trips; charge a conservation fee",
+     "result": "Pressure on the reef eases, and there's money for monitoring."
+    },
+    "1": {
+     "label": "Allow it",
+     "result": "Revenue goes up. So does coral bleaching."
+    }
+   },
+   "know": {
+    "q": "Can tourism revenue fund conservation? Under what conditions?"
+   }
+  },
+  "a8": {
+   "title": "Redirecting Subsidies",
+   "text": "The finance ministry asks you: should fishing fuel subsidies be redirected to help fishers transition?",
+   "options": {
+    "0": {
+     "label": "Reform, and set up a fisher transition fund",
+     "result": "Fishing pressure drops, and fishers get support to transition."
+    },
+    "1": {
+     "label": "Keep them",
+     "result": "The fishers are happy. The fish are not."
+    }
+   },
+   "know": {
+    "q": "Target 18 calls for identifying and reforming harmful subsidies. Why is subsidy reform so hard?"
+   }
+  },
+  "a9": {
+   "title": "A Side-Event Encounter",
+   "text": "At a side event you meet a counterpart in a situation much like yours, who suggests swapping experiences.",
+   "options": {
+    "0": {
+     "label": "Share your data in exchange for their methods",
+     "result": "One plus one is greater than two."
+    },
+    "1": {
+     "label": "Just swap business cards",
+     "result": "One more contact on LinkedIn."
+    }
+   },
+   "know": {
+    "q": "Why do South-South cooperation and experience-sharing matter for capacity-building?"
+   }
+  },
+  "a10": {
+   "title": "The COP Runs Over",
+   "text": "The COP is extended by a day, and changing your flight costs extra.",
+   "options": {
+    "0": {
+     "label": "Change the flight; stay to the end",
+     "result": "In the closing plenary, your statement goes on the record."
+    },
+    "1": {
+     "label": "Fly home on schedule",
+     "result": "You watch the livestream at the airport. The decision is missing the paragraph you cared about."
+    }
+   },
+   "know": {
+    "q": "How do overrunning sessions affect small delegations?"
+   }
+  },
+  "a11": {
+   "title": "City Biodiversity Index",
+   "text": "The mayor wants your city at the top of an international urban biodiversity ranking.",
+   "options": {
+    "0": {
+     "label": "Promote green roofs and ecological corridors",
+     "result": "The number of bird species in the city goes up."
+    },
+    "1": {
+     "label": "Plant street trees for the photo op",
+     "result": "The ranking ticks up slightly; the ecological benefit is limited."
+    }
+   },
+   "know": {
+    "q": "What can cities do for biodiversity?"
+   }
+  },
+  "a12": {
+   "title": "Cutting Pesticides",
+   "text": "A study finds high pesticide levels in nearby streams, and bee numbers are falling.",
+   "options": {
+    "0": {
+     "label": "Promote subsidies for nature-friendly farming",
+     "result": "Pesticide use falls, and the bees come back."
+    },
+    "1": {
+     "label": "Step up awareness campaigns",
+     "result": "Some farmers change their practices."
+    }
+   },
+   "know": {
+    "q": "Target 7 calls for reducing the overall risk from pesticides. How can cuts be balanced with farmers' livelihoods?"
+   }
+  },
+  "a13": {
+   "title": "Fishers and the MPA",
+   "text": "A newly designated marine protected area cuts small-scale fishers off from their traditional fishing grounds.",
+   "options": {
+    "0": {
+     "label": "Zone no-take and sustainable-use areas together with fishers",
+     "result": "A few years later, catches outside the protected area go up too."
+    },
+    "1": {
+     "label": "Ban all fishing",
+     "result": "Great protection results; fishers protest at the harbour."
+    }
+   },
+   "know": {
+    "q": "Can protected areas and local livelihoods coexist?"
+   }
+  },
+  "sd1": {
+   "title": "A Two-Person Delegation",
+   "text": "The COP has three working groups meeting at once: finance, digital sequence information and oceans are all on tonight. Your delegation has two people.",
+   "options": {
+    "0": {
+     "label": "Team up with other island states and split up, one room each",
+     "result": "The group chat buzzes all night, but someone speaks for island states in every room."
+    },
+    "1": {
+     "label": "Cover only the crucial finance talks",
+     "result": "You hold the line on the finance text, but the brackets in the oceans text are removed while you're away."
+    },
+    "2": {
+     "label": "Apply to the participation trust fund to send one more next time",
+     "fx": {
+      "delayed": {
+       "why": "Participation trust fund"
+      }
+     },
+     "result": "Application sent. Contributions to the trust fund have always been thin; whether you get support depends on next year."
+    }
+   },
+   "know": {
+    "q": "How does a lack of funding to attend meetings affect small countries' weight at the negotiating table?"
+   }
+  },
+  "sd2": {
+   "title": "Coral Bleaching",
+   "text": "Sea temperatures hit another record, and the corals around the atoll bleach on a massive scale. Fishers say this year's catch is down by half.",
+   "options": {
+    "0": {
+     "label": "Use the national budget for emergency monitoring and restoration",
+     "result": "Monitoring data show parts of the reef starting to recover, which also becomes strong evidence for you at the COP."
+    },
+    "1": {
+     "label": "Make a statement at the COP urging all countries to cut emissions",
+     "result": "A standing ovation. The applause is warm; the sea temperature doesn't change."
+    },
+    "2": {
+     "label": "Wait a season and see",
+     "result": "Next season, the bleaching has spread."
+    }
+   },
+   "know": {
+    "q": "Island states bear the least responsibility for climate change and suffer the most from it. How should international cooperation respond to this injustice?"
+   }
+  },
+  "sd3": {
+   "title": "Rats Ashore",
+   "text": "Alien rats brought by a supply ship are breeding on an uninhabited island, and seabird nests are losing their eggs one after another.",
+   "options": {
+    "0": {
+     "label": "Launch an eradication programme",
+     "result": "After a full season of effort, no more signs of rats are found on the island, and the seabirds return."
+    },
+    "1": {
+     "label": "Ask NGOs and researchers to help monitor",
+     "result": "A monitoring network is set up, and the data make the next step very clear."
+    },
+    "2": {
+     "label": "Not enough money; leave it for now",
+     "result": "The rats swim to the next island."
+    }
+   },
+   "know": {
+    "q": "Why are islands priority sites for tackling invasive alien species?"
+   }
+  },
+  "sd4": {
+   "title": "Forms Thicker Than the Island",
+   "text": "An international fund's project wants a feasibility study, proof of co-financing and a gender assessment. Your national environment ministry has five staff.",
+   "options": {
+    "0": {
+     "label": "Ask an international organization to help write the proposal",
+     "fx": {
+      "delayed": {
+       "why": "International fund project"
+      }
+     },
+     "result": "The proposal is approved, and the implementing agency takes a service fee. The money won't arrive until next year."
+    },
+    "1": {
+     "label": "Pull all-nighters and write it yourself",
+     "result": "You finish it and collapse, but the experience stays with your own people."
+    },
+    "2": {
+     "label": "Skip this round",
+     "result": "You spend the time on local surveys. At least the data are your own."
+    }
+   },
+   "know": {
+    "q": "Funding rules apply equally to all. Is that fair to countries with very few administrative staff?"
+   }
+  },
+  "sd5": {
+   "title": "A Seabed Mining Offer",
+   "text": "A company proposes test mining for seabed minerals in your exclusive economic zone, promising royalties big enough to build a new hospital.",
+   "options": {
+    "0": {
+     "label": "Accept; the country needs the money",
+     "result": "Work on the hospital begins. How the deep-sea ecosystem is affected, nobody can say."
+    },
+    "1": {
+     "label": "Require a full environmental impact assessment first",
+     "result": "The assessment will take three years. The company says it will wait, and also that it will look at other countries."
+    },
+    "2": {
+     "label": "Decline, and share your decision at the COP",
+     "result": "You give up a lot of money and earn other countries' respect."
+    }
+   },
+   "know": {
+    "q": "When developing countries face trade-offs between development and conservation, what alternatives can the international community offer?"
+   }
+  }
+ },
+ "events": {
+  "crises": {
+   "c1": {
+    "title": "Invasive Species Outbreak",
+    "text": "An alien vine is spreading along the riverbanks, smothering native forest. Tackling it takes both people and data.",
+    "ok": "Volunteers, scientists and government worked together, and the vine is under control.",
+    "half": "The main stretch of river is cleared, but the vine is still spreading along the tributaries.",
+    "fail": "The vine swallowed the entire riverside forest.",
+    "know": {
+     "q": "Why are early detection and rapid response the key to dealing with invasive alien species?"
+    }
+   },
+   "c2": {
+    "title": "Megafire",
+    "text": "After a long drought, a wildfire burns for three weeks.",
+    "ok": "Cross-border disaster relief, and a post-fire restoration plan kicks off immediately.",
+    "half": "The fire is out, but there is no money for restoration.",
+    "fail": "The burned forest will take decades to recover.",
+    "know": {
+     "q": "How do climate change and biodiversity loss make each other worse?"
+    }
+   },
+   "c3": {
+    "title": "Mass Coral Bleaching",
+    "text": "Sea temperatures hit a record high, and reefs bleach across vast areas.",
+    "ok": "Local pressures were reduced and a monitoring network set up; some corals recover.",
+    "half": "The monitoring data is in, but local pressures have not eased.",
+    "fail": "The bleached reefs die off en masse.",
+    "know": {
+     "q": "In the face of global warming, does local conservation still help?"
+    }
+   },
+   "c4": {
+    "title": "Poaching Spree",
+    "text": "An international smuggling ring targets the pangolins in a protected area.",
+    "ok": "Cross-border law enforcement cooperation busts the smuggling network.",
+    "half": "The couriers are caught, but the masterminds are still at large.",
+    "fail": "The protected area's pangolin population collapses.",
+    "know": {
+     "q": "Source, transit and market of illegal wildlife trade: who should be responsible for each?"
+    }
+   },
+   "c5": {
+    "title": "Election Upset",
+    "text": "A new government takes office and announces a review of all environmental laws.",
+    "ok": "Civil society and international partners speak up, and key conservation laws survive.",
+    "half": "Some regulations are relaxed.",
+    "fail": "The conservation budget is cut in half and several laws are scrapped.",
+    "know": {
+     "q": "How can biodiversity policy survive a change of ruling party?"
+    }
+   },
+   "c6": {
+    "title": "Global Recession",
+    "text": "A financial crisis hits, countries slash budgets, and international aid is the first to go.",
+    "ok": "Several roles together kept the key programmes afloat.",
+    "half": "Some programmes are postponed.",
+    "fail": "Many conservation programmes grind to a halt.",
+    "know": {
+     "q": "In an economic downturn, should biodiversity funding be protected first?"
+    }
+   },
+   "c7": {
+    "title": "Plastic Tsunami",
+    "text": "After a typhoon, beaches are piled with plastic waste, and reports of sea turtles swallowing it keep coming.",
+    "ok": "Beach clean-ups and reduction at source, working hand in hand.",
+    "half": "The beaches are clean, but nothing changed at the source.",
+    "fail": "Marine life suffers heavy losses.",
+    "know": {
+     "q": "Beach clean-ups or cutting plastic at the source: which tackles the root cause?"
+    }
+   },
+   "c8": {
+    "title": "Pesticide Pollution",
+    "text": "High levels of pesticides are found in a river, and fish downstream die en masse.",
+    "ok": "The pollution source is traced and wildlife-friendly farming is promoted.",
+    "half": "The source has been found; the transition is still under discussion.",
+    "fail": "The downstream ecosystem is badly damaged.",
+    "know": {
+     "q": "To halve pesticide risk, what must farmers, governments and consumers each do?"
+    }
+   },
+   "c9": {
+    "title": "Megaproject Looms",
+    "text": "The government approves a highway that cuts across a biodiversity hotspot.",
+    "ok": "The environmental impact assessment is sent back for more work, and the route is moved around the hotspot.",
+    "half": "Wildlife corridors are added, but the habitat is still cut apart.",
+    "fail": "The habitat is broken into fragments.",
+    "know": {
+     "q": "How can infrastructure planning take biodiversity into account?"
+    }
+   },
+   "c10": {
+    "title": "Disease Spillover",
+    "text": "A new infectious disease breaks out at a wildlife market, and countries close their borders.",
+    "ok": "One Health cooperation brings the outbreak quickly under control.",
+    "half": "The outbreak is contained, but wildlife trade management lags behind.",
+    "fail": "The epidemic spreads, and all conservation work stops.",
+    "know": {
+     "q": "Why are human health, animal health and ecosystem health linked?"
+    }
+   },
+   "c11": {
+    "title": "Greenwashing Scandal",
+    "text": "A major company's \"zero deforestation\" pledge is exposed as fake, and the public loses faith in corporate disclosure.",
+    "ok": "An oversight mechanism is set up and corporate disclosure standards are raised.",
+    "half": "The company apologizes, but the standards stay the same.",
+    "fail": "Every company's sustainability report is now under suspicion.",
+    "know": {
+     "q": "How can corporate disclosure avoid becoming greenwashing?"
+    }
+   },
+   "c12": {
+    "title": "No Quorum",
+    "text": "After a Party raises a procedural motion, the plenary cannot reach a quorum.",
+    "ok": "The Friends of the Chair group negotiates through the night, and the meeting resumes.",
+    "half": "The meeting resumes, but the agenda is squeezed.",
+    "fail": "The meeting is suspended, and you are stuck in brackets.",
+    "know": {
+     "q": "In consensus-based international negotiations, what are the strengths and the costs?"
+    }
+   }
+  },
+  "plenary": {
+   "l1": {
+    "title": "Coffee Machine Down",
+    "text": "The plenary runs until 4 a.m. and the coffee machine breaks. You make it through on sheer willpower (🤝+1)."
+   },
+   "l2": {
+    "title": "The Chair's Masterstroke",
+    "text": "The Chair proposes compromise text that nobody likes but everyone can live with. Everyone 🤝+1."
+   },
+   "l3": {
+    "title": "Headset Battery Dead",
+    "text": "Your interpretation headset died and you missed a key intervention; you can only read the record afterwards (📚+1, 🤝−1)."
+   },
+   "l4": {
+    "title": "The Minister Arrives",
+    "text": "Your country's minister shows up unannounced with a new pledge (💰+2)."
+   },
+   "l5": {
+    "title": "Footnote Wars",
+    "text": "Three hours of debate over a single footnote. You get sent into brackets."
+   },
+   "l6": {
+    "title": "A Moving Speech",
+    "text": "An Indigenous elder's speech brings the whole room to its feet (Nature Index +2)."
+   },
+   "l7": {
+    "title": "Corridor Diplomacy",
+    "text": "In the corridor, you reach a quiet understanding with three delegations (🤝+2)."
+   },
+   "l8": {
+    "title": "Side-Event Snacks",
+    "text": "The snacks at a side event are delicious, and you pick up a new monitoring method too (📚+2)."
+   },
+   "l9": {
+    "title": "Standing Ovation",
+    "text": "The moment the decision is adopted, everyone claps, hugs and takes photos (Nature Index +1, everyone 📚+1)."
+   },
+   "l10": {
+    "title": "Give Ground?",
+    "text": "The other side will accept your text, on condition that you delete another paragraph you care deeply about.",
+    "options": {
+     "0": {
+      "label": "Concede, get it adopted",
+      "result": "The decision is adopted, minus the paragraph you cared about most."
+     },
+     "1": {
+      "label": "Hold your ground",
+      "result": "You kept your principles, but the issue is deferred to the next meeting."
+     }
+    }
+   },
+   "l11": {
+    "title": "Laptop Stolen",
+    "text": "Your laptop was stolen near the venue, and your prepared statement is gone (📚−1)."
+   },
+   "l12": {
+    "title": "Last-Minute Surprise",
+    "text": "A country announces an additional pledge (Nature Index +1, 💰+1)."
+   }
+  },
+  "cop": {
+   "d1": {
+    "title": "Long-Term Financial Mechanism",
+    "text": "Should a new entity be set up to operate the financial mechanism, or should an existing one be confirmed?",
+    "options": {
+     "0": {
+      "label": "Set up a new entity",
+      "result": "Developing countries gain a bigger say, but the new entity has to be built from scratch."
+     },
+     "1": {
+      "label": "Keep and reform the existing one",
+      "result": "The existing entity pledges faster disbursement: no fund disbursement delays for the next 6 rounds."
+     }
+    },
+    "know": {
+     "q": "Creating a new entity vs. reforming an existing one: what are the pros and cons of each?"
+    }
+   },
+   "d2": {
+    "title": "Mandatory DSI Contributions?",
+    "text": "The Cali Fund has received almost no contributions. Keep it voluntary, or require countries to make it mandatory by law?",
+    "options": {
+     "0": {
+      "label": "National laws require companies to pay",
+      "result": "The Cali Fund finally has money (Cali Fund +6)."
+     },
+     "1": {
+      "label": "Stay voluntary, promote harder",
+      "result": "A few more companies contribute (Cali Fund +2)."
+     }
+    },
+    "know": {
+     "q": "Voluntary or mandatory contributions: which is more likely to get the Cali Fund working?"
+    }
+   },
+   "d3": {
+    "title": "Direct Access for IPLC",
+    "text": "Should Indigenous peoples and local communities be able to apply for funds directly, without going through governments?",
+    "options": {
+     "0": {
+      "label": "Open a direct access window",
+      "result": "Indigenous peoples and local communities receive money directly for the first time (💰+3)."
+     },
+     "1": {
+      "label": "Keep it via national governments",
+      "result": "National governments stay in control."
+     }
+    },
+    "know": {
+     "q": "Funding communities directly vs. distributing through governments: what are the risks of each?"
+    }
+   },
+   "d4": {
+    "title": "Biodiversity Credits",
+    "text": "Should a study be commissioned to examine whether biodiversity credits and offsets really deliver additional conservation outcomes?",
+    "options": {
+     "0": {
+      "label": "Commission a study, add safeguards",
+      "result": "The study begins, and the market cools for now (everyone 📚+1)."
+     },
+     "1": {
+      "label": "Promote credit markets now",
+      "result": "Money flows in; nobody is sure about additionality (everyone 💰+1)."
+     }
+    },
+    "know": {
+     "q": "Why does \"additionality\" matter for biodiversity credits?"
+    }
+   },
+   "d5": {
+    "title": "Resourcing the Gender Plan",
+    "text": "Mid-term review of the Gender Plan of Action: should resources be encouraged for women-led initiatives?",
+    "options": {
+     "0": {
+      "label": "Encourage funding, simplify access",
+      "result": "Women-led initiatives get support."
+     },
+     "1": {
+      "label": "Defer to the next meeting",
+      "result": "The mid-term review is merely noted."
+     }
+    },
+    "know": {
+     "q": "What resources does the Gender Plan of Action need to be implemented?"
+    }
+   },
+   "d6": {
+    "title": "Subsidy Reform Timeline",
+    "text": "Should a reporting timeline be set for countries to identify and reform harmful subsidies?",
+    "options": {
+     "0": {
+      "label": "Set a reporting timeline",
+      "result": "Countries start taking stock of their harmful subsidies."
+     },
+     "1": {
+      "label": "Leave it to each country",
+      "result": "Lots of flexibility, very little progress."
+     }
+    },
+    "know": {
+     "q": "Is a commitment without a timeline really a commitment?"
+    }
+   },
+   "d7": {
+    "title": "Broaden the Donor Base",
+    "text": "International biodiversity finance currently comes from only a handful of countries. Should more Parties be called on to contribute?",
+    "options": {
+     "0": {
+      "label": "Call for more contributors",
+      "result": "Several emerging economies announce pledges (GBFF +4)."
+     },
+     "1": {
+      "label": "Insist on developed-country duty",
+      "result": "The principle holds, but funding does not increase."
+     }
+    },
+    "know": {
+     "q": "Who should pay for global biodiversity, and on what basis?"
+    }
+   },
+   "d8": {
+    "title": "Youth & Women in Project Cycle",
+    "text": "Should the GEF be asked to strengthen the participation of Indigenous peoples and local communities, women and youth at every stage of the project cycle?",
+    "options": {
+     "0": {
+      "label": "Write it into the decision",
+      "result": "Project reviews start inviting youth and women representatives."
+     },
+     "1": {
+      "label": "Delete the paragraph",
+      "result": "The procedure got simpler."
+     }
+    },
+    "know": {
+     "q": "What is the difference between taking part in \"project decisions\" and taking part in \"meetings\"?"
+    }
+   }
+  }
+ },
+ "targets": {
+  "targets": {
+   "T1": {
+    "short": "Spatial Planning",
+    "explain": "All areas, on land and at sea, should be under biodiversity-inclusive spatial planning or effective management, so that the loss of areas of high biodiversity importance is brought close to zero by 2030. Planning must be participatory and respect the rights of indigenous peoples and local communities."
+   },
+   "T2": {
+    "short": "30% Restoration",
+    "explain": "By 2030, at least 30% of degraded terrestrial, inland water, and marine and coastal ecosystems should be under effective restoration, to enhance biodiversity, ecosystem functions and services, ecological integrity and connectivity."
+   },
+   "T3": {
+    "short": "30×30 Conservation",
+    "explain": "This is the famous \"30x30\": by 2030, at least 30% of land (including inland waters) and of marine and coastal areas should be effectively conserved through protected areas and other effective area-based conservation measures (OECMs). It is not just about size: these systems must be ecologically representative, well-connected and equitably governed, and recognize the rights and traditional territories of indigenous peoples. Any use within them must be fully consistent with conservation outcomes."
+   },
+   "T4": {
+    "short": "Species Rescue",
+    "explain": "Take urgent action for threatened species: halt human-induced extinction and reduce extinction risk. Maintain the genetic diversity of wild and domesticated species (including through in situ and ex situ conservation). And manage human-wildlife conflict effectively, for coexistence."
+   },
+   "T5": {
+    "short": "Legal, Sustainable Use",
+    "explain": "The use, harvesting and trade of wild species must be sustainable, safe and legal: no overexploitation, minimal impacts on non-target species and ecosystems, and a lower risk of pathogen spillover from wildlife to people. Customary sustainable use by indigenous peoples and local communities must be respected."
+   },
+   "T6": {
+    "short": "Halve Invasives",
+    "explain": "Reduce the harm caused by invasive alien species: manage introduction pathways, stop priority invasive alien species, cut the rates of introduction and establishment of other invasive species by at least half by 2030, and eradicate or control invasive species in priority sites such as islands."
+   },
+   "T7": {
+    "short": "Cut Pollution",
+    "explain": "By 2030, reduce pollution from all sources to levels that are not harmful to biodiversity, with three concrete targets: cut excess nutrients lost to the environment (e.g. fertilizer) by at least half, cut the overall risk from pesticides and highly hazardous chemicals by at least half, and work towards eliminating plastic pollution."
+   },
+   "T8": {
+    "short": "Climate & Acidification",
+    "explain": "Minimize the impact of climate change and ocean acidification on biodiversity and increase its resilience, including through nature-based solutions. At the same time, climate action itself must not end up harming biodiversity."
+   },
+   "T9": {
+    "short": "Wild Species Management",
+    "explain": "The management and use of wild species must be sustainable, providing social, economic and environmental benefits for people, especially those in vulnerable situations and those most dependent on biodiversity. Customary sustainable use by indigenous peoples and local communities should be protected and encouraged."
+   },
+   "T10": {
+    "short": "Sustainable Production",
+    "explain": "Areas under agriculture, aquaculture, fisheries and forestry must be managed sustainably, with a substantial increase in biodiversity-friendly practices (such as agroecology), making production systems more resilient, with long-term efficiency and productivity, while supporting both food security and biodiversity."
+   },
+   "T11": {
+    "short": "Nature's Contributions",
+    "explain": "Restore and enhance nature's contributions to people, such as the regulation of air, water and climate, soil health, pollination, reduction of disease risk, and protection from natural hazards, mainly through nature-based solutions and/or ecosystem-based approaches."
+   },
+   "T12": {
+    "short": "Urban Green-Blue Space",
+    "explain": "Green and blue spaces in urban and densely populated areas should be bigger, better, more connected and easier to access. Urban planning must be biodiversity-inclusive, enhance native biodiversity, and improve people's health and connection to nature."
+   },
+   "T13": {
+    "short": "Benefit-Sharing",
+    "explain": "Countries must take legal, policy, administrative and capacity-building measures to ensure the fair and equitable sharing of benefits from genetic resources, digital sequence information (DSI) and associated traditional knowledge, and to facilitate appropriate access to genetic resources. By 2030, the benefits shared should increase significantly."
+   },
+   "T14": {
+    "short": "Mainstreaming",
+    "explain": "This is \"mainstreaming\": biodiversity must be integrated into policies, regulations, planning, environmental assessments and national accounting at all levels of government and across all sectors, especially those with significant impacts on biodiversity. Public and private activities and financial flows should be progressively aligned with the Framework."
+   },
+   "T15": {
+    "short": "Business Disclosure",
+    "explain": "Governments must use legal, administrative or policy measures to encourage and enable businesses — and in particular to ensure that large and transnational companies and financial institutions — regularly monitor, assess and transparently disclose their biodiversity risks, dependencies and impacts (including supply chains and portfolios), provide the information consumers need, and report on compliance with access and benefit-sharing regulations."
+   },
+   "T16": {
+    "short": "Sustainable Consumption",
+    "explain": "Make it easier for people to make sustainable consumption choices (through policy, education and accurate information). By 2030, reduce the global footprint of consumption in an equitable manner, including halving global food waste and significantly reducing overconsumption and waste."
+   },
+   "T17": {
+    "short": "Biosafety",
+    "explain": "All countries must establish and implement biosafety measures (Article 8(g) of the Convention) and measures for the handling of biotechnology and distribution of its benefits (Article 19 of the Convention), and strengthen their capacity to do so."
+   },
+   "T18": {
+    "short": "Subsidy Reform",
+    "explain": "Identify incentives, including subsidies, harmful to biodiversity by 2025, then eliminate, phase out or reform them in a just and equitable way, reducing them by at least $500 billion per year by 2030, starting with the most harmful. At the same time, scale up positive incentives for conservation."
+   },
+   "T19": {
+    "short": "Resource Mobilization",
+    "explain": "By 2030, mobilize at least $200 billion per year from all sources to implement national biodiversity strategies and action plans (NBSAPs). This includes international finance from developed to developing countries of at least $20 billion per year by 2025 and at least $30 billion per year by 2030; the rest comes from more domestic resource mobilization, leveraging private finance, innovative financial schemes and more."
+   },
+   "T20": {
+    "short": "Capacity-Building",
+    "explain": "Strengthen capacity-building, technology transfer and technical and scientific cooperation (including South-South, North-South and triangular cooperation), particularly for developing countries; foster joint technology development and joint research programmes; and strengthen scientific research and monitoring capacities."
+   },
+   "T21": {
+    "short": "Access to Knowledge",
+    "explain": "Decision makers, practitioners and the public should all have access to the best available data, information and knowledge to improve governance, management, education and research. The traditional knowledge of indigenous peoples and local communities should only be accessed with their free, prior and informed consent (FPIC), in accordance with national legislation."
+   },
+   "T22": {
+    "short": "Participation & Rights",
+    "explain": "Indigenous peoples and local communities, women and girls, children and youth, and persons with disabilities must be able to participate fully in biodiversity decision-making and have access to information and justice. The rights of indigenous peoples and local communities over lands, territories, resources and traditional knowledge must be respected, and environmental human rights defenders must be protected."
+   },
+   "T23": {
+    "short": "Gender Equality",
+    "explain": "Implement the Framework with gender equality: women and girls should have equal opportunity and capacity to contribute, equal rights and access to land and natural resources, and full participation and leadership at all levels of action, policy and decision-making."
+   }
+  }
+ },
+ "_note": "English overlay for Operation 30×30. Keys mirror the Chinese data files; data.js merges this onto them. Facts are shown as verbatim quotes in English mode."
+}
