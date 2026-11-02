@@ -1,6 +1,6 @@
 // 離線使用：安裝時快取全部檔案。有網路時先抓新版（3 秒逾時就用快取），沒網路時用快取。
 // 更新遊戲檔案後，把 VERSION 加一，舊快取會在啟用時清掉。
-const VERSION = "kmgbf-v2";
+const VERSION = "kmgbf-v3";
 const FILES = [
   "./", "index.html", "game.css", "manifest.json",
   "js/ui.js", "js/engine.js", "js/ai.js", "js/data.js", "js/i18n.js", "js/sound.js",
